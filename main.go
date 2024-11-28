@@ -28,7 +28,7 @@ func main() {
 		fmt.Println(err.Error())
 	}
 	defer db.Close()
-	
+
 	if len(args) > 0 && args[0] == "migrate" {
 		models.InitTables(db)
 		fmt.Println("database updated successfully :)")
@@ -42,7 +42,9 @@ func main() {
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 
 	/* pages handlers */
+	mux.HandleFunc("/", controllers.Home)
 	mux.HandleFunc("/register", controllers.Register)
+	mux.HandleFunc("/login", controllers.Login)
 
 	/* run server */
 	fmt.Printf("server running on http://localhost%s\n", port)
