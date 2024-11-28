@@ -12,11 +12,11 @@ import (
 )
 
 func main() {
-	/* port handlig */
+	/* port handling */
 	args := os.Args[1:]
 	port := ":8000"
 	if len(args) == 1 {
-		port = fmt.Sprintf(":%s",port)
+		port = fmt.Sprintf(":%s", port)
 	} else if len(args) > 1 {
 		fmt.Println("server runnig error You need enter only 1 argument!")
 		os.Exit(1)
@@ -28,20 +28,25 @@ func main() {
 		fmt.Println(err.Error())
 	}
 	defer db.Close()
-	models.InitTables(db)
+	
+	if len(args) > 0 && args[0] == "migrate" {
+		models.InitTables(db)
+		fmt.Println("database updated successfully :)")
+		os.Exit(0)
+	}
 
 	/* router */
 	mux := http.NewServeMux()
 
 	/* run static files */
-	mux.Handle("/static/", http.StripPrefix("/static/",http.FileServer(http.Dir("./static"))))
-	
+	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+
 	/* pages handlers */
-	mux.HandleFunc("/register",controllers.Register)
+	mux.HandleFunc("/register", controllers.Register)
 
 	/* run server */
-	fmt.Printf("server running on http://localhost%s\n",port)
-	server_err := http.ListenAndServe(port,mux)
+	fmt.Printf("server running on http://localhost%s\n", port)
+	server_err := http.ListenAndServe(port, mux)
 	if server_err != nil {
 		fmt.Printf("server runnig error! %v", server_err.Error())
 		os.Exit(1)
