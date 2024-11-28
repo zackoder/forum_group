@@ -10,7 +10,7 @@ import (
 
 func InitTables(db *sql.DB) {
 	UsersTable(db)
-	SessiensTable(db)
+	SessionsTable(db)
 }
 
 func runQuery(db *sql.DB, query string) {
@@ -30,10 +30,10 @@ func UsersTable(db *sql.DB) {
 			password TEXT NOT NULL
 		);
 	`
-	runQuery(db,query)
+	runQuery(db, query)
 }
 
-func SessiensTable(db *sql.DB) {
+func SessionsTable(db *sql.DB) {
 	query := `
 		CREATE TABLE IF NOT EXISTS sessions(
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -41,5 +41,5 @@ func SessiensTable(db *sql.DB) {
 			passkey TEXT NOT NULL UNIQUE
 		)
 	`
-	runQuery(db,query)
+	runQuery(db, query)
 }
