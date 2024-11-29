@@ -7,7 +7,12 @@ import (
 )
 
 func ExecuteTemplate(w http.ResponseWriter, pages []string, data any) {
-	pages = append(pages, "views/base.html")
+	base_pages := []string{
+		"views/components/navbar.html",
+		"views/components/footer.html",
+		"views/base.html",
+	}
+	pages = append(pages, base_pages...)
 	tmpl, err := template.ParseFiles(pages...)
 	if err != nil {
 		fmt.Printf("html page template error: %v", err.Error())

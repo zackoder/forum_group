@@ -3,10 +3,11 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"forum/controllers"
-	"forum/models"
 	"net/http"
 	"os"
+
+	"forum/controllers"
+	"forum/models"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -16,7 +17,7 @@ func main() {
 	args := os.Args[1:]
 	port := ":8000"
 	if len(args) == 1 {
-		port = fmt.Sprintf(":%s", port)
+		port = fmt.Sprintf(":%s", args[0])
 	} else if len(args) > 1 {
 		fmt.Println("server runnig error You need enter only 1 argument!")
 		os.Exit(1)
@@ -35,7 +36,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	/* router */
+	/* server mux router */
 	mux := http.NewServeMux()
 
 	/* run static files */
