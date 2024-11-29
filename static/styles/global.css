@@ -1,0 +1,13 @@
+html {
+    --accent-color: #EF2940;
+    --primary-color: #2B263A;
+    --secondary-color: #7C7C7C;
+    --warning-color: #F2EC60;
+    --light-color: #EEEFF1;
+    font-size: 10px; 
+}
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
