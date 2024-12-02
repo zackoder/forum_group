@@ -43,3 +43,9 @@ func SessionsTable(db *sql.DB) {
 	`
 	runQuery(db, query)
 }
+
+func PostsTable(db *sql.DB)               {}
+func CategoriesTable(db *sql.DB)          {}
+func CommentsTable(db *sql.DB)            {}
+func LikeDislikePostsTable(db *sql.DB)    {}
+func LikeDislikeCommentsTable(db *sql.DB) {}

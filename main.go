@@ -14,12 +14,12 @@ import (
 
 func main() {
 	/* port handling */
-	args := os.Args[1:]
-	port := ":8000"
+	args := os.Args[1:] // user flags here 
+	port := ":8000" // use env variable
 	if len(args) == 1 {
 		port = fmt.Sprintf(":%s", args[0])
 	} else if len(args) > 1 {
-		fmt.Println("server runnig error You need enter only 1 argument!")
+		fmt.Println("server runnig error You need enter only 1 argument!") // use logs here , new logger 
 		os.Exit(1)
 	}
 
@@ -30,7 +30,7 @@ func main() {
 	}
 	defer db.Close()
 
-	if len(args) > 0 && args[0] == "migrate" {
+	if len(args) > 0 && args[0] == "migrate" { // put it in another file hahaha
 		models.InitTables(db)
 		fmt.Println("database updated successfully :)")
 		os.Exit(0)
