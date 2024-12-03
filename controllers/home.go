@@ -11,6 +11,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		utils.ExecuteTemplate(w, []string{"views/pages/error.html"}, nil)
 		return
 	}
+	
 	pages := []string{"views/pages/home.html"}
 	utils.ExecuteTemplate(w, pages, nil)
 }

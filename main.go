@@ -46,6 +46,7 @@ func main() {
 	mux.HandleFunc("/", controllers.Home)
 	mux.HandleFunc("/register", controllers.Register)
 	mux.HandleFunc("/login", controllers.Login)
+	mux.HandleFunc("/add-post", controllers.AddPost)
 
 	/* run server */
 	fmt.Printf("server running on http://localhost%s\n", port)
