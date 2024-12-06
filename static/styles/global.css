@@ -6,6 +6,7 @@ html {
     --warning-color: #F2EC60;
     --light-color: #EEEFF1;
     --poppins-font: "Poppins", serif;
+    --dark-bg: #212121;
     font-size: 16px;
 }
 
@@ -13,6 +14,15 @@ html {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+}
+
+.light {
+    color: var(--primary-color);
+    background-color: var(--light-color);
+}
+.dark {
+    color: var(--light-color);
+    background-color: var(--dark-bg);
 }
 
 body {

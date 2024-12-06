@@ -37,23 +37,25 @@ func SessionsTable(db *sql.DB) {
 	query := `
 		CREATE TABLE IF NOT EXISTS sessions(
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			username TEXT NOT NULL UNIQUE,
-			passkey TEXT NOT NULL UNIQUE
+			user_id INTEGER NOT NULL UNIQUE,
+			passkey TEXT NOT NULL UNIQUE,
+			FOREIGN KEY (user_id) REFERENCES users(id)
 		);
 	`
 	runQuery(db, query)
 }
 
-func PostsTable(db *sql.DB)               { // not complated
+func PostsTable(db *sql.DB)               {
 	query := `
 		CREATE TABLE IF NOT EXISTS posts (
 			id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-			user_id INTEGER -- line not complated,
+			user_id INTEGER NOT NULL,
 			title varchar(250) NOT NULL,
 			content TEXT NOT NULL,
 			image varchar(250),
 			categories TEXT NOT NULL,
-			date DATE NOT NULL
+			date DATE NOT NULL,
+			FOREIGN KEY (user_id) REFERENCES users(id)
 		);
 	`
 	runQuery(db, query)
