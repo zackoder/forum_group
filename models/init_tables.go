@@ -11,6 +11,11 @@ import (
 func InitTables(db *sql.DB) {
 	UsersTable(db)
 	SessionsTable(db)
+	PostsTable(db)
+	CategoriesTable(db)
+	CommentsTable(db)
+	ReactionsTable(db)
+	PostsCategoriesTable(db)
 }
 
 func runQuery(db *sql.DB, query string) {
@@ -45,7 +50,7 @@ func SessionsTable(db *sql.DB) {
 	runQuery(db, query)
 }
 
-func PostsTable(db *sql.DB)               {
+func PostsTable(db *sql.DB) {
 	query := `
 		CREATE TABLE IF NOT EXISTS posts (
 			id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -60,45 +65,60 @@ func PostsTable(db *sql.DB)               {
 	`
 	runQuery(db, query)
 }
-func CategoriesTable(db *sql.DB)          {
+
+func CategoriesTable(db *sql.DB) {
 	query := `
 		CREATE TABLE IF NOT EXISTS categories (
 			id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 			name varchar(255) NOT NULL UNIQUE
 		);
 	`
-	runQuery(db,query)
+	runQuery(db, query)
 }
-func CommentsTable(db *sql.DB)            { // not complated
+
+func CommentsTable(db *sql.DB) {
 	query := `
 		CREATE TABLE IF NOT EXISTS comments (
 			id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-			user_id -- line not complated,
-			post_id -- line not complated,
+			user_id INTEGER NOT NULL,
+			post_id INTEGER NOT NULL,
 			comment TEXT NOT NULL,
-			date DATE NOT NULL
-		);
-	`
-	runQuery(db,query)
-}
-func ReactionsTable(db *sql.DB)    { // not complated
-	query := `
-		CREATE TABLE IF NOT EXISTS reactions (
-			id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-			user_id -- line not complated,
-			post_id -- line not complated,
-			comment_id -- line not complated,
-			type varchar(50) NOT NULL
+			date DATE NOT NULL,
+			FOREIGN KEY (user_id) REFERENCES users(id),
+			FOREIGN KEY (post_id) REFERENCES posts(id)
 		);
 	`
 	runQuery(db, query)
 }
-func PostsCategoriesTable(db *sql.DB) { // not complated
+
+func ReactionsTable(db *sql.DB) {
+	query := `
+		CREATE TABLE IF NOT EXISTS reactions (
+			id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+			user_id INTEGER NOT NULL,
+			post_id INTEGER,
+			comment_id INTEGER,
+			type varchar(50) NOT NULL,
+			FOREIGN KEY (user_id) REFERENCES users(id),
+			FOREIGN KEY (post_id) REFERENCES posts(id),
+			FOREIGN KEY (comment_id) REFERENCES comments(id),
+			CHECK (
+				(post_id IS NULL AND comment_id IS NOT NULL) OR
+				(post_id IS NOT NULL AND comment_id IS NULL)
+			)
+		);
+	`
+	runQuery(db, query)
+}
+
+func PostsCategoriesTable(db *sql.DB) {
 	query := `
 		CREATE TABLE IF NOT EXISTS posts_categories (
-			id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-			post_id -- line not complated,
-			category_id -- line not complated,
+			post_id INTEGER NOT NULL,
+			category_id INTEGER NOT NULL,
+			PRIMARY KEY (post_id,category_id),
+			FOREIGN KEY (post_id) REFERENCES posts(id),
+			FOREIGN KEY (category_id) REFERENCES categories(id)
 		)
 	`
 	runQuery(db, query)
