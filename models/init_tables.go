@@ -44,7 +44,7 @@ func SessionsTable(db *sql.DB) {
 	runQuery(db, query)
 }
 
-func PostsTable(db *sql.DB)               {
+func PostsTable(db *sql.DB)               { // not complated
 	query := `
 		CREATE TABLE IF NOT EXISTS posts (
 			id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -67,7 +67,7 @@ func CategoriesTable(db *sql.DB)          {
 	`
 	runQuery(db,query)
 }
-func CommentsTable(db *sql.DB)            {
+func CommentsTable(db *sql.DB)            { // not complated
 	query := `
 		CREATE TABLE IF NOT EXISTS comments (
 			id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -79,7 +79,7 @@ func CommentsTable(db *sql.DB)            {
 	`
 	runQuery(db,query)
 }
-func ReactionsTable(db *sql.DB)    {
+func ReactionsTable(db *sql.DB)    { // not complated
 	query := `
 		CREATE TABLE IF NOT EXISTS reactions (
 			id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -91,7 +91,7 @@ func ReactionsTable(db *sql.DB)    {
 	`
 	runQuery(db, query)
 }
-func PostsCategoriesTable(db *sql.DB) {
+func PostsCategoriesTable(db *sql.DB) { // not complated
 	query := `
 		CREATE TABLE IF NOT EXISTS posts_categories (
 			id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
