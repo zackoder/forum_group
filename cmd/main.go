@@ -8,6 +8,7 @@ import (
 
 	"forum/controllers"
 	"forum/models"
+	"forum/utils"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -17,12 +18,13 @@ func main() {
 	port := ":8000" // use env variable
 
 	/* init database tables */
-	db, err := sql.Open("sqlite3", "./database.sqlite")
+	var err error
+	utils.DB, err = sql.Open("sqlite3", "./database.sqlite")
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-	defer db.Close()
-	models.InitTables(db)
+	defer utils.DB.Close()
+	models.InitTables(utils.DB)
 
 	/* server mux router */
 	mux := http.NewServeMux()
