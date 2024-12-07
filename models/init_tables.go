@@ -21,6 +21,7 @@ func InitTables(db *sql.DB) {
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			user_id INTEGER NOT NULL UNIQUE,
 			token varchar(255) NOT NULL UNIQUE,
+			date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			FOREIGN KEY (user_id) REFERENCES users(id)
 		);
 
