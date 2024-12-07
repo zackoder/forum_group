@@ -14,14 +14,7 @@ import (
 
 func main() {
 	/* port handling */
-	args := os.Args[1:] // user flags here
-	port := ":8000"     // use env variable
-	if len(args) == 1 {
-		port = fmt.Sprintf(":%s", args[0])
-	} else if len(args) > 1 {
-		fmt.Println("server runnig error You need enter only 1 argument!") // use logs here , new logger
-		os.Exit(1)
-	}
+	port := ":8000" // use env variable
 
 	/* init database tables */
 	db, err := sql.Open("sqlite3", "./database.sqlite")

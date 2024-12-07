@@ -12,15 +12,15 @@ func InitTables(db *sql.DB) {
 	query := `
 		CREATE TABLE IF NOT EXISTS users(
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			username TEXT NOT NULL,
-			email TEXT NOT NULL UNIQUE,
-			password TEXT NOT NULL
+			username varchar(255) NOT NULL,
+			email varchar(255) NOT NULL UNIQUE,
+			password varchar(255) NOT NULL
 		);
 
 		CREATE TABLE IF NOT EXISTS sessions(
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			user_id INTEGER NOT NULL UNIQUE,
-			token TEXT NOT NULL UNIQUE,
+			token varchar(255) NOT NULL UNIQUE,
 			FOREIGN KEY (user_id) REFERENCES users(id)
 		);
 
