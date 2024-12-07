@@ -28,24 +28,24 @@ type Comment struct {
 }
 
 type Post struct {
-	Id int
-	UserId int
-	Title string
-	Content string
-	Image string
+	Id         int
+	UserId     int
+	Title      string
+	Content    string
+	Image      string
 	Categories string
-	Date string
+	Date       string
 }
 
 type Reaction struct {
-	Id int
-	UserId int
-	PostId int
+	Id        int
+	UserId    int
+	PostId    int
 	CommentId int
-	Type string
+	Type      string
 }
 
 type PostCategory struct {
-	PostId int
+	PostId     int
 	CategoryId int
 }
