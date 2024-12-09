@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"fmt"
-	"log"
 	"net/http"
 
 	"forum/utils"
@@ -13,7 +11,13 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		utils.ExecuteTemplate(w, []string{"views/pages/error.html"}, nil)
 		return
 	}
-	query := `SELECT * FROM categories;`
+
+	pages := []string{"views/pages/home.html"}
+	utils.ExecuteTemplate(w, pages, nil)
+}
+
+/*
+query := `SELECT * FROM categories;`
 	rows, err := utils.DB.Query(query)
 	if err != nil {
 		log.Println(err.Error())
@@ -30,6 +34,4 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		categories = append(categories, category)
 	}
 	fmt.Println(categories)
-	pages := []string{"views/pages/home.html"}
-	utils.ExecuteTemplate(w, pages, nil)
-}
+*/
