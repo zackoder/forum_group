@@ -12,7 +12,7 @@ func main() {
 	port := ":8080"
 	mux := http.NewServeMux()
 	mux.HandleFunc("/api/comments", handlers.Comments)
-	mux.HandleFunc("/api/posts", handlers.Posts)
+	mux.HandleFunc("/api/posts", handlers.FetchPosts)
 	mux.HandleFunc("/api/reaction", handlers.Reactions)
 
 	/* run server */
