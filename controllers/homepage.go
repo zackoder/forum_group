@@ -3,8 +3,9 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-	"forum/utils"
 	"net/http"
+
+	"forum/utils"
 )
 
 func HomePage(w http.ResponseWriter, r *http.Request) {
@@ -18,28 +19,28 @@ func HomePage(w http.ResponseWriter, r *http.Request) {
 	// 	return
 	// }
 	var isConnected bool
-	cookie, err := r.Cookie("token") //Name the cookie
+	cookie, err := r.Cookie("token") // Name the cookie
 	if err != nil {
 		isConnected = false
 	} else {
 		isConnected = true
 		name := ""
 		var userId int
-		if err := db.DB.QueryRow(`SELECT user_id FROM sessions WHERE token =?`, cookie.Value).Scan(&userId); err != nil {
+		if err := utils.DB.QueryRow(`SELECT user_id FROM sessions WHERE token =?`, cookie.Value).Scan(&userId); err != nil {
 			isConnected = false
 		}
-		if err := db.DB.QueryRow(`SELECT username FROM users WHERE id =?`, userId).Scan(&name); err != nil {
-			//http.Error(w, "Not Found this User", http.StatusInternalServerError)
+		if err := utils.DB.QueryRow(`SELECT username FROM users WHERE id =?`, userId).Scan(&name); err != nil {
+			// http.Error(w, "Not Found this User", http.StatusInternalServerError)
 			fmt.Println("Not Found user Name")
 			isConnected = false
 		}
 
 	}
 
-	//query := `SELECT id, user_id, title, content FROM posts ORDER BY id DESC LIMIT 20`
+	// query := `SELECT id, user_id, title, content FROM posts ORDER BY id DESC LIMIT 20`
 	query := "SELECT id, user_id, title, content FROM posts ORDER BY id DESC LIMIT 20"
 
-	rows, err := db.DB.Query(query)
+	rows, err := utils.DB.Query(query)
 	if err != nil {
 		http.Error(w, "Post Not Found", http.StatusInternalServerError)
 		return
@@ -53,15 +54,16 @@ func HomePage(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
-		if err := db.DB.QueryRow("SELECT username FROM users WHERE id =?", userId).Scan(&post.UserName); err != nil {
+		if err := utils.DB.QueryRow("SELECT username FROM users WHERE id =?", userId).Scan(&post.Username); err != nil {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
 		Posts = append(Posts, post)
 
 	}
-	if isConnected {}
+	if isConnected {
+	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(Posts) // create struct data
-	//tmpl.Execute(w, Posts)
+	// tmpl.Execute(w, Posts)
 }

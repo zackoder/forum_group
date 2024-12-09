@@ -30,6 +30,7 @@ type Comment struct {
 type Post struct {
 	Id         int
 	UserId     int
+	Username   string
 	Title      string
 	Content    string
 	Image      string
