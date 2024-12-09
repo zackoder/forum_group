@@ -29,8 +29,10 @@ func main() {
 	/* server mux router */
 	mux := http.NewServeMux()
 	/* run static files */
-	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
-
+	// mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+	mux.HandleFunc("/scripts/", controllers.Server)
+	mux.HandleFunc("/styles/", controllers.Server)
+	mux.HandleFunc("/images/", controllers.Server)
 	/* pages handlers */
 	mux.HandleFunc("/", controllers.Home)
 	mux.HandleFunc("/register", controllers.Register)
