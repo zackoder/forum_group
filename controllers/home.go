@@ -11,8 +11,21 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		utils.ExecuteTemplate(w, []string{"views/pages/error.html"}, nil)
 		return
 	}
+	user_id_cookie := http.Cookie{
+		Name: "user_id",
+		Value: "1",
+	}
+	user_token_cookie := http.Cookie{
+		Name: "user_token",
+		Value: "123456789",
+	}
+	http.SetCookie(w,&user_id_cookie)
+	http.SetCookie(w,&user_token_cookie)
 
-	pages := []string{"views/pages/home.html"}
+	pages := []string{
+		"views/pages/home.html",
+		"views/components/new_comment.html",
+	}
 	utils.ExecuteTemplate(w, pages, nil)
 }
 
