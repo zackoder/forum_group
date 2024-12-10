@@ -1,26 +1,37 @@
-{{define "style"}}
-<link rel="stylesheet" href="/static/styles/login.css">
-{{end}}
-{{define "title"}}Login{{end}}
-{{define "content"}}
-<div class="grip">
-    <div class="form">
-        <h1>Log_in</h1>
-        <form action="" method="post" onsubmit="validlogin(event)">
+<!DOCTYPE html>
+<html lang="en">
 
-            <label for="email">EMAIL:</label>
-            <input type="text" name="email" id="email">
-            <p id="errorUsername"></p>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/styles/login.css">
+    {{define "title"}}Login{{end}}
+</head>
 
-            <label for="password">PASSWORD:</label>
-            <input type="password" name="password" id="password">
-            <p id="errorPassword"></p>
+<body>
+    {{ template "navbar" }}
+    {{define "content"}}
+    <div class="grip">
+        <div class="form">
+            <h1>Log_in</h1>
+            <form action="" method="post" onsubmit="validlogin(event)">
 
-            <button type="submit">SUBMIT</button>
-        </form>
+                <label for="email">EMAIL:</label>
+                <input type="text" name="email" id="email">
+                <p id="errorUsername"></p>
+
+                <label for="password">PASSWORD:</label>
+                <input type="password" name="password" id="password">
+                <p id="errorPassword"></p>
+
+                <button type="submit">SUBMIT</button>
+            </form>
+        </div>
     </div>
-</div>
-{{end}}
-{{define "script"}}
-<script src="/static/scripts/login.js"></script>
-{{end}}
+    {{end}}
+    {{define "script"}}
+    <script src="/static/scripts/login.js"></script>
+    {{end}}
+</body>
+
+</html>
