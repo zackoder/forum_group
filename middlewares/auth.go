@@ -1,22 +1,25 @@
 package middlewares
 
 import (
-	"fmt"
 	"net/http"
+
+	"forum/utils"
 )
 
 func Permission(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var (
-			token *http.Cookie
-			err   error
-		)
-		token, err = r.Cookie("user_token")
+		token, err := r.Cookie("token")
 		if err != nil {
-			fmt.Printf("%v", err.Error())
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
 			return
 		}
-		fmt.Printf("token: %v\n", token.Value)
+		query := `SELECT user_id FROM sessions WHERE token=?;`
+		var user_id int
+		row_err := utils.DB.QueryRow(query, token.Value).Scan(&user_id)
+		if row_err != nil {
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
 		next(w, r)
 	}
 }

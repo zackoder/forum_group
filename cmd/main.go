@@ -34,8 +34,8 @@ func main() {
 
 	/* pages handlers */
 	mux.HandleFunc("/", controllers.Home)
-	mux.HandleFunc("/register", controllers.Register)
-	mux.HandleFunc("/login", middlewares.Permission(controllers.Login))
+	mux.HandleFunc("/register", middlewares.Permission(controllers.Register))
+	mux.HandleFunc("/login", controllers.Login)
 	mux.HandleFunc("/add-post", middlewares.Permission(controllers.AddPost))
 	mux.HandleFunc("/comment", middlewares.Permission(controllers.Comments))
 
