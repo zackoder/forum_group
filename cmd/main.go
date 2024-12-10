@@ -34,10 +34,10 @@ func main() {
 
 	/* pages handlers */
 	mux.HandleFunc("/", controllers.Home)
-	mux.HandleFunc("/register", middlewares.Permission(controllers.Register))
+	mux.HandleFunc("/register", middlewares.Authorization(controllers.Register))
 	mux.HandleFunc("/login", controllers.Login)
-	mux.HandleFunc("/add-post", middlewares.Permission(controllers.AddPost))
-	mux.HandleFunc("/comment", middlewares.Permission(controllers.Comments))
+	mux.HandleFunc("/add-post", middlewares.Authorization(controllers.AddPost))
+	mux.HandleFunc("/comment", middlewares.Authorization(controllers.Comments))
 
 	/* run server */
 	fmt.Printf("server running on http://localhost%s\n", port)

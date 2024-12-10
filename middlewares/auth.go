@@ -6,7 +6,7 @@ import (
 	"forum/utils"
 )
 
-func Permission(next http.HandlerFunc) http.HandlerFunc {
+func Authorization(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		token, err := r.Cookie("token")
 		if err != nil {
