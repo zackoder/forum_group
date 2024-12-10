@@ -11,7 +11,7 @@ html, body {
     display: flex; 
     justify-content: center; 
     align-items: center;
-    background-color: #e1e3e6;
+    background-color: #ffffff;
     height: 100%;
   
 }
@@ -19,10 +19,13 @@ html, body {
 
     width: 35%;
     height: auto;
-    border: 1px solid rgb(0, 47, 255);
+    color: #2867c5;
+    border: 1px solid rgb(0, 50, 124);
     border-radius: 25px;
+    backdrop-filter: blur(5px);
     justify-items: center; 
     align-content: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.06);
 
 }
 h1{
@@ -34,10 +37,13 @@ form{
 
 label{
     font-size: 25px;
+    color: #2867c5;
 }
 input{
     height: 35px;
     width: 400px;
+
+    border: #2867c5 solid 1px;
     border-radius: 25px;
     margin-bottom: 3%;
     padding-left: 4%;
@@ -50,14 +56,14 @@ button{
     padding: 2%;
     margin: 0 35% ;
     border-radius: 25px;
-    background-color: rgb(2, 165, 2);
+    background-color: rgb(37, 132, 221);
     padding: 2% 7%;
-    color: #e1e3e6;
+    color: white;
 }
 
 
 a{
-    color: #0023be;
-    text-decoration: none;
-    font-size: 20px;
+    padding-top: 10px;
+    display: flex;
+    justify-content: center;
 }

@@ -2,25 +2,24 @@
 <link rel="stylesheet" href="/static/styles/login.css">
 {{end}}
 {{define "title"}}Login{{end}}
-{{define "content"}} 
-<div class="card">
-    <div class="card-title">
-        <h1>login</h1>
-    </div>
-    <div class="card-body">
-        <form action="" method="post">
-            <div class="">
-                <label for="email">EMAIL:</label>
-                <input type="text" name="email" id="email">
-            </div>
-            <div class="">
-                <label for="password">PASSWORD:</label>
-                <input type="password" name="password" id="password">
-            </div>
+{{define "content"}}
+<div class="grip">
+    <div class="form">
+        <h1>Log_in</h1>
+        <form action="" method="post" onsubmit="validlogin(event)">
+
+            <label for="email">EMAIL:</label>
+            <input type="text" name="email" id="email">
+            <p id="errorUsername"></p>
+
+            <label for="password">PASSWORD:</label>
+            <input type="password" name="password" id="password">
+            <p id="errorPassword"></p>
+
             <button type="submit">SUBMIT</button>
         </form>
     </div>
-</div> 
+</div>
 {{end}}
 {{define "script"}}
 <script src="/static/scripts/login.js"></script>
