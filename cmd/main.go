@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"forum/controllers"
+	"forum/middlewares"
 	"forum/models"
 	"forum/utils"
 
@@ -34,9 +35,9 @@ func main() {
 	/* pages handlers */
 	mux.HandleFunc("/", controllers.Home)
 	mux.HandleFunc("/register", controllers.Register)
-	mux.HandleFunc("/login", controllers.Login)
-	mux.HandleFunc("/add-post", controllers.AddPost)
-	mux.HandleFunc("/comment", controllers.Comments)
+	mux.HandleFunc("/login", middlewares.Permission(controllers.Login))
+	mux.HandleFunc("/add-post", middlewares.Permission(controllers.AddPost))
+	mux.HandleFunc("/comment", middlewares.Permission(controllers.Comments))
 
 	/* run server */
 	fmt.Printf("server running on http://localhost%s\n", port)
