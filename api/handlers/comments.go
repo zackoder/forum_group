@@ -20,6 +20,12 @@ func Comments(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("query error!")
 		return
 	}
+	c, er := r.Cookie("user_token")
+	if er != nil {
+		fmt.Println(er)
+		return
+	}
+	fmt.Println(c.Value)
 	for rows.Next() {
 		var comment utils.Comment
 		if cm_err := rows.Scan(&comment.Comment); cm_err != nil {
