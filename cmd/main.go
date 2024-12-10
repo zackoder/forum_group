@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"forum/controllers"
+	"forum/middlewares"
 	"forum/models"
 	"forum/utils"
 
@@ -34,7 +35,7 @@ func main() {
 	/* pages handlers */
 	mux.HandleFunc("/", controllers.Home)
 	mux.HandleFunc("/register", controllers.Register)
-	mux.HandleFunc("/login", controllers.Login)
+	mux.HandleFunc("/login", middlewares.Permission(controllers.Login))
 	mux.HandleFunc("/add-post", controllers.AddPost)
 	mux.HandleFunc("/comment", controllers.Comments)
 
