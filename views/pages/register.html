@@ -6,22 +6,26 @@
         <h1>register</h1>
     </div>
     <div class="card-body">
-        <form action="" method="post">
+        <form action="" method="post" onsubmit="validregister(event)">
             <div class="">
                 <label for="username">USERNAME:</label>
                 <input type="text" name="username" id="username">
+                <p id="errorUsername"></p>
             </div>
             <div class="">
                 <label for="email">EMAIL:</label>
                 <input type="text" name="email" id="email">
+                <p id="erroremail"></p>
             </div>
             <div class="">
                 <label for="password">PASSWORD:</label>
                 <input type="password" name="password" id="password">
+                <p id="errorPassword"></p>
             </div>
             <div class="">
                 <label for="password2">REPEAT PASSWORD:</label>
                 <input type="password" name="password2" id="password2">
+                <p id="errorPassword_config"></p>
             </div>
             <button type="submit">SUBMIT</button>
         </form>
