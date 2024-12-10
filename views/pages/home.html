@@ -1,8 +1,33 @@
-{{define "style"}}
-<link rel="stylesheet" href="style.css">
-{{end}}
-{{define "title"}}FORUM{{end}}
-{{define "content"}} 
-<h1>home page!</h1>
-{{end}}
-{{define "script"}}{{end}}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/static/styles/home.css">
+    <title>Forum</title>
+  </head>
+  <body>
+    {{ template "navbar" }} {{ if .Logdin }}
+    <div class="lay-out"></div>
+    <h1 class="greeting">Welcome, {{.Name}}</h1>
+    <button class="show-postForm">hi</button>
+    <form class="postForm" action="/posts" method="post">
+      <label class="create_Post" for="post">Create Post:</label>
+      <input
+        class="title_inpt"
+        type="text"
+        id="post"
+        name="title"
+        placeholder="Post Title"
+        required
+      />
+      <textarea class="post_contant" name="content" id="content"></textarea>
+      <input name="filename" type="file" />
+      <button type="submit">Submit</button>
+    </form>
+    {{end}}
+    <section id="posts-container"></section>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-min.js"></script>
+    <script src="/static/scripts/posts.js"></script>
+  </body>
+</html>
