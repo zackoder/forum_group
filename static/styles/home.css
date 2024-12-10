@@ -1,0 +1,164 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--background-color);
+}
+
+
+.greeting {
+  width: 50%;
+  text-align: center;
+  padding: 150px 0 25px ;
+}
+
+.title {
+  font-size: 20px;
+}
+
+.post-container {
+  box-shadow: 0 0 10px 2px rgb(65, 65, 65);
+  width: 60%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  margin: 40px auto;
+  background-color: white;
+  padding: 10px 10px 30px 10px;
+  border-radius: 8px;
+}
+
+.post-container .pc {
+  border: 1px black solid;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.poster {
+  padding: 10px 0 15px 10px;
+  color: rgb(5, 5, 5);
+  position: relative;
+}
+
+.poster img {
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
+}
+
+.like-dislike-container {
+  width: 100%;
+}
+
+.like-btn,
+.dislike-btn {
+  margin-left: 10px;
+  font-size: 18px;
+  width: 60px;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 8px;
+  transition: background-color 200ms ease;
+  background-color: none;
+}
+
+span {
+  margin-left: 15px;
+  position: absolute;
+  top: 25px;
+}
+
+.content {
+  height: 300px;
+  padding: 10px 0 0 10px;
+}
+
+.comment_form {
+  margin-top: 10px;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-direction: row;
+  width: 100%;
+  padding-left: 10px;
+}
+
+.comment {
+  width: 90%;
+  height: 30px;
+  padding-left: 5px;
+  border-radius: 8px;
+}
+
+.send_comment {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+}
+
+.sendimg {
+  background-color: transparent;
+  width: 25px;
+  height: 25px;
+  margin-left: -4px;
+  margin-bottom: -4px;
+  filter: drop-shadow(0 0 4px black);
+}
+
+.postForm {
+  display: none;
+  height: 300px;
+  width: 600px;
+  flex-direction: column;
+  margin: auto;
+  gap: 20px;
+  border: none;
+  padding: 20px;
+  z-index: 10;
+  background-color: white;
+  box-shadow: var(--shadow);
+  border-radius: 8px;
+  border: 1px solid black;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.show-postForm {
+  width: 20px;
+  
+}
+
+.lay-out {
+  display: none;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(67, 67, 67, 0.527);
+  z-index: 5;
+}
+
+.title_inpt {
+  height: 30px;
+  padding: 8px;
+  border-radius: 8px;
+}
+
+.create_Post {
+  text-align: center;
+  font-size: 22px;
+  letter-spacing: 3px;
+}
+
+.post_contant {
+  height: 90px;
+  border-radius: 8px;
+  padding: 8px;
+  resize: none;
+}
