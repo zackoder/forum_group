@@ -1,4 +1,4 @@
-package handlers
+package api
 
 import (
 	"encoding/json"
@@ -20,7 +20,7 @@ func Comments(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("query error!")
 		return
 	}
-	c, er := r.Cookie("user_token")
+	c, er := r.Cookie("token")
 	if er != nil {
 		fmt.Println(er)
 		return

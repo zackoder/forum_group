@@ -1,4 +1,4 @@
-package controllers
+package api
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"forum/utils"
 )
 
-func Comments(w http.ResponseWriter, r *http.Request) {
+func NewComment(w http.ResponseWriter, r *http.Request) {
 	var comment utils.Comment
 	if r.Method != "POST" {
 		fmt.Println("error method not allowd!")
@@ -19,7 +19,6 @@ func Comments(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	postId := r.PathValue("PostId")
-	fmt.Println(postId)
 	var postIdErr error
 	comment.PostId, postIdErr = strconv.Atoi(postId)
 	if postIdErr != nil || !CheckPost(comment.PostId) {
@@ -27,12 +26,11 @@ func Comments(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	getUserIdQuery := `SELECT user_id FROM sessions WHERE token=?;`
-	queryErr := utils.DB.QueryRow(getUserIdQuery, token).Scan(&comment.UserId)
+	queryErr := utils.DB.QueryRow(getUserIdQuery, token.Value).Scan(&comment.UserId)
 	if queryErr != nil {
 		fmt.Println(queryErr.Error())
 		return
 	}
-	comment.PostId = 1
 	comment.Comment = r.FormValue("comment")
 	query := `INSERT INTO comments VALUES (NULL,?,?,?,NULL);`
 	_, err := utils.DB.Exec(query, comment.UserId, comment.PostId, comment.Comment)

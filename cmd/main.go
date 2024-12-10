@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	"forum/api"
 	"forum/controllers"
 	"forum/middlewares"
 	"forum/models"
@@ -37,7 +38,13 @@ func main() {
 	mux.HandleFunc("/register", middlewares.Authorization(controllers.Register))
 	mux.HandleFunc("/login", controllers.Login)
 	mux.HandleFunc("/add-post", middlewares.Authorization(controllers.AddPost))
-	mux.HandleFunc("/comment", middlewares.Authorization(controllers.Comments))
+	// mux.HandleFunc("/comment", middlewares.Authorization(controllers.Comments))
+
+	/* api handlers */
+	mux.HandleFunc(`/api/{PostId}/comments`, api.Comments)
+	mux.HandleFunc("/api/posts", api.Posts)
+	mux.HandleFunc("/api/reaction", api.Reactions)
+	mux.HandleFunc("/api/{PostId}/comment/new", middlewares.Authorization(api.NewComment))
 
 	/* run server */
 	fmt.Printf("server running on http://localhost%s\n", port)
