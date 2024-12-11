@@ -7,6 +7,8 @@ import (
 	"strings"
 
 	"forum/utils"
+
+	"github.com/gofrs/uuid"
 )
 
 func Register(w http.ResponseWriter, r *http.Request) {
@@ -45,33 +47,53 @@ func SingUp(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(map[string]string{"error": "sorry but there are error in server try anther time"})
 		return
 	}
-	statuscode, err := Insert(user)
+	statuscode, userId, err := Insert(user)
 	if err != nil {
 		w.WriteHeader(statuscode)
 		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
 	}
+	uid, err := uuid.NewV4()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "there are error in server try later please")
+		return
+	}
+	err = CraeteSession(userId, uid.String())
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "there are error in server try later please")
+		return
+	}
+	http.SetCookie(w, &http.Cookie{
+		Name:     "token",
+		Value:    uid.String(),
+		MaxAge:   300,
+		HttpOnly: true,
+		Path:     "/",
+	})
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{"status": "user insert into database"})
 }
 
-func Insert(user utils.User) (int, error) {
+func Insert(user utils.User) (int, int, error) {
 	query := `INSERT INTO user (user_name , email , passwd) 
 		VALUES (?, ? , ?)
 	`
 	stmt, err := utils.DB.Prepare(query)
 	if err != nil {
-		return http.StatusInternalServerError, fmt.Errorf("sorry but there are error in server try anther time")
+		return http.StatusInternalServerError, -1, fmt.Errorf("sorry but there are error in server try anther time")
 	}
 	defer stmt.Close()
-	_, err = stmt.Exec(user.Username, user.Email, user.Password)
+	res, err := stmt.Exec(user.Username, user.Email, user.Password)
 	if err == nil {
-		return http.StatusOK, nil
+		latdID, _ := res.LastInsertId()
+		return http.StatusOK, int(latdID), nil
 	}
 	if strings.Contains(err.Error(), "user_name") {
-		return http.StatusFound, fmt.Errorf("user name already used try anther user name")
+		return http.StatusFound, -1, fmt.Errorf("user name already used try anther user name")
 	} else if strings.Contains(err.Error(), "email") {
-		return http.StatusFound, fmt.Errorf("email already used try anther email")
+		return http.StatusFound, -1, fmt.Errorf("email already used try anther email")
 	}
-	return http.StatusInternalServerError, fmt.Errorf("sorry but there are error in server try anther time")
+	return http.StatusInternalServerError, -1, fmt.Errorf("sorry but there are error in server try anther time")
 }
