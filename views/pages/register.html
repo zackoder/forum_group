@@ -1,32 +1,34 @@
-{{define "style"}}{{end}}
-{{define "title"}}Register{{end}}
+{{define "style"}}
+<link rel="stylesheet" href="/static/styles/login.css">
+{{end}}
+{{define "title"}}Login{{end}}
 {{define "content"}}
-<div class="card">
-    <div class="card-title">
-        <h1>register</h1>
-    </div>
-    <div class="card-body">
-        <form action="" method="post">
-            <div class="">
-                <label for="username">USERNAME:</label>
-                <input type="text" name="username" id="username">
-            </div>
-            <div class="">
-                <label for="email">EMAIL:</label>
-                <input type="text" name="email" id="email">
-            </div>
-            <div class="">
-                <label for="password">PASSWORD:</label>
-                <input type="password" name="password" id="password">
-            </div>
-            <div class="">
-                <label for="password2">REPEAT PASSWORD:</label>
-                <input type="password" name="password2" id="password2">
-            </div>
-            <button type="submit">SUBMIT</button>
-        </form>
-    </div>
-</div> 
+
+<div class="form">
+    <h1 class="minititle">Register</h1>
+    <form action="/RegisterUser" method="post" onsubmit="validregister(event)">
+        <label class="lbl" for="usename">usename</label> <br>
+        <input class="impt" type="text" name="username" id="username">
+        <p id="errorUsername"></p>
+
+        <label class="lbl" for="email">email</label><br>
+        <input class="impt" type="email" name="email" id="email">
+        <p id="erroremail"></p>
+
+        <label class="lbl" for="password">password</label> <br>
+        <input class="impt" type="password" name="password" id="password">
+        <p id="errorPassword"></p>
+
+        <label class="lbl" for="password_config">password_config</label> <br>
+        <input class="impt" type="password" name="password_config" id="password_config">
+        <p id="errorPassword_config"></p>
+
+
+        <button type="submit" class="submit">submit</button>
+
+    </form>
+</div>
+
 {{end}}
 {{define "script"}}
 <script src="/static/scripts/register.js"></script>

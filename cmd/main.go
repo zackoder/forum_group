@@ -33,7 +33,7 @@ func main() {
 	mux.HandleFunc("/static/", controllers.Server)
 	/* pages handlers */
 	mux.HandleFunc("/", controllers.Home)
-	mux.HandleFunc("/register", middlewares.Authorization(controllers.Register))
+	mux.HandleFunc("/register", controllers.Register)
 	mux.HandleFunc("/login", controllers.Login)
 	mux.HandleFunc("/add-post", middlewares.Authorization(controllers.AddPost))
 	// mux.HandleFunc("/comment", middlewares.Authorization(controllers.Comments))
