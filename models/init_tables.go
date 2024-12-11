@@ -32,7 +32,7 @@ func InitTables(db *sql.DB) {
 			content TEXT NOT NULL,
 			image varchar(250),
 			categories TEXT NOT NULL,
-			date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			date TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
 			FOREIGN KEY (user_id) REFERENCES users(id)
 		);
 		
@@ -46,7 +46,7 @@ func InitTables(db *sql.DB) {
 			user_id INTEGER NOT NULL,
 			post_id INTEGER NOT NULL,
 			comment TEXT NOT NULL,
-			date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			date TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
 			FOREIGN KEY (user_id) REFERENCES users(id),
 			FOREIGN KEY (post_id) REFERENCES posts(id)
 		);

@@ -63,8 +63,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func SingIn(w http.ResponseWriter, r *http.Request) {
-}
+// func SingIn(w http.ResponseWriter, r *http.Request) {
+// }
 
 func Select(userIfo, passwd string) (int, error) {
 	query := `SELECT id , password FROM users

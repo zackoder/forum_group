@@ -32,7 +32,7 @@ func NewComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	comment.Comment = r.FormValue("comment")
-	query := `INSERT INTO comments VALUES (NULL,?,?,?,NULL);`
+	query := `INSERT INTO comments(user_id,post_id,comment) VALUES (?,?,?);`
 	_, err := utils.DB.Exec(query, comment.UserId, comment.PostId, comment.Comment)
 	if err != nil {
 		fmt.Println(err.Error())
