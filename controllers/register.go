@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
@@ -13,71 +12,77 @@ import (
 
 func Register(w http.ResponseWriter, r *http.Request) {
 	pages := []string{"views/pages/register.html"}
-	utils.ExecuteTemplate(w, pages, nil)
-}
-
-func SingUp(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
-		return
-	} else if r.Method != http.MethodPost {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		json.NewEncoder(w).Encode(map[string]string{"error": "method not allown"})
-		return
+		utils.ExecuteTemplate(w, pages, nil)
+	} else if r.Method == http.MethodPost {
+		user := utils.User{}
+		user.Email = r.FormValue("email")
+		user.Password = r.FormValue("password")
+		user.Username = r.FormValue("username")
+		confPass := r.FormValue("password_config")
+		if user.Email == "" || user.Password == "" || user.Username == "" || user.Password != confPass {
+			fmt.Println(user.Email == "", user.Password == "", user.Username == "", user.Password != confPass)
+			w.WriteHeader(http.StatusBadRequest)
+			utils.ExecuteTemplate(w, pages, utils.Error{
+				ErrorMs: "invalid Input for register",
+			})
+			return
+		}
+		if !IsValidUsername(user.Username) || !IsValidEmail(user.Email) {
+			w.WriteHeader(http.StatusBadRequest)
+			utils.ExecuteTemplate(w, pages, utils.Error{
+				ErrorMs: "invalid Input for register",
+			})
+			fmt.Println("ok 1")
+			return
+		}
+		fmt.Println("here")
+		var err error
+		user.Password, err = HasPassowd(user.Password)
+		fmt.Println("ok")
+		if err != nil {
+			fmt.Println(err)
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+		statuscode, userId, err := Insert(user)
+		if err != nil {
+			fmt.Println(err)
+			if statuscode == http.StatusInternalServerError {
+				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+				return
+			}
+			w.WriteHeader(statuscode)
+			utils.ExecuteTemplate(w, pages, utils.Error{
+				ErrorMs: err.Error(),
+			})
+			return
+		}
+		uid, err := uuid.NewV4()
+		if err != nil {
+			fmt.Println(err)
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+		err = CraeteSession(userId, uid.String())
+		if err != nil {
+			fmt.Println(err)
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+		http.SetCookie(w, &http.Cookie{
+			Name:     "token",
+			Value:    uid.String(),
+			MaxAge:   300,
+			HttpOnly: true,
+			Path:     "/",
+		})
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}
-	user := utils.User{}
-	err := json.NewDecoder(r.Body).Decode(&user)
-	w.Header().Add("Content-type", "application/json")
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]string{"error": "invalid input for logup"})
-		return
-	} else if user.Email == "" || user.Password == "" || user.Username == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]string{"error": "invalid input for logup"})
-		return
-	}
-	if !IsValidUsername(user.Username) || !IsValidEmail(user.Email) {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]string{"error": "check you input , invalid input"})
-		return
-	}
-	user.Password, err = HasPassowd(user.Password)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]string{"error": "sorry but there are error in server try anther time"})
-		return
-	}
-	statuscode, userId, err := Insert(user)
-	if err != nil {
-		w.WriteHeader(statuscode)
-		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
-		return
-	}
-	uid, err := uuid.NewV4()
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "there are error in server try later please")
-		return
-	}
-	err = CraeteSession(userId, uid.String())
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "there are error in server try later please")
-		return
-	}
-	http.SetCookie(w, &http.Cookie{
-		Name:     "token",
-		Value:    uid.String(),
-		MaxAge:   300,
-		HttpOnly: true,
-		Path:     "/",
-	})
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{"status": "user insert into database"})
 }
 
 func Insert(user utils.User) (int, int, error) {
-	query := `INSERT INTO user (user_name , email , passwd) 
+	query := `INSERT INTO users (username , email , password) 
 		VALUES (?, ? , ?)
 	`
 	stmt, err := utils.DB.Prepare(query)

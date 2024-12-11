@@ -1,5 +1,5 @@
 function validregister(e) {
-    e.preventDefault();
+    // e.preventDefault();
 
     var username = document.getElementById("username");
     var email = document.getElementById("email");

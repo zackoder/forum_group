@@ -36,10 +36,12 @@ func main() {
 	mux.HandleFunc("/register", controllers.Register)
 	mux.HandleFunc("/login", controllers.Login)
 	mux.HandleFunc("/add-post", middlewares.Authorization(controllers.AddPost))
+
+
 	// mux.HandleFunc("/comment", middlewares.Authorization(controllers.Comments))
 
-	/* api handlers */
-	mux.HandleFunc("/user/singup", controllers.SingIn)
+
+	
 	mux.HandleFunc(`/api/{PostId}/comments`, api.Comments)
 	mux.HandleFunc("/api/posts", api.Posts)
 	mux.HandleFunc("/api/reaction", api.Reactions)

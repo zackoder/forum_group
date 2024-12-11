@@ -12,12 +12,12 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token_cookie := http.Cookie{
-		Name: "token",
-		Value: "123456789abcdefghijklmnopqrstuvwxyz",
-	}
+	// token_cookie := http.Cookie{
+	// 	Name: "token",
+	// 	Value: "123456789abcdefghijklmnopqrstuvwxyz",
+	// }
 
-	http.SetCookie(w,&token_cookie)
+	// http.SetCookie(w,&token_cookie)
 
 	pages := []string{
 		"views/pages/home.html",
