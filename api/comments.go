@@ -20,12 +20,12 @@ func Comments(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("query error!")
 		return
 	}
-	c, er := r.Cookie("token")
-	if er != nil {
-		fmt.Println(er)
-		return
-	}
-	fmt.Println(c.Value)
+	// c, er := r.Cookie("token")
+	// if er != nil {
+	// 	fmt.Println(er)
+	// 	return
+	// }
+	// fmt.Println(c.Value)
 	for rows.Next() {
 		var comment utils.Comment
 		if cm_err := rows.Scan(&comment.Comment); cm_err != nil {
@@ -34,6 +34,7 @@ func Comments(w http.ResponseWriter, r *http.Request) {
 		}
 		comments = append(comments, comment)
 	}
+	fmt.Println(comments)
 	w.Header().Set("Content-type", "application/json")
 	json.NewEncoder(w).Encode(comments)
 }
