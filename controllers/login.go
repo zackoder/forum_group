@@ -91,9 +91,9 @@ func Select(userIfo, passwd string) (int, error) {
 }
 
 func CraeteSession(userid int, session string) error {
-	query := `INSERT INTO session(user_id , uid)
+	query := `INSERT INTO sessions(user_id , token)
 		VALUES(?,?)
-		ON CONFLICT DO UPDATE SET uid = EXCLUDED.uid , date = CURRENT_TIMESTAMP
+		ON CONFLICT DO UPDATE SET token = EXCLUDED.token , date = CURRENT_TIMESTAMP
 	`
 	stmt, err := utils.DB.Prepare(query)
 	if err != nil {

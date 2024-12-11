@@ -16,20 +16,18 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	u := &user{Name: "zbessado"}
+	// token_cookie := http.Cookie{
+	// 	Name: "token",
+	// 	Value: "123456789abcdefghijklmnopqrstuvwxyz",
+	// }
 
-	token_cookie := http.Cookie{
-		Name: "token",
-		Value: "123456789abcdefghijklmnopqrstuvwxyz",
-	}
-
-	http.SetCookie(w,&token_cookie)
+	// http.SetCookie(w,&token_cookie)
 
 	pages := []string{
 		"views/pages/home.html",
 		"views/components/new_comment.html",
 	}
-	utils.ExecuteTemplate(w, pages, u)
+	utils.ExecuteTemplate(w, pages, nil)
 }
 
 /*

@@ -14,7 +14,7 @@
   <input name="filename" type="file" />
   <button type="submit">Submit</button>
 </form>
-
+{{ block "comment_form" . }} {{end}}
 <section id="posts-container"></section>
 {{end}}
 {{define "script"}}
