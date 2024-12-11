@@ -5,9 +5,9 @@
 {{define "title"}}Home{{end}}
 {{define "content"}}
 <div class="lay-out"></div>
-<h1 class="greeting">Welcome, {{.Name}}</h1>
+<h1 class="greeting">Welcome, {{.}}</h1>
 <button class="show-postForm">hi</button>
-<form class="postForm" action="/posts" method="post">
+<form class="postForm" action="/add-post" method="post">
   <label class="create_Post" for="post">Create Post:</label>
   <input class="title_inpt" type="text" id="post" name="title" placeholder="Post Title" required />
   <textarea class="post_contant" name="content" id="content"></textarea>

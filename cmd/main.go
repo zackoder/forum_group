@@ -8,7 +8,7 @@ import (
 
 	"forum/api"
 	"forum/controllers"
-	"forum/middlewares"
+	"forum/middleware"
 	"forum/models"
 	"forum/utils"
 
@@ -35,15 +35,15 @@ func main() {
 	mux.HandleFunc("/", controllers.Home)
 	mux.HandleFunc("/register", controllers.Register)
 	mux.HandleFunc("/login", controllers.Login)
-	mux.HandleFunc("/add-post", middlewares.Authorization(controllers.AddPost))
-	// mux.HandleFunc("/comment", middlewares.Authorization(controllers.Comments))
+	mux.HandleFunc("/add-post", middleware.Authorization(controllers.AddPost))
+	mux.HandleFunc("/user/singup", controllers.SingIn)
+	// mux.HandleFunc("/comment", middleware.Authorization(middleware.Comments))
 
 	/* api handlers */
-	mux.HandleFunc("/user/singup", controllers.SingIn)
 	mux.HandleFunc(`/api/{PostId}/comments`, api.Comments)
 	mux.HandleFunc("/api/posts", api.Posts)
 	mux.HandleFunc("/api/reaction", api.Reactions)
-	mux.HandleFunc("/api/{PostId}/comment/new", middlewares.Authorization(api.NewComment))
+	mux.HandleFunc("/api/{PostId}/comment/new", middleware.Authorization(api.NewComment))
 
 	/* run server */
 	fmt.Printf("server running on http://localhost%s\n", port)
