@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
-	"strings"
 
 	"forum/utils"
 
@@ -14,6 +13,10 @@ import (
 
 func Login(w http.ResponseWriter, r *http.Request) {
 	pages := []string{"views/pages/login.html"}
+	// user_id, _ := r.Cookie("user_id")
+	// user_token, _ := r.Cookie("user_token")
+
+	// fmt.Printf("user id: %s,\nuser token: %s\n", user_id.Value, user_token.Value)
 	utils.ExecuteTemplate(w, pages, nil)
 }
 
@@ -26,7 +29,7 @@ func SingIn(w http.ResponseWriter, r *http.Request) {
 
 	}
 	userInf := r.FormValue("userInf")
-	userInf = strings.TrimLeft(userInf, " ")
+	// userInf = strings.TrimLeft(userInf, " ")
 	passwd := r.FormValue("passwd")
 	if !IsValidEmail(userInf) && !IsValidUsername(userInf) || passwd == "" {
 		w.WriteHeader(http.StatusBadRequest)
@@ -87,14 +90,14 @@ func Select(userIfo, passwd string) (int, error) {
 func CraeteSession(userid int, session string) error {
 	query := `INSERT INTO session(user_id , uid)
 		VALUES(?,?)
-		ON CONFLICT DO UPDATE SET uid = ?
+		ON CONFLICT DO UPDATE SET uid = EXCLUDED.uid , date = CURRENT_TIMESTAMP
 	`
 	stmt, err := utils.DB.Prepare(query)
 	if err != nil {
 		return err
 	}
 	defer stmt.Close()
-	_, err = stmt.Exec(userid, session, session)
+	_, err = stmt.Exec(userid, session)
 
 	return err
 }

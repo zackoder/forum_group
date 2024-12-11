@@ -26,7 +26,7 @@ func SingUp(w http.ResponseWriter, r *http.Request) {
 	}
 	user := utils.User{}
 	err := json.NewDecoder(r.Body).Decode(&user)
-	w.Header().Set("Content-type", "application/json")
+	w.Header().Add("Content-type", "application/json")
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(map[string]string{"error": "invalid input for logup"})

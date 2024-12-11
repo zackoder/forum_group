@@ -12,7 +12,17 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pages := []string{"views/pages/home.html"}
+	token_cookie := http.Cookie{
+		Name: "token",
+		Value: "123456789abcdefghijklmnopqrstuvwxyz",
+	}
+
+	http.SetCookie(w,&token_cookie)
+
+	pages := []string{
+		"views/pages/home.html",
+		"views/components/new_comment.html",
+	}
 	utils.ExecuteTemplate(w, pages, nil)
 }
 
