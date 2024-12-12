@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"regexp"
+	"unicode"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -27,7 +28,23 @@ func HasPassowd(password string) (string, error) {
 	return string(hashpassord), nil
 }
 
-func ValidPassword(passwor string) bool {
-	password_RGX := regexp.MustCompile(`^(?=(.*[a-z]))(?=(.*[A-Z]))(?=(.*\d)).{8,}$`)
-	return password_RGX.MatchString(passwor)
+func isValidPassword(password string) bool {
+	hasUpper := false
+	hasLower := false
+	hasDigit := false
+	hasSpecial := false
+
+	for _, ch := range password {
+		if unicode.IsUpper(ch) {
+			hasUpper = true
+		} else if unicode.IsLower(ch) {
+			hasLower = true
+		} else if unicode.IsDigit(ch) {
+			hasDigit = true
+		} else if !unicode.IsLetter(ch) && !unicode.IsDigit(ch) {
+			hasSpecial = true
+		}
+	}
+
+	return hasUpper && hasLower && hasDigit && hasSpecial
 }

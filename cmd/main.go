@@ -51,6 +51,8 @@ func main() {
 	mux.HandleFunc("/api/created/posts", api.CreatedPosts)
 	mux.HandleFunc("/api/liked/posts", api.LikedPosts)
 
+	mux.HandleFunc("/Register",controllers.RegisterUser)
+	mux.HandleFunc("/Login",controllers.SingIn)
 	/* run server */
 	fmt.Printf("server running on http://localhost%s\n", port)
 	server_err := http.ListenAndServe(port, mux)
