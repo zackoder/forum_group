@@ -1,10 +1,10 @@
 package utils
 
 type User struct {
-	Id       int
-	Username string
-	Email    string
-	Password string
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	ConfPass string `json:"password_config"`
 }
 
 type Session struct {
@@ -48,8 +48,4 @@ type Reaction struct {
 type PostCategory struct {
 	PostId     int
 	CategoryId int
-}
-
-type Error struct {
-	ErrorMs string
 }

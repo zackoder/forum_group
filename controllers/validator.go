@@ -27,7 +27,15 @@ func HasPassowd(password string) (string, error) {
 	return string(hashpassord), nil
 }
 
-func ValidPassword(passwor string) bool {
-	password_RGX := regexp.MustCompile(`^(?=(.*[a-z]))(?=(.*[A-Z]))(?=(.*\d)).{8,}$`)
-	return password_RGX.MatchString(passwor)
+func isValidPassword(password string) bool {
+	lowercase := regexp.MustCompile(`[a-z]`)
+	uppercase := regexp.MustCompile(`[A-Z]`)
+	digit := regexp.MustCompile(`\d`)
+	specialChar := regexp.MustCompile(`[.\+\-\*/_/@]`)
+	length := len(password) >= 8
+	return lowercase.MatchString(password) &&
+		uppercase.MatchString(password) &&
+		digit.MatchString(password) &&
+		specialChar.MatchString(password) &&
+		length
 }

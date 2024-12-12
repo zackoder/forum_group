@@ -5,7 +5,7 @@
 <div class="form">
   <h1 class="minititle">Log In</h1>
   <form method="post" action="/login" onsubmit="validlogin(event)">
-    <label class="lbl" for="username">username</label>
+    <label class="lbl" for="Email">Email</label>
     <input class="impt" type="text" id="email" name="email" />
     <p id="erroremail"></p>
 
@@ -14,7 +14,6 @@
     <p id="errorPassword"></p>
 
     <button type="submit" class="submit">submit</button><br />
-    {{if .}} <label for="">{{.}}</label>{{end}}
   </form>
 </div>
 {{end}} {{define "script"}}

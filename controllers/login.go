@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -15,55 +16,48 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	pages := []string{"views/pages/login.html"}
 	if r.Method == http.MethodGet {
 		utils.ExecuteTemplate(w, pages, nil)
-	} else if r.Method == http.MethodPost {
-		userInf := r.FormValue("email")
-		passwd := r.FormValue("password")
-		if !IsValidEmail(userInf) || passwd == "" {
-			w.WriteHeader(http.StatusBadRequest)
-			utils.ExecuteTemplate(w, pages, utils.Error{
-				ErrorMs: "Check you input",
-			})
-			return
-		}
-		id, err := Select(userInf, passwd)
-		if err != nil {
-			fmt.Println(err)
-			if id == -2 {
-				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-				return
-			}
-			w.WriteHeader(http.StatusNotFound)
-			utils.ExecuteTemplate(w, pages, utils.Error{
-				ErrorMs: err.Error(),
-			})
-			return
-		}
-		uid, err := uuid.NewV4()
-		if err != nil {
-			fmt.Println(err)
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			return
-		}
-		err = CraeteSession(id, uid.String())
-		if err != nil {
-			fmt.Println(err)
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			return
-		}
-		http.SetCookie(w, &http.Cookie{
-			Name:     "token",
-			Value:    uid.String(),
-			MaxAge:   300,
-			HttpOnly: true,
-			Path:     "/",
-		})
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-	} else {
-		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 	}
 }
 
 func SingIn(w http.ResponseWriter, r *http.Request) {
+	user := utils.User{}
+	err := json.NewDecoder(r.Body).Decode(&user)
+	if !IsValidEmail(user.Email) || user.Password == "" || err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Inavlid input for login"})
+		return
+	}
+	id, err := Select(user.Email, user.Password)
+	if err != nil {
+		if id == -2 {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]string{"error": "there are error in server try anthor time"})
+		} else {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]string{"error": "user or password not correct"})
+		}
+
+		return
+	}
+	uid, err := uuid.NewV4()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "there are error in server try anthor time"})
+		return
+	}
+	err = CraeteSession(id, uid.String())
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "there are error in server try anthor time"})
+		return
+	}
+	http.SetCookie(w, &http.Cookie{
+		Name:     "token",
+		Value:    uid.String(),
+		MaxAge:   300,
+		HttpOnly: true,
+		Path:     "/",
+	})
 }
 
 func Select(userIfo, passwd string) (int, error) {
