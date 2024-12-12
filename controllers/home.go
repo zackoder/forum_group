@@ -6,7 +6,7 @@ import (
 	"forum/utils"
 )
 
-type user struct {
+type User struct {
 	Name string
 }
 

@@ -2,30 +2,13 @@ package controllers
 
 import (
 	"regexp"
-	"unicode"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 func IsValidUsername(username string) bool {
-	if username == "" {
-		return false
-	}
-	last := []rune(username)[0]
-	for _, c := range username {
-		if c == '_' {
-			if last == '_' {
-				return false
-			}
-			last = c
-			continue
-		}
-		if !unicode.IsLetter(c) && !unicode.IsDigit(c) {
-			return false
-		}
-		last = c
-	}
-	return true
+	username_RGX := regexp.MustCompile(`^[a-zA-Z0-9_-]{3,20}$`)
+	return username_RGX.MatchString(username)
 }
 
 // This for valid email
@@ -42,4 +25,9 @@ func HasPassowd(password string) (string, error) {
 		return "", err
 	}
 	return string(hashpassord), nil
+}
+
+func ValidPassword(passwor string) bool {
+	password_RGX := regexp.MustCompile(`^(?=(.*[a-z]))(?=(.*[A-Z]))(?=(.*\d)).{8,}$`)
+	return password_RGX.MatchString(passwor)
 }

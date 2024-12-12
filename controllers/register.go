@@ -20,23 +20,13 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		user.Password = r.FormValue("password")
 		user.Username = r.FormValue("username")
 		confPass := r.FormValue("password_config")
-		if user.Email == "" || user.Password == "" || user.Username == "" || user.Password != confPass {
-			fmt.Println(user.Email == "", user.Password == "", user.Username == "", user.Password != confPass)
+		if !IsValidUsername(user.Username) || !IsValidEmail(user.Email) || !ValidPassword(user.Password) || user.Password != confPass {
 			w.WriteHeader(http.StatusBadRequest)
 			utils.ExecuteTemplate(w, pages, utils.Error{
 				ErrorMs: "invalid Input for register",
 			})
 			return
 		}
-		if !IsValidUsername(user.Username) || !IsValidEmail(user.Email) {
-			w.WriteHeader(http.StatusBadRequest)
-			utils.ExecuteTemplate(w, pages, utils.Error{
-				ErrorMs: "invalid Input for register",
-			})
-			fmt.Println("ok 1")
-			return
-		}
-		fmt.Println("here")
 		var err error
 		user.Password, err = HasPassowd(user.Password)
 		fmt.Println("ok")
