@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"regexp"
+	"unicode"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -28,14 +29,22 @@ func HasPassowd(password string) (string, error) {
 }
 
 func isValidPassword(password string) bool {
-	lowercase := regexp.MustCompile(`[a-z]`)
-	uppercase := regexp.MustCompile(`[A-Z]`)
-	digit := regexp.MustCompile(`\d`)
-	specialChar := regexp.MustCompile(`[.\+\-\*/_/@]`)
-	length := len(password) >= 8
-	return lowercase.MatchString(password) &&
-		uppercase.MatchString(password) &&
-		digit.MatchString(password) &&
-		specialChar.MatchString(password) &&
-		length
+	hasUpper := false
+	hasLower := false
+	hasDigit := false
+	hasSpecial := false
+
+	for _, ch := range password {
+		if unicode.IsUpper(ch) {
+			hasUpper = true
+		} else if unicode.IsLower(ch) {
+			hasLower = true
+		} else if unicode.IsDigit(ch) {
+			hasDigit = true
+		} else if !unicode.IsLetter(ch) && !unicode.IsDigit(ch) {
+			hasSpecial = true
+		}
+	}
+
+	return hasUpper && hasLower && hasDigit && hasSpecial
 }
