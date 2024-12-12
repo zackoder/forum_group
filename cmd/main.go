@@ -42,8 +42,14 @@ func main() {
 	/* api handlers */
 	mux.HandleFunc(`/api/{PostId}/comments`, api.Comments)
 	mux.HandleFunc("/api/posts", api.Posts)
-	mux.HandleFunc("/api/reaction", api.Reactions)
 	mux.HandleFunc("/api/{PostId}/comment/new", middleware.Authorization(api.NewComment))
+	// mux.HandleFunc("/api/{PostId}/", api.PostReaction)
+	// mux.HandleFunc("", api.CommentReaction)
+
+	/* filters */
+	mux.HandleFunc("/api/category/filter/{CategoryId}", api.FilterByCategory)
+	mux.HandleFunc("/api/created/posts", api.CreatedPosts)
+	mux.HandleFunc("/api/liked/posts", api.LikedPosts)
 
 	/* run server */
 	fmt.Printf("server running on http://localhost%s\n", port)
