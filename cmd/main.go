@@ -33,11 +33,10 @@ func main() {
 	mux.HandleFunc("/static/", controllers.Server)
 	/* pages handlers */
 	mux.HandleFunc("/", controllers.Home)
-	mux.HandleFunc("/register", controllers.Register)
-	mux.HandleFunc("/login", controllers.Login)
+	mux.HandleFunc("/register", controllers.Register) // chno kadir had register 7itach raha m3awda 2 mrat
+	mux.HandleFunc("/login", controllers.Login)       // chno kadir had login 7itach raha m3awda 2 mrat
 	mux.HandleFunc("/add-post", middleware.Authorization(controllers.AddPost))
 	mux.HandleFunc("/user/singup", controllers.SingIn)
-	// mux.HandleFunc("/comment", middleware.Authorization(middleware.Comments))
 
 	/* api handlers */
 	mux.HandleFunc(`/api/{PostId}/comments`, api.Comments)
@@ -51,8 +50,8 @@ func main() {
 	mux.HandleFunc("/api/created/posts", middleware.Authorization(api.CreatedPosts))
 	mux.HandleFunc("/api/liked/posts", middleware.Authorization(api.LikedPosts))
 
-	mux.HandleFunc("/Register", controllers.RegisterUser)
-	mux.HandleFunc("/Login", controllers.SingIn)
+	mux.HandleFunc("/Register", controllers.RegisterUser) // chno kadir had register 7itach raha m3awda 2 mrat
+	mux.HandleFunc("/Login", controllers.SingIn)          // chno kadir had login 7itach raha m3awda 2 mrat
 	/* run server */
 	fmt.Printf("server running on http://localhost%s\n", port)
 	server_err := http.ListenAndServe(port, mux)
