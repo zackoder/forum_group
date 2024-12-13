@@ -49,3 +49,18 @@ type PostCategory struct {
 	PostId     int
 	CategoryId int
 }
+
+type PostsResult struct {
+	UserName   string
+	UserImage  string
+	Title      string
+	Content    string
+	Image      string
+	Categories []string
+	Date       string
+	Reactions  struct {
+		Likes    int
+		Dislikes int
+		Action   string
+	}
+}

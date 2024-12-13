@@ -21,16 +21,16 @@ func NewComment(w http.ResponseWriter, r *http.Request) {
 	postId := r.PathValue("PostId")
 	var postIdErr error
 	comment.PostId, postIdErr = strconv.Atoi(postId)
-	if postIdErr != nil || CheckPost(comment.PostId){
+	if postIdErr != nil || CheckPost(comment.PostId) {
 		fmt.Println("Post id errrrrrrrrrrrrrrrrrrrrrrrrrr")
 		fmt.Println(comment.PostId)
 		return
 	}
-	getUserIdQuery := `SELECT user_id FROM sessions WHERE token=?;`
-	queryErr := utils.DB.QueryRow(getUserIdQuery, token.Value).Scan(&comment.UserId)
-	if queryErr != nil {
+	var user_err error
+	comment.UserId, user_err = utils.GetUserByToken(token.Value)
+	if user_err != nil {
 		fmt.Println("get user_id from db errrrrrrrrrrrrrrrrrrrrrr")
-		fmt.Println(queryErr.Error())
+		fmt.Println(user_err.Error())
 		return
 	}
 	comment.Comment = r.FormValue("comment")

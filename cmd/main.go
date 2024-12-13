@@ -48,11 +48,11 @@ func main() {
 
 	/* filters */
 	mux.HandleFunc("/api/category/filter/{CategoryId}", api.FilterByCategory)
-	mux.HandleFunc("/api/created/posts", api.CreatedPosts)
-	mux.HandleFunc("/api/liked/posts", api.LikedPosts)
+	mux.HandleFunc("/api/created/posts", middleware.Authorization(api.CreatedPosts))
+	mux.HandleFunc("/api/liked/posts", middleware.Authorization(api.LikedPosts))
 
-	mux.HandleFunc("/Register",controllers.RegisterUser)
-	mux.HandleFunc("/Login",controllers.SingIn)
+	mux.HandleFunc("/Register", controllers.RegisterUser)
+	mux.HandleFunc("/Login", controllers.SingIn)
 	/* run server */
 	fmt.Printf("server running on http://localhost%s\n", port)
 	server_err := http.ListenAndServe(port, mux)

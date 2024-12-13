@@ -10,30 +10,6 @@ import (
 	"forum/utils"
 )
 
-type PostsResult struct {
-	UserName   string
-	UserImage  string
-	Title      string
-	Content    string
-	Image      string
-	Categories []string
-	Date       string
-	Reactions  struct {
-		Likes    int
-		Dislikes int
-		Action   string
-	}
-}
-
-type FilterPostsCategory struct {
-	UserId     int
-	Title      string
-	Content    string
-	Image      string
-	Categories string
-	Date       string
-}
-
 func FilterByCategory(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("CategoryId")
 	category_id, num_err := strconv.Atoi(id)
@@ -41,7 +17,7 @@ func FilterByCategory(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(num_err.Error())
 		return
 	}
-	var contents []PostsResult
+	var contents []utils.PostsResult
 	query := `
 		SELECT p.user_id,p.title,p.content,p.categories,p.date, u.username
 		FROM posts p JOIN posts_categories pc
@@ -56,7 +32,7 @@ func FilterByCategory(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var user_id int
 		var categories string
-		var c PostsResult
+		var c utils.PostsResult
 		if err = rows.Scan(&user_id, &c.Title, &c.Content, &categories, &c.Date, &c.UserName); err != nil {
 			fmt.Println(err.Error())
 			return
