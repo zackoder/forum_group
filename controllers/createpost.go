@@ -26,7 +26,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
-	_, err = utils.DB.Exec("INSERT INTO posts(user_id, title, content, image, categories, date) VALUES(?, ?, ?)", userId, title, strings.ReplaceAll(strings.TrimSpace(content), "\r\n", "<br>"))
+	_, err = utils.DB.Exec("INSERT INTO posts(user_id, title, content, image, categories, date) VALUES(?, ?, ?, ?, ?, ?)", userId, title, strings.ReplaceAll(strings.TrimSpace(content), "\r\n", "<br>"))
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return

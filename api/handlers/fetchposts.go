@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -18,7 +20,7 @@ func FetchPosts(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		nbr_offset = 0
 	}
-
+	//, image, categories, date
 	query := "SELECT id, user_id, title, content, image, categories, date FROM posts ORDER BY id DESC LIMIT ? OFFSET ?"
 	rows, err := utils.DB.Query(query, 20, nbr_offset)
 	if err != nil {
@@ -31,10 +33,25 @@ func FetchPosts(w http.ResponseWriter, r *http.Request) {
 		// post := Post{}
 		var post utils.Post
 		var user_id int
-		if err := rows.Scan(&post.Id, &user_id, &post.Title, &post.Content, &post.Image, &post.Categories, &post.Date); err != nil {
+		var image sql.NullString
+		var date sql.NullString
+		if err := rows.Scan(&post.Id, &user_id, &post.Title, &post.Content, &image, &post.Categories, &date); err != nil {
+			// log.Printf("Error scanning row %v", err)
+			fmt.Println(err)
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
+		if image.Valid {
+			post.Image = image.String
+		} else {
+			post.Image = ""
+		}
+		if date.Valid {
+			post.Date = date.String
+		} else {
+			post.Date = ""
+		}
+
 		if err := utils.DB.QueryRow("SELECT username FROM users WHERE id = ?", user_id).Scan(&post.Username); err != nil {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
