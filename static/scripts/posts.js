@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Event delegation for click events
   postsContainer.addEventListener("click", function (event) {
-    const postElement = event.target.closest(".post-container"); // Find the nearest post-container
+    const postElement = event.target.closest(".post-container");
     if (!postElement) return;
 
     const postId = postElement.getAttribute("data-post-id");
@@ -17,14 +17,14 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  postsContainer.addEventListener("submit", function (event) {
+  postsContainer.addEventListener("submit", function (event) {    
     if (event.target.classList.contains("comment_form")) {
+
+      const postElement = event.target.closest(".post-container");
       event.preventDefault();
 
       const form = event.target;
-      const postId = form
-        .querySelector(".comment")
-        .getAttribute("data-post-id");
+      const postId = postElement.getAttribute("data-post-id");
       const commentText = form.querySelector(".comment").value.trim();
 
       if (commentText === "") {
@@ -87,26 +87,38 @@ function handleComment(postId, comment) {
 
 let home = "home";
 let profile = document.getElementById("profile");
-profile.addEventListener("click", () => {
-  loadMorePosts(profile);
-});
+if (profile) {
+  profile.addEventListener("click", () => {
+    loadMorePosts(profile);
+  });
+}
 
 let offset = 0;
 const limit = 20;
 let loading = false;
 
-async function loadMorePosts(name = "home") {
+async function loadMorePosts(name) {
   console.log(name);
-
+  if (name !== "home" || name !== "profile") name = "home";
   if (loading) return;
   loading = true;
 
   try {
-    console.log("hello");
-    const response = await fetch(`/fetch-posts?offset=${offset}&name=${name}`);
+    const response = await fetch(
+      `http://localhost:8080/fetch-posts?offset=0&name=home`
+    )
+      .then((res) => {
+        console.log(res.json());
+      })
+      .catch((err) => {
+        alert(err);
+        console.log(err);
+      });
 
+    if (!response.ok) alert("not ok");
     const posts = await response.json();
-    if (!posts || posts.length === 0) return;
+    // if (!posts || posts.length === 0) return;
+    console.log(posts);
 
     const postsContainer = document.getElementById("posts-container");
     posts.forEach((post) => {
