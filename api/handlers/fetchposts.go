@@ -10,7 +10,7 @@ import (
 
 func FetchPosts(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
 	offset := r.URL.Query().Get("offset")
@@ -19,7 +19,7 @@ func FetchPosts(w http.ResponseWriter, r *http.Request) {
 		nbr_offset = 0
 	}
 
-	query := "SELECT id, user_id, title, content FROM posts ORDER BY id DESC LIMIT ? OFFSET ?"
+	query := "SELECT id, user_id, title, content, image, categories, date FROM posts ORDER BY id DESC LIMIT ? OFFSET ?"
 	rows, err := utils.DB.Query(query, 20, nbr_offset)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -31,7 +31,7 @@ func FetchPosts(w http.ResponseWriter, r *http.Request) {
 		// post := Post{}
 		var post utils.Post
 		var user_id int
-		if err := rows.Scan(&post.Id, &user_id, &post.Title, &post.Content); err != nil {
+		if err := rows.Scan(&post.Id, &user_id, &post.Title, &post.Content, &post.Image, &post.Categories, &post.Date); err != nil {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
