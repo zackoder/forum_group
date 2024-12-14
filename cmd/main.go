@@ -41,7 +41,7 @@ func main() {
 
 	/* api handlers */
 	mux.HandleFunc(`/api/{PostId}/comments`, api.Comments)
-	mux.HandleFunc("/api/posts", api.Posts)
+	mux.HandleFunc("/api/posts", api.FetchPosts)
 	mux.HandleFunc("/api/{PostId}/comment/new", middleware.Authorization(api.NewComment))
 	// mux.HandleFunc("/api/{PostId}/", api.PostReaction)
 	// mux.HandleFunc("", api.CommentReaction)
