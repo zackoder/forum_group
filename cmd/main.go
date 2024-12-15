@@ -43,8 +43,8 @@ func main() {
 	mux.HandleFunc(`/api/{PostId}/comments`, api.Comments)
 	mux.HandleFunc("/api/posts", api.FetchPosts)
 	mux.HandleFunc("/api/{PostId}/comment/new", middleware.Authorization(api.NewComment))
+	mux.HandleFunc("/api/comment/reaction/{PostId}", api.CommentReaction)
 	// mux.HandleFunc("/api/{PostId}/", api.PostReaction)
-	// mux.HandleFunc("", api.CommentReaction)
 
 	/* filters */
 	mux.HandleFunc("/api/category/filter/{CategoryId}", api.FilterByCategory)
