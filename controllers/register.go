@@ -39,6 +39,12 @@ func Insert(user utils.User) (int, int, error) {
 }
 
 func RegisterUser(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-Type", "application/json")
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		json.NewEncoder(w).Encode(map[string]string{"error": http.StatusText(http.StatusMethodNotAllowed)})
+		return
+	}
 	user := utils.User{}
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if !IsValidUsername(user.Username) || !IsValidEmail(user.Email) || user.Password != user.ConfPass || err != nil {
@@ -47,7 +53,7 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if !isValidPassword(user.Password) {
-		
+
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(map[string]string{"error": "password is weak"})
 		return

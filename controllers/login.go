@@ -20,6 +20,12 @@ func Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func SingIn(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-Type", "application/json")
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		json.NewEncoder(w).Encode(map[string]string{"error": http.StatusText(http.StatusMethodNotAllowed)})
+		return
+	}
 	user := utils.User{}
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if !IsValidEmail(user.Email) || user.Password == "" || err != nil {
