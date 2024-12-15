@@ -50,7 +50,7 @@ func InitTables(db *sql.DB) {
 			FOREIGN KEY (user_id) REFERENCES users(id),
 			FOREIGN KEY (post_id) REFERENCES posts(id)
 		);
-
+		
 		CREATE TABLE IF NOT EXISTS reactions (
 			id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 			user_id INTEGER NOT NULL,
@@ -60,6 +60,8 @@ func InitTables(db *sql.DB) {
 			FOREIGN KEY (user_id) REFERENCES users(id),
 			FOREIGN KEY (post_id) REFERENCES posts(id),
 			FOREIGN KEY (comment_id) REFERENCES comments(id),
+			UNIQUE(user_id,post_id),
+			UNIQUE(user_id,comment_id),
 			CHECK (
 				(post_id IS NULL AND comment_id IS NOT NULL) OR
 				(post_id IS NOT NULL AND comment_id IS NULL)
