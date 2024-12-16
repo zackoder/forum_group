@@ -36,23 +36,25 @@ func main() {
 	mux.HandleFunc("/register", controllers.Register)
 	mux.HandleFunc("/login", controllers.Login)
 	mux.HandleFunc("/add-post", middleware.Authorization(controllers.AddPost))
+
+	/*  */
 	mux.HandleFunc("/user/singup", controllers.SingIn)
-	// mux.HandleFunc("/comment", middleware.Authorization(middleware.Comments))
+	mux.HandleFunc("/createpost", controllers.CreatePost)
+	mux.HandleFunc("/Register", controllers.RegisterUser)
+	mux.HandleFunc("/Login", controllers.SingIn)
 
 	/* api handlers */
 	mux.HandleFunc(`/api/{PostId}/comments`, api.Comments)
 	mux.HandleFunc("/api/posts", api.FetchPosts)
 	mux.HandleFunc("/api/{PostId}/comment/new", middleware.Authorization(api.NewComment))
 	mux.HandleFunc("/api/comment/reaction/{PostId}", api.CommentReaction)
-	// mux.HandleFunc("/api/{PostId}/", api.PostReaction)
 
 	/* filters */
 	mux.HandleFunc("/api/category/filter/{CategoryId}", api.FilterByCategory)
 	mux.HandleFunc("/api/created/posts", api.CreatedPosts)
 	mux.HandleFunc("/api/liked/posts", api.LikedPosts)
 
-	mux.HandleFunc("/Register",controllers.RegisterUser)
-	mux.HandleFunc("/Login",controllers.SingIn)
+	
 	/* run server */
 	fmt.Printf("server running on http://localhost%s\n", port)
 	server_err := http.ListenAndServe(port, mux)
