@@ -1,46 +1,63 @@
 package controllers
 
 import (
+	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
-	"time"
 
 	"forum/utils"
 )
 
+type Error struct {
+	Message string `json:"message"`
+	Code    int    `json:"status"`
+}
+
 func CreatePost(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		// http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		err := Error{Message: "Not Allowed", Code: http.StatusMethodNotAllowed}
+		json.NewEncoder(w).Encode(err)
 	}
 	cookie, err := r.Cookie("token") // Name the Cookie
 	if err != nil {
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		// http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		err := Error{Message: "Unauthorized", Code: http.StatusUnauthorized}
+		json.NewEncoder(w).Encode(err)
 		return
 	}
 
 	title := r.FormValue("title")
 	content := r.FormValue("content")
 	categories := r.Form["option"]
-	for i := 0; i < len(categories); i++ {
-		fmt.Printf(categories[i])
-	}
+	// for i := 0; i < len(categories); i++ {
+	// 	fmt.Printf(categories[i])
+	// }
 	image := r.FormValue("image")
-	date := r.FormValue("date")
 
 	var userId int
+
 	err = utils.DB.QueryRow("SELECT user_id FROM sessions WHERE token = ?", cookie.Value).Scan(&userId)
 	if err != nil {
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		err := Error{Message: "Error", Code: 500}
+		// http.Redirect(w, r, "/login", http.StatusSeeOther)
+		json.NewEncoder(w).Encode(err)
 		return
 	}
-	parsedDate, err := time.Parse("2006-01-02 15:04:05", date)
-	if err != nil {
-		log.Fatal("Invalid date formate", err)
+	// parsedDate, err := time.Parse("2006-01-02 15:04:05", date)
+	// if err != nil {
+	// 	log.Fatal("Invalid date formate", err)
+	// }
+	// formattedDate := parsedDate.Format("2006-01-02 15:04:05")
+	title = strings.TrimSpace(title)
+	content = strings.TrimSpace(content)
+	if title == "" || content == "" {
+		err := Error{Message: "Title or Content is Empty", Code: http.StatusUnauthorized}
+		json.NewEncoder(w).Encode(err)
+		return
 	}
-	formattedDate := parsedDate.Format("2006-01-02 15:04:05")
-	result, err := utils.DB.Exec("INSERT INTO posts(user_id, title, content, image, categories, date) VALUES(?, ?, ?, ?, ?, ?)", userId, title, strings.ReplaceAll(strings.TrimSpace(content), "\r\n", "<br>"), strings.Join(categories, ", "), image, formattedDate)
+	result, err := utils.DB.Exec("INSERT INTO posts(user_id, title, content, image, categories) VALUES(?, ?, ?, ?, ?, ?)", userId, title, strings.ReplaceAll(content, "\r\n", "<br>"), strings.Join(categories, ", "), image)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
@@ -48,7 +65,10 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	last_post_id, err := result.LastInsertId()
 	fmt.Println(last_post_id)
 	if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		// http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		err := Error{Message: "Error", Code: http.StatusInternalServerError}
+		// http.Redirect(w, r, "/login", http.StatusSeeOther)
+		json.NewEncoder(w).Encode(err)
 		return
 	}
 	for _, id_categ := range categories {

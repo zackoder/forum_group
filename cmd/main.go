@@ -35,7 +35,7 @@ func main() {
 	mux.HandleFunc("/", controllers.Home)
 	mux.HandleFunc("/register", controllers.Register)
 	mux.HandleFunc("/login", controllers.Login)
-	mux.HandleFunc("/add-post", middleware.Authorization(controllers.AddPost))
+	mux.HandleFunc("/add-post", middleware.Authorization(controllers.CreatePost))
 	mux.HandleFunc("/user/singup", controllers.SingIn)
 	mux.HandleFunc("/createpost", controllers.CreatePost)
 	// mux.HandleFunc("/comment", middleware.Authorization(middleware.Comments))
