@@ -89,15 +89,16 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		var category_id int
 		err := utils.DB.QueryRow("SELECT id FROM categories WHERE name = ?", categ).Scan(&category_id)
 		if err != nil {
-			fmt.Println(err)
+			err := Error{Message: "Bad Request", Code: http.StatusBadRequest}
+			json.NewEncoder(w).Encode(err)
+			return
 		}
 		_, err = utils.DB.Exec("INSERT INTO posts_categories(post_id, category_id) VALUES(?, ?)", last_post_id, category_id) // GetLast id in table posts
 		if err != nil {
 			// http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-			err := Error{Message: "Bad Request", Code: http.StatusBadRequest}
-			fmt.Println("insert post cat")
+			err := Error{Message: "Bad Request", Code: http.StatusInternalServerError}
 			json.NewEncoder(w).Encode(err)
-			return 
+			return
 		}
 	}
 	http.Redirect(w, r, "/", http.StatusSeeOther)
