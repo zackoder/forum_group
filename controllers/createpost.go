@@ -76,15 +76,8 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(err)
 		return
 	}
-	last_post_id, err := result.LastInsertId()
-	if err != nil {
-		// http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		err := Error{Message: "Error", Code: http.StatusInternalServerError}
-		w.WriteHeader(500)
-		// http.Redirect(w, r, "/login", http.StatusSeeOther)
-		json.NewEncoder(w).Encode(err)
-		return
-	}
+	last_post_id, _ := result.LastInsertId()
+
 	for _, categ := range categories {
 		var category_id int
 		err := utils.DB.QueryRow("SELECT id FROM categories WHERE name = ?", categ).Scan(&category_id)
