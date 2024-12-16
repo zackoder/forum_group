@@ -120,7 +120,7 @@ func Insert(user utils.User) (int, int, error) {
 }
 
 func RegisterUser(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		json.NewEncoder(w).Encode(map[string]string{"error": http.StatusText(http.StatusMethodNotAllowed)})
@@ -130,7 +130,7 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if !IsValidUsername(user.Username) || !IsValidEmail(user.Email) || user.Password != user.ConfPass || err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]string{"error": "Inavlid input for login"})
+		json.NewEncoder(w).Encode(map[string]string{"error": "Inavlid input for Register"})
 		return
 	}
 	if !isValidPassword(user.Password) {
