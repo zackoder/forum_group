@@ -43,7 +43,8 @@ func main() {
 	mux.HandleFunc("/Register", auth.RegisterUser)
 	mux.HandleFunc("/Login", auth.SingIn)
 	mux.HandleFunc("/register", controllers.Register)
-	mux.HandleFunc("/login", controllers.Login)
+	mux.HandleFunc("/login", controllers.Login)	
+	mux.HandleFunc("/CreatePost", controllers.CreatePosts)
 
 	/* api handlers */
 	mux.HandleFunc(`/api/{PostId}/comments`, api.Comments) // comments list
