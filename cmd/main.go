@@ -33,9 +33,9 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/static/", controllers.Server)
 	/* pages handlers */
-	mux.HandleFunc("/createpost", controllers.CreatePost)
+	// mux.HandleFunc("/createpost", controllers.CreatePost)
 	mux.HandleFunc("/", controllers.Home)
-	mux.HandleFunc("/add-post", middleware.Authorization(controllers.AddPost))
+	mux.HandleFunc("/add-post", middleware.Authorization(controllers.CreatePost))
 
 	/* login and register handlers */
 	mux.HandleFunc("/Register", auth.RegisterUser)
