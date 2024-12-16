@@ -32,16 +32,16 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/static/", controllers.Server)
 	/* pages handlers */
-	mux.HandleFunc("/", controllers.Home)
-	mux.HandleFunc("/register", controllers.Register)
-	mux.HandleFunc("/login", controllers.Login)
-	mux.HandleFunc("/add-post", middleware.Authorization(controllers.AddPost))
-
-	/*  */
-	mux.HandleFunc("/user/singup", controllers.SingIn)
 	mux.HandleFunc("/createpost", controllers.CreatePost)
+	mux.HandleFunc("/", controllers.Home)
+	mux.HandleFunc("/add-post", middleware.Authorization(controllers.AddPost))
+	
+	/* login and register handlers */
+	mux.HandleFunc("/user/singup", controllers.SingIn)
 	mux.HandleFunc("/Register", controllers.RegisterUser)
+	mux.HandleFunc("/register", controllers.Register)
 	mux.HandleFunc("/Login", controllers.SingIn)
+	mux.HandleFunc("/login", controllers.Login)
 
 	/* api handlers */
 	mux.HandleFunc(`/api/{PostId}/comments`, api.Comments)
