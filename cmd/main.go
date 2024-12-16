@@ -48,13 +48,13 @@ func main() {
 	mux.HandleFunc("/api/posts", api.FetchPosts)
 	mux.HandleFunc("/api/{PostId}/comment/new", middleware.Authorization(api.NewComment))
 	mux.HandleFunc("/api/comment/reaction/{PostId}", api.CommentReaction)
+	mux.HandleFunc("/api/category/list", api.CategoryList)
 
 	/* filters */
 	mux.HandleFunc("/api/category/filter/{CategoryId}", api.FilterByCategory)
 	mux.HandleFunc("/api/created/posts", api.CreatedPosts)
 	mux.HandleFunc("/api/liked/posts", api.LikedPosts)
 
-	
 	/* run server */
 	fmt.Printf("server running on http://localhost%s\n", port)
 	server_err := http.ListenAndServe(port, mux)
