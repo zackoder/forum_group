@@ -31,7 +31,7 @@ func main() {
 
 	/* server mux router */
 	mux := http.NewServeMux()
-	
+
 	/* serve static files */
 	mux.HandleFunc("/static/", controllers.Server)
 
@@ -46,16 +46,16 @@ func main() {
 	mux.HandleFunc("/login", controllers.Login)
 
 	/* api handlers */
-	mux.HandleFunc(`/api/{PostId}/comments`, api.Comments)
+	mux.HandleFunc(`/api/{PostId}/comments`, api.Comments) // comments list
+	mux.HandleFunc("/api/{PostId}/comment/new", middleware.Authorization(api.NewComment)) // create comment
+	mux.HandleFunc("/api/comment/reaction/{PostId}", api.CommentReaction) // react a comment
+	mux.HandleFunc("/api/category/list", api.CategoryList) // get all categories
 	mux.HandleFunc("/api/posts", api.FetchPosts)
-	mux.HandleFunc("/api/{PostId}/comment/new", middleware.Authorization(api.NewComment))
-	mux.HandleFunc("/api/comment/reaction/{PostId}", api.CommentReaction)
-	mux.HandleFunc("/api/category/list", api.CategoryList)
 
 	/* filters */
-	mux.HandleFunc("/api/category/filter/{CategoryId}", api.FilterByCategory)
-	mux.HandleFunc("/api/created/posts", api.CreatedPosts)
-	mux.HandleFunc("/api/liked/posts", api.LikedPosts)
+	mux.HandleFunc("/api/category/filter/{CategoryId}", api.FilterByCategory) // not complated
+	mux.HandleFunc("/api/created/posts", api.CreatedPosts) // not complated
+	mux.HandleFunc("/api/liked/posts", api.LikedPosts) // not complated
 
 	/* run server */
 	fmt.Printf("server running on http://localhost%s\n", port)
