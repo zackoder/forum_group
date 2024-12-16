@@ -8,6 +8,7 @@ import (
 
 	"forum/api"
 	"forum/controllers"
+	"forum/controllers/auth"
 	"forum/middleware"
 	"forum/models"
 	"forum/utils"
@@ -35,12 +36,11 @@ func main() {
 	mux.HandleFunc("/createpost", controllers.CreatePost)
 	mux.HandleFunc("/", controllers.Home)
 	mux.HandleFunc("/add-post", middleware.Authorization(controllers.AddPost))
-	
+
 	/* login and register handlers */
-	mux.HandleFunc("/user/singup", controllers.SingIn)
-	mux.HandleFunc("/Register", controllers.RegisterUser)
+	mux.HandleFunc("/Register", auth.RegisterUser)
+	mux.HandleFunc("/Login", auth.SingIn)
 	mux.HandleFunc("/register", controllers.Register)
-	mux.HandleFunc("/Login", controllers.SingIn)
 	mux.HandleFunc("/login", controllers.Login)
 
 	/* api handlers */
