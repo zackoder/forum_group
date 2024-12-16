@@ -32,7 +32,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 
 	title := r.FormValue("title")
 	content := r.FormValue("content")
-	categories := r.Form["option"]
+	categories := r.Form["categories"]
 	// for i := 0; i < len(categories); i++ {
 	// 	fmt.Printf(categories[i])
 	// }
@@ -68,7 +68,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(err)
 		return
 	}
-	result, err := utils.DB.Exec("INSERT INTO posts(user_id, title, content, image, categories) VALUES(?, ?, ?, ?, ?, ?)", userId, title, strings.ReplaceAll(content, "\r\n", "<br>"), strings.Join(categories, ", "), image)
+	result, err := utils.DB.Exec("INSERT INTO posts(user_id, title, content, image, categories) VALUES(?, ?, ?, ?, ?)", userId, title, strings.ReplaceAll(content, "\r\n", "<br>"), strings.Join(categories, ", "), image)
 	if err != nil {
 		// http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		err := Error{Message: "Bad Request", Code: http.StatusBadRequest}
@@ -77,7 +77,6 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	last_post_id, err := result.LastInsertId()
-	fmt.Println(last_post_id)
 	if err != nil {
 		// http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		err := Error{Message: "Error", Code: http.StatusInternalServerError}
@@ -91,6 +90,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			// http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			err := Error{Message: "Bad Request", Code: http.StatusBadRequest}
+			fmt.Println("insert post cat")
 			json.NewEncoder(w).Encode(err)
 			return
 		}

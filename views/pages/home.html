@@ -12,6 +12,17 @@
   <input class="title_inpt" type="text" id="post" name="title" placeholder="Post Title" required />
   <textarea class="post_contant" name="content" id="content"></textarea>
   <input name="filename" type="file" />
+  <label>
+    <input type="checkbox" name="categories" value="tech"> Tech
+  </label>
+  <br>
+  <label>
+    <input type="checkbox" name="categories" value="dev"> Dev
+  </label>
+  <br>
+  <label>
+    <input type="checkbox" name="categories" value="news"> News
+  </label>
   <button type="submit">Submit</button>
 </form>
 {{ block "comment_form" . }} {{end}}

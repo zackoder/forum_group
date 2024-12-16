@@ -111,7 +111,7 @@ span {
 }
 
 .postForm {
-  display: none;
+  display: flex;
   height: 300px;
   width: 600px;
   flex-direction: column;
