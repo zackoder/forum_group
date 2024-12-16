@@ -18,12 +18,14 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		// http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		err := Error{Message: "Not Allowed", Code: http.StatusMethodNotAllowed}
+		w.WriteHeader(405)
 		json.NewEncoder(w).Encode(err)
 	}
 	cookie, err := r.Cookie("token") // Name the Cookie
 	if err != nil {
 		// http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		err := Error{Message: "Unauthorized", Code: http.StatusUnauthorized}
+		w.WriteHeader(401)
 		json.NewEncoder(w).Encode(err)
 		return
 	}
@@ -42,6 +44,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		err := Error{Message: "Error", Code: 500}
 		// http.Redirect(w, r, "/login", http.StatusSeeOther)
+		w.WriteHeader(500)
 		json.NewEncoder(w).Encode(err)
 		return
 	}
@@ -54,12 +57,16 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	content = strings.TrimSpace(content)
 	if title == "" || content == "" {
 		err := Error{Message: "Title or Content is Empty", Code: http.StatusUnauthorized}
+		w.WriteHeader(401)
 		json.NewEncoder(w).Encode(err)
 		return
 	}
 	result, err := utils.DB.Exec("INSERT INTO posts(user_id, title, content, image, categories) VALUES(?, ?, ?, ?, ?, ?)", userId, title, strings.ReplaceAll(content, "\r\n", "<br>"), strings.Join(categories, ", "), image)
 	if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		// http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		err := Error{Message: "Bad Request", Code: http.StatusBadRequest}
+		w.WriteHeader(400)
+		json.NewEncoder(w).Encode(err)
 		return
 	}
 	last_post_id, err := result.LastInsertId()
@@ -67,6 +74,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		err := Error{Message: "Error", Code: http.StatusInternalServerError}
+		w.WriteHeader(500)
 		// http.Redirect(w, r, "/login", http.StatusSeeOther)
 		json.NewEncoder(w).Encode(err)
 		return
@@ -74,7 +82,9 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	for _, id_categ := range categories {
 		_, err = utils.DB.Exec("INSERT INTO posts_categories(post_id, category_id) VALUES(?, ?)", last_post_id, id_categ) // GetLast id in table posts
 		if err != nil {
-			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			// http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			err := Error{Message: "Bad Request", Code: http.StatusBadRequest}
+			json.NewEncoder(w).Encode(err)
 			return
 		}
 	}
