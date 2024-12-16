@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"forum/utils"
 )
@@ -27,8 +28,13 @@ func Comments(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("status 405 method not allowd!")
 		return
 	}
-	query := `SELECT id,user_id,comment,date FROM comments;`
-	rows, err := utils.DB.Query(query)
+	post_id, err := strconv.Atoi(r.PathValue("PostId"))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	query := `SELECT id,user_id,comment,date FROM comments WHERE post_id = ?;`
+	rows, err := utils.DB.Query(query, post_id)
 	if err != nil {
 		fmt.Println("query error!")
 		return
