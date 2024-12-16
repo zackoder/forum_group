@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -14,6 +15,8 @@ func CommentReaction(w http.ResponseWriter, r *http.Request) {
 	if utils.HandleError(utils.Error{Err: cookie_err, Code: http.StatusUnauthorized}, w) {
 		return
 	}
+
+	/* get user_id with token start */
 	get_user := `SELECT user_id FROM sessions WHERE token= ? LIMIT 1`
 	stm, stm_err := utils.DB.Prepare(get_user)
 	if utils.HandleError(utils.Error{Err: stm_err, Code: http.StatusInternalServerError}, w) {
@@ -27,12 +30,22 @@ func CommentReaction(w http.ResponseWriter, r *http.Request) {
 	if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
 		return
 	}
+	/* get user_id with token end */
+
+	if user_id == 0 {
+		// handle token not valid err or expire session
+		err := errors.New("token not valid")
+		if utils.HandleError(utils.Error{Err: err, Code: http.StatusUnauthorized}, w) {
+			return
+		}
+	}
 	reactInfo := struct {
 		user_id    int
 		comment_id int
 	}{1, 1}
 	reactInfo.comment_id, err = strconv.Atoi(r.PathValue("PostId"))
 	if utils.HandleError(utils.Error{Err: err, Code: http.StatusNotFound}, w) {
+		fmt.Println("post id not valid")
 		return
 	}
 	if r.Method == http.MethodPost {
@@ -50,7 +63,7 @@ func CommentReaction(w http.ResponseWriter, r *http.Request) {
 			query = `INSERT INTO reactions(user_id,comment_id,type) VALUES (?,?,?)`
 			stm, err := utils.DB.Prepare(query)
 			if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
-				return
+				return/* get user_id with token start */
 			}
 			_, err = stm.Exec(&reactInfo.user_id, &reactInfo.comment_id, &action)
 			if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
