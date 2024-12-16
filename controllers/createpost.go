@@ -18,7 +18,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		// http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		err := Error{Message: "Not Allowed", Code: http.StatusMethodNotAllowed}
-		w.WriteHeader(405)
+		w.WriteHeader(http.StatusMethodNotAllowed)
 		json.NewEncoder(w).Encode(err)
 	}
 	cookie, err := r.Cookie("token") // Name the Cookie
@@ -53,6 +53,13 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	// 	log.Fatal("Invalid date formate", err)
 	// }
 	// formattedDate := parsedDate.Format("2006-01-02 15:04:05")
+	// newCategories := []
+	// for _, cat := range categories{
+	// 	if cat != ""{
+	// 		return
+	// 	}
+	// }
+	fmt.Println(categories)
 	title = strings.TrimSpace(title)
 	content = strings.TrimSpace(content)
 	if title == "" || content == "" {
