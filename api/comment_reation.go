@@ -11,20 +11,20 @@ import (
 func CommentReaction(w http.ResponseWriter, r *http.Request) {
 	action := r.FormValue("action")
 	cookie, cookie_err := r.Cookie("token")
-	if utils.HandleError(utils.Error{W: w, Err: cookie_err, Code: http.StatusUnauthorized}) {
+	if utils.HandleError(utils.Error{Err: cookie_err, Code: http.StatusUnauthorized}, w) {
 		return
 	}
 	get_user := `SELECT user_id FROM sessions WHERE token= ? LIMIT 1`
 	stm, stm_err := utils.DB.Prepare(get_user)
-	if utils.HandleError(utils.Error{W: w, Err: stm_err, Code: http.StatusInternalServerError}) {
+	if utils.HandleError(utils.Error{Err: stm_err, Code: http.StatusInternalServerError}, w) {
 		return
 	}
 	result, data_err := stm.Exec(cookie.Value)
-	if utils.HandleError(utils.Error{W: w, Err: data_err, Code: http.StatusInternalServerError}) {
+	if utils.HandleError(utils.Error{Err: data_err, Code: http.StatusInternalServerError}, w) {
 		return
 	}
 	user_id, err := result.RowsAffected()
-	if utils.HandleError(utils.Error{W: w, Err: err, Code: http.StatusInternalServerError}) {
+	if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
 		return
 	}
 	reactInfo := struct {
@@ -32,38 +32,38 @@ func CommentReaction(w http.ResponseWriter, r *http.Request) {
 		comment_id int
 	}{1, 1}
 	reactInfo.comment_id, err = strconv.Atoi(r.PathValue("PostId"))
-	if utils.HandleError(utils.Error{W: w, Err: err, Code: http.StatusNotFound}) {
+	if utils.HandleError(utils.Error{Err: err, Code: http.StatusNotFound}, w) {
 		return
 	}
 	if r.Method == http.MethodPost {
 		var exist int
 		query := `SELECT EXISTS(SELECT 1 FROM reactions WHERE (user_id = ? AND comment_id = ?));`
 		stm, err := utils.DB.Prepare(query)
-		if utils.HandleError(utils.Error{W: w, Err: err, Code: http.StatusInternalServerError}) {
+		if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
 			return
 		}
 		row_err := stm.QueryRow(user_id, reactInfo.comment_id).Scan(&exist)
-		if utils.HandleError(utils.Error{W: w, Err: row_err, Code: http.StatusInternalServerError}) {
+		if utils.HandleError(utils.Error{Err: row_err, Code: http.StatusInternalServerError}, w) {
 			return
 		}
 		if exist == 0 { /* add reaction */
 			query = `INSERT INTO reactions(user_id,comment_id,type) VALUES (?,?,?)`
 			stm, err := utils.DB.Prepare(query)
-			if utils.HandleError(utils.Error{W: w, Err: err, Code: http.StatusInternalServerError}) {
+			if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
 				return
 			}
 			_, err = stm.Exec(&reactInfo.user_id, &reactInfo.comment_id, &action)
-			if utils.HandleError(utils.Error{W: w, Err: err, Code: http.StatusInternalServerError}) {
+			if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
 				return
 			}
 		} else { /* edit reaction */
 			query = `UPDATE reactions SET type = ? WHERE user_id = ? AND comment_id = ?;`
 			stm, err := utils.DB.Prepare(query)
-			if utils.HandleError(utils.Error{W: w, Err: err, Code: http.StatusInternalServerError}) {
+			if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
 				return
 			}
 			_, row_err = stm.Exec(query, &action, &reactInfo.user_id, &reactInfo.comment_id)
-			if utils.HandleError(utils.Error{W: w, Err: row_err, Code: http.StatusInternalServerError}) {
+			if utils.HandleError(utils.Error{Err: row_err, Code: http.StatusInternalServerError}, w) {
 				return
 			}
 		}
@@ -71,17 +71,17 @@ func CommentReaction(w http.ResponseWriter, r *http.Request) {
 		/* delete reaction */
 		query := `DELETE FROM reactions WHERE user_id = ? AND comment_id = ?;`
 		stmt, err := utils.DB.Prepare(query)
-		if utils.HandleError(utils.Error{W: w, Err: err, Code: http.StatusInternalServerError}) {
+		if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
 			return
 		}
 		_, err = stmt.Exec(reactInfo.user_id, reactInfo.comment_id)
-		if utils.HandleError(utils.Error{W: w, Err: err, Code: http.StatusInternalServerError}) {
+		if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
 			return
 		}
 	} else {
 		/* handle error method not allowed */
 		err := errors.New("method not allowd")
-		if utils.HandleError(utils.Error{W: w, Err: err, Code: http.StatusMethodNotAllowed}) {
+		if utils.HandleError(utils.Error{Err: err, Code: http.StatusMethodNotAllowed}, w) {
 			return
 		}
 	}

@@ -1,7 +1,5 @@
 package utils
 
-import "net/http"
-
 type User struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
@@ -69,7 +67,6 @@ type PostCategory struct {
 }
 
 type Error struct {
-	W       http.ResponseWriter
-	Err     error
-	Code    int
+	Err  error
+	Code int
 }

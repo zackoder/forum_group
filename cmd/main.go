@@ -31,9 +31,11 @@ func main() {
 
 	/* server mux router */
 	mux := http.NewServeMux()
+	
+	/* serve static files */
 	mux.HandleFunc("/static/", controllers.Server)
+
 	/* pages handlers */
-	// mux.HandleFunc("/createpost", controllers.CreatePost)
 	mux.HandleFunc("/", controllers.Home)
 	mux.HandleFunc("/add-post", middleware.Authorization(controllers.CreatePost))
 

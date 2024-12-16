@@ -38,7 +38,7 @@ type FilterPostsCategory struct {
 func FilterByCategory(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		err := errors.New("method not allowed")
-		if utils.HandleError(utils.Error{W: w,Err: err,Code: http.StatusMethodNotAllowed }) {
+		if utils.HandleError(utils.Error{Err: err,Code: http.StatusMethodNotAllowed },w) {
 			return
 		}
 	}
