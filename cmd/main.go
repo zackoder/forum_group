@@ -48,9 +48,10 @@ func main() {
 	/* api handlers */
 	mux.HandleFunc(`/api/{PostId}/comments`, api.Comments) // comments list
 	mux.HandleFunc("/api/{PostId}/comment/new", middleware.Authorization(api.NewComment)) // create comment
-	mux.HandleFunc("/api/comment/reaction/{CommentId}", middleware.Authorization(api.CommentReaction)) // react a comment
+	mux.HandleFunc("/api/comment/reaction/{CommentId}", middleware.Authorization(api.CommentReaction)) // (like or dislike) a comment
 	mux.HandleFunc("/api/category/list", api.CategoryList) // get all categories
 	mux.HandleFunc("/api/posts", api.FetchPosts)
+	mux.HandleFunc("/api/posts/reaction/{PostId}",middleware.Authorization(api.PostReaction))
 
 	/* filters */
 	mux.HandleFunc("/api/category/filter/{CategoryId}", api.FilterByCategory) // not complated
