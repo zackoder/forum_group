@@ -48,14 +48,14 @@ func main() {
 	/* api handlers */
 	mux.HandleFunc(`/api/{PostId}/comments`, api.Comments) // comments list
 	mux.HandleFunc("/api/{PostId}/comment/new", middleware.Authorization(api.NewComment)) // create comment
-	mux.HandleFunc("/api/comment/reaction/{PostId}", api.CommentReaction) // react a comment
+	mux.HandleFunc("/api/comment/reaction/{CommentId}", middleware.Authorization(api.CommentReaction)) // react a comment
 	mux.HandleFunc("/api/category/list", api.CategoryList) // get all categories
 	mux.HandleFunc("/api/posts", api.FetchPosts)
 
 	/* filters */
 	mux.HandleFunc("/api/category/filter/{CategoryId}", api.FilterByCategory) // not complated
-	mux.HandleFunc("/api/created/posts", api.CreatedPosts) // not complated
-	mux.HandleFunc("/api/liked/posts", api.LikedPosts) // not complated
+	mux.HandleFunc("/api/created/posts", middleware.Authorization(api.CreatedPosts)) // not complated
+	mux.HandleFunc("/api/liked/posts", middleware.Authorization(api.LikedPosts)) // not complated
 
 	/* run server */
 	fmt.Printf("server running on http://localhost%s\n", port)

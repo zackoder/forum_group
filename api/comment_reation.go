@@ -3,17 +3,37 @@ package api
 import (
 	"errors"
 	"net/http"
+	"slices"
 	"strconv"
 
 	"forum/utils"
 )
 
 func CommentReaction(w http.ResponseWriter, r *http.Request) {
-	action := r.FormValue("action")
+	var reactInfo struct {
+		user_id    int    // get from token
+		comment_id int    // get from url
+		action     string // get from form
+	}
+
+	/* ------------------------------ handle action ------------------------------ */
+	reactInfo.action = r.FormValue("action")
+	actions := []string{"like", "dislike"}
+	if !slices.Contains(actions, reactInfo.action) {
+		err := errors.New("invalid action")
+		if utils.HandleError(utils.Error{Err: err, Code: http.StatusBadRequest}, w) {
+			return
+		}
+	}
+
+	/* ------------------------------ handle user_id ------------------------------ */
+	/* get cookie */
 	cookie, cookie_err := r.Cookie("token")
 	if utils.HandleError(utils.Error{Err: cookie_err, Code: http.StatusUnauthorized}, w) {
 		return
 	}
+
+	/* select user_id from database */
 	get_user := `SELECT user_id FROM sessions WHERE token= ? LIMIT 1`
 	stm, stm_err := utils.DB.Prepare(get_user)
 	if utils.HandleError(utils.Error{Err: stm_err, Code: http.StatusInternalServerError}, w) {
@@ -27,14 +47,14 @@ func CommentReaction(w http.ResponseWriter, r *http.Request) {
 	if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
 		return
 	}
-	reactInfo := struct {
-		user_id    int
-		comment_id int
-	}{1, 1}
-	reactInfo.comment_id, err = strconv.Atoi(r.PathValue("PostId"))
+
+	/* ------------------------------ handle comment_id ------------------------------ */
+	reactInfo.comment_id, err = strconv.Atoi(r.PathValue("CommentId"))
 	if utils.HandleError(utils.Error{Err: err, Code: http.StatusNotFound}, w) {
 		return
 	}
+
+	/* ------------------------------ handle comment reaction ------------------------------ */
 	if r.Method == http.MethodPost {
 		var exist int
 		query := `SELECT EXISTS(SELECT 1 FROM reactions WHERE (user_id = ? AND comment_id = ?));`
@@ -52,7 +72,7 @@ func CommentReaction(w http.ResponseWriter, r *http.Request) {
 			if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
 				return
 			}
-			_, err = stm.Exec(&reactInfo.user_id, &reactInfo.comment_id, &action)
+			_, err = stm.Exec(&reactInfo.user_id, &reactInfo.comment_id, &reactInfo.action)
 			if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
 				return
 			}
@@ -62,7 +82,7 @@ func CommentReaction(w http.ResponseWriter, r *http.Request) {
 			if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
 				return
 			}
-			_, row_err = stm.Exec(query, &action, &reactInfo.user_id, &reactInfo.comment_id)
+			_, row_err = stm.Exec(query, &reactInfo.action, &reactInfo.user_id, &reactInfo.comment_id)
 			if utils.HandleError(utils.Error{Err: row_err, Code: http.StatusInternalServerError}, w) {
 				return
 			}
