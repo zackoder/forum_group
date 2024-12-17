@@ -28,13 +28,14 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	title := r.FormValue("title")
-	content := r.FormValue("content")
-	categories := r.Form["option"]
+	title := r.FormValue("Title")
+	content := r.FormValue("Content")
+	categories := r.Form["options"]
+	fmt.Println(categories)
 	// for i := 0; i < len(categories); i++ {
 	// 	fmt.Printf(categories[i])
 	// }
-	image := r.FormValue("image")
+
 
 	var userId int
 
@@ -53,13 +54,14 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	title = strings.TrimSpace(title)
 	content = strings.TrimSpace(content)
 	if title == "" || content == "" {
-		err := Error{Message: "Title or Content is Empty", Code: http.StatusUnauthorized}
+		err := Error{Message: "Title or Content is", Code: http.StatusUnauthorized}
 		json.NewEncoder(w).Encode(err)
 		return
 	}
-	result, err := utils.DB.Exec("INSERT INTO posts(user_id, title, content, image, categories) VALUES(?, ?, ?, ?, ?, ?)", userId, title, strings.ReplaceAll(content, "\r\n", "<br>"), strings.Join(categories, ", "), image)
+	result, err := utils.DB.Exec("INSERT INTO posts(user_id, title, content, categories) VALUES(?, ?, ?, ?)", userId, title, strings.ReplaceAll(content, "\r\n", "<br>"), strings.Join(categories, ", "))
 	if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		err := Error{Message: "can insert in base donne", Code: http.StatusUnauthorized}
+		json.NewEncoder(w).Encode(err)
 		return
 	}
 	last_post_id, err := result.LastInsertId()
@@ -71,10 +73,19 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(err)
 		return
 	}
-	for _, id_categ := range categories {
-		_, err = utils.DB.Exec("INSERT INTO posts_categories(post_id, category_id) VALUES(?, ?)", last_post_id, id_categ) // GetLast id in table posts
+	for _, categ := range categories {
+		var category_id int
+		err := utils.DB.QueryRow("SELECT id FROM categories WHERE name = ?", categ).Scan(&category_id)
 		if err != nil {
-			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			err := Error{Message: "Bad Request", Code: http.StatusBadRequest}
+			json.NewEncoder(w).Encode(err)
+			return
+		}
+		_, err = utils.DB.Exec("INSERT INTO posts_categories(post_id, category_id) VALUES(?, ?)", last_post_id, category_id) // GetLast id in table posts
+		if err != nil {
+			// http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			err := Error{Message: "Bad Request", Code: http.StatusInternalServerError}
+			json.NewEncoder(w).Encode(err)
 			return
 		}
 	}

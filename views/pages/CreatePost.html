@@ -4,14 +4,16 @@
 
 <div class="form">
     <h1 class="minititle">create Post</h1>
-    <form >
-
+    <form method="POST" action="/add-post"   onsubmit="SubmitPost(e)"  >
         <label for="Title">Title</label> 
         <input type="text" name="Title" id="Title"><br>
+        <p id="errorTitle"></p>
         <label for="Content">Content</label>
-        <input type="text" name="Content" id="Content" required><br>
+        <input type="text" name="Content" id="Content"><br>
+        <p id="errorContent"></p>
         <div id="category"></div>
-        <button onclick="SubmitPost()" class="submit">submit</button><br />
+        <button   type="submit" class="submit">submit</button><br />
+        <p id="errorcategory"></p>
     </form>
 </div>
 {{end}} {{define "script"}}
