@@ -2,38 +2,23 @@
 <link rel="stylesheet" href="/static/styles/home.css" />
 {{end}} {{define "title"}}Forum{{end}} {{define "content"}}
 <div class="lay-out"></div>
-<h1 class="greeting">Welcome,</h1>
-<button class="show-postForm"><img src="/static/images/add.png" /></button>
-<form id="postForm" class="postForm">
-  <label class="create_Post" for="post">Create Post:</label>
-  <input
-    class="title_inpt"
-    type="text"
-    id="post"
-    name="title"
-    placeholder="Post Title"
-    required
-  />
-  <textarea class="post_contant" name="content" id="content"></textarea>
-  <input name="filename" type="file" />
-  <div class="checkbox-container">
-    <label class="checkbox-wrapper">
-      <input type="checkbox" class="checkbox-input" />
-      <span class="custom-checkbox">developpment</span>
-    </label>
+<h1 class="greeting">Welcome, {{.}}</h1>
+<button class="show-postForm">hi</button>
+    <form id="postForm" class="postForm">
+        <label for="Title">Title</label>
+        <input type="text" name="Title" id="Title"><br>
+        <p id="errorTitle"></p>
 
-    <label class="checkbox-wrapper">
-      <input type="checkbox" class="checkbox-input" />
-      <span class="custom-checkbox">technology</span>
-    </label>
+        <label for="Content">Content</label>
+        <input type="text" name="Content" id="Content"><br>
+        <p id="errorContent"></p>
 
-    <label class="checkbox-wrapper">
-      <input type="checkbox" class="checkbox-input" />
-      <span class="custom-checkbox">news</span>
-    </label>
-  </div>
-  <button type="submit">Submit</button>
-</form>
+        <div id="category"></div>
+        <p id="errorcategory"></p>
+
+        <button type="submit" class="submit">Submit</button><br />
+    </form>
+{{ block "comment_form" . }} {{end}}
 <section id="posts-container"></section>
 {{end}} {{define "script"}}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-min.js"></script>

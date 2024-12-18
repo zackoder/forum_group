@@ -65,3 +65,8 @@ type PostCategory struct {
 	PostId     int
 	CategoryId int
 }
+
+type Error struct {
+	Err  error
+	Code int
+}

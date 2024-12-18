@@ -8,6 +8,7 @@ import (
 
 	"forum/api"
 	"forum/controllers"
+	"forum/controllers/auth"
 	"forum/middleware"
 	"forum/models"
 	"forum/utils"
@@ -30,30 +31,33 @@ func main() {
 
 	/* server mux router */
 	mux := http.NewServeMux()
+
+	/* serve static files */
 	mux.HandleFunc("/static/", controllers.Server)
+
 	/* pages handlers */
 	mux.HandleFunc("/", controllers.Home)
-	mux.HandleFunc("/register", controllers.Register)
-	mux.HandleFunc("/login", controllers.Login)
 	mux.HandleFunc("/add-post", middleware.Authorization(controllers.CreatePost))
-	mux.HandleFunc("/user/singup", controllers.SingIn)
-	// mux.HandleFunc("/createpost", controllers.CreatePost)
-	// mux.HandleFunc("/comment", middleware.Authorization(middleware.Comments))
+
+	/* login and register handlers */
+	mux.HandleFunc("/Register", auth.RegisterUser)
+	mux.HandleFunc("/Login", auth.SingIn)
+	mux.HandleFunc("/register", controllers.Register)
+	mux.HandleFunc("/login", controllers.Login)	
+	mux.HandleFunc("/createpost", controllers.CreatePosts)
 
 	/* api handlers */
-	mux.HandleFunc(`/api/{PostId}/comments`, api.Comments)
+	mux.HandleFunc(`/api/{PostId}/comments`, api.Comments) // comments list
+	mux.HandleFunc("/api/{PostId}/comment/new", middleware.Authorization(api.NewComment)) // create comment
+	mux.HandleFunc("/api/comment/reaction/{PostId}", api.CommentReaction) // react a comment
+	mux.HandleFunc("/api/category/list", api.CategoryList) // get all categories
 	mux.HandleFunc("/api/posts", api.FetchPosts)
-	mux.HandleFunc("/api/{PostId}/comment/new", middleware.Authorization(api.NewComment))
-	// mux.HandleFunc("/api/{PostId}/", api.PostReaction)
-	// mux.HandleFunc("", api.CommentReaction)
 
 	/* filters */
-	mux.HandleFunc("/api/category/filter/{CategoryId}", api.FilterByCategory)
-	mux.HandleFunc("/api/created/posts", api.CreatedPosts)
-	mux.HandleFunc("/api/liked/posts", api.LikedPosts)
+	mux.HandleFunc("/api/category/filter/{CategoryId}", api.FilterByCategory) // not complated
+	mux.HandleFunc("/api/created/posts", api.CreatedPosts) // not complated
+	mux.HandleFunc("/api/liked/posts", api.LikedPosts) // not complated
 
-	mux.HandleFunc("/Register", controllers.RegisterUser)
-	mux.HandleFunc("/Login", controllers.SingIn)
 	/* run server */
 	fmt.Printf("server running on http://localhost%s\n", port)
 	server_err := http.ListenAndServe(port, mux)

@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -35,6 +36,12 @@ type FilterPostsCategory struct {
 }
 
 func FilterByCategory(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		err := errors.New("method not allowed")
+		if utils.HandleError(utils.Error{Err: err,Code: http.StatusMethodNotAllowed },w) {
+			return
+		}
+	}
 	id := r.PathValue("CategoryId")
 	category_id, num_err := strconv.Atoi(id)
 	if num_err != nil {

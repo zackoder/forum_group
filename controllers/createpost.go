@@ -15,31 +15,36 @@ type Error struct {
 }
 
 func CreatePost(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("tttt")
 	if r.Method != http.MethodPost {
 		// http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		err := Error{Message: "Not Allowed", Code: http.StatusMethodNotAllowed}
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		json.NewEncoder(w).Encode(err)
+		return
 	}
 	cookie, err := r.Cookie("token") // Name the Cookie
 	if err != nil {
 		// http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		err := Error{Message: "Unauthorized", Code: http.StatusUnauthorized}
-		w.WriteHeader(401)
+		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(err)
 		return
 	}
 
-	title := r.FormValue("title")
-	content := r.FormValue("content")
-	categories := r.Form["categories"]
-	fmt.Println(title)
-	fmt.Println(content)
+	err = r.ParseForm()
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	title := r.FormValue("Title")
+	content := r.FormValue("Content")
+	categories := r.Form["options"]
 	fmt.Println(categories)
 	// for i := 0; i < len(categories); i++ {
 	// 	fmt.Printf(categories[i])
 	// }
-	image := r.FormValue("image")
+
 
 	var userId int
 
@@ -66,26 +71,34 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	title = strings.TrimSpace(title)
 	content = strings.TrimSpace(content)
 	if title == "" || content == "" {
-		err := Error{Message: "Title or Content is Empty", Code: http.StatusUnauthorized}
-		w.WriteHeader(401)
+		err := Error{Message: "Title or Content is", Code: http.StatusUnauthorized}
+		w.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(w).Encode(err)
 		return
 	}
-	result, err := utils.DB.Exec("INSERT INTO posts(user_id, title, content, image, categories) VALUES(?, ?, ?, ?, ?)", userId, title, strings.ReplaceAll(content, "\r\n", "<br>"), strings.Join(categories, ", "), image)
+	result, err := utils.DB.Exec("INSERT INTO posts(user_id, title, content, categories) VALUES(?, ?, ?, ?)", userId, title, strings.ReplaceAll(content, "\r\n", "<br>"), strings.Join(categories, ", "))
+	if err != nil {
+		err := Error{Message: "can insert in base donne", Code: http.StatusUnauthorized}
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(err)
+		return
+	}
+	last_post_id, err := result.LastInsertId()
+	fmt.Println(last_post_id)
 	if err != nil {
 		// http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		err := Error{Message: "Bad Request", Code: http.StatusBadRequest}
-		w.WriteHeader(400)
+		err := Error{Message: "Error", Code: http.StatusInternalServerError}
+		// http.Redirect(w, r, "/login", http.StatusSeeOther)
+		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(err)
 		return
 	}
-	last_post_id, _ := result.LastInsertId()
-
 	for _, categ := range categories {
 		var category_id int
 		err := utils.DB.QueryRow("SELECT id FROM categories WHERE name = ?", categ).Scan(&category_id)
 		if err != nil {
 			err := Error{Message: "Bad Request", Code: http.StatusBadRequest}
+			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode(err)
 			return
 		}
@@ -93,6 +106,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			// http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			err := Error{Message: "Bad Request", Code: http.StatusInternalServerError}
+			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode(err)
 			return
 		}
