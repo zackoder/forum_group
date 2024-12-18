@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"forum/utils"
 
@@ -54,7 +55,7 @@ func SingIn(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     "token",
 		Value:    uid.String(),
-		MaxAge:   300,
+		MaxAge:   int(time.Hour) * 24,
 		HttpOnly: true,
 		Path:     "/",
 	})
@@ -167,7 +168,7 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     "token",
 		Value:    uid.String(),
-		MaxAge:   300,
+		MaxAge:   int(time.Hour) * 24,
 		HttpOnly: true,
 		Path:     "/",
 	})
