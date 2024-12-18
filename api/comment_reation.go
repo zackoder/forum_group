@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
 	"slices"
@@ -15,6 +16,13 @@ func CommentReaction(w http.ResponseWriter, r *http.Request) {
 		comment_id int    // get from url
 		action     string // get from form
 	}
+
+	type Result struct {
+		Message string
+		Code    int
+	}
+
+	w.Header().Set("Content-Type", "application/json")
 
 	/* ------------------------------ handle action ------------------------------ */
 	reactInfo.action = r.FormValue("action")
@@ -76,6 +84,8 @@ func CommentReaction(w http.ResponseWriter, r *http.Request) {
 			if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
 				return
 			}
+			w.WriteHeader(http.StatusCreated)
+			json.NewEncoder(w).Encode(Result{Message: http.StatusText(http.StatusCreated), Code: http.StatusCreated})
 		} else { /* edit reaction */
 			query = `UPDATE reactions SET type = ? WHERE user_id = ? AND comment_id = ?;`
 			stm, err := utils.DB.Prepare(query)
@@ -86,6 +96,9 @@ func CommentReaction(w http.ResponseWriter, r *http.Request) {
 			if utils.HandleError(utils.Error{Err: row_err, Code: http.StatusInternalServerError}, w) {
 				return
 			}
+
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(Result{Message: http.StatusText(http.StatusOK), Code: http.StatusOK})
 		}
 	} else if r.Method == http.MethodDelete {
 		/* delete reaction */
@@ -98,6 +111,8 @@ func CommentReaction(w http.ResponseWriter, r *http.Request) {
 		if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
 			return
 		}
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(Result{Message: http.StatusText(http.StatusOK), Code: http.StatusOK})
 	} else {
 		/* handle error method not allowed */
 		err := errors.New("method not allowd")
