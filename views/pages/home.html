@@ -7,13 +7,20 @@
 <div class="lay-out"></div>
 <h1 class="greeting">Welcome, {{.}}</h1>
 <button class="show-postForm">hi</button>
-<form class="postForm" action="/add-post" method="post">
-  <label class="create_Post" for="post">Create Post:</label>
-  <input class="title_inpt" type="text" id="post" name="title" placeholder="Post Title" required />
-  <textarea class="post_contant" name="content" id="content"></textarea>
-  <input name="filename" type="file" />
-  <button type="submit">Submit</button>
-</form>
+    <form id="postForm" class="postForm">
+        <label for="Title">Title</label>
+        <input type="text" name="Title" id="Title"><br>
+        <p id="errorTitle"></p>
+
+        <label for="Content">Content</label>
+        <input type="text" name="Content" id="Content"><br>
+        <p id="errorContent"></p>
+
+        <div id="category"></div>
+        <p id="errorcategory"></p>
+
+        <button type="submit" class="submit">Submit</button><br />
+    </form>
 {{ block "comment_form" . }} {{end}}
 <section id="posts-container"></section>
 {{end}}

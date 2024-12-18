@@ -4,18 +4,13 @@ async function PostCategory() {
         const res = await fetch("http://localhost:8001/api/category/list")
         const data = await res.json()
         data.forEach(catg => {
-
             category.innerHTML += `
         <input type="checkbox" name="options" id="" value="${catg.Name}" data-name="${catg.Name}">${catg.Name}<br>
         `
-            console.log(catg.Id);
         });
     } catch {
         console.log("erroure");
     }
-
-
-
 }
 PostCategory()
 
@@ -141,18 +136,19 @@ document.getElementById("postForm").addEventListener("submit", async function (e
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
                 body: new URLSearchParams({
-                    Title: Title,
-                    Content: Content,
-                    categoryName: categoryName
-                }).toString()
+                    "Title": Title,
+                    "Content": Content,
+                    "options": categoryName
+                })
             });
 
             if (res.ok) {
+                console.log(res);
+                
                 alert('Post successfully submitted');
 
-                // After the alert closes, redirect after a short delay (e.g., 500 milliseconds)
                 setTimeout(function () {
-                    window.location.href = res.url; // Redirect to the URL from the response
+                    window.location.href = res.url; 
                 }, 500);
             } else {
                 alert("Failed to submit post");
