@@ -15,15 +15,19 @@ type Error struct {
 }
 
 func CreatePost(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("tttt")
 	if r.Method != http.MethodPost {
 		// http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		w.WriteHeader(http.StatusMethodNotAllowed)
 		err := Error{Message: "Not Allowed", Code: http.StatusMethodNotAllowed}
 		json.NewEncoder(w).Encode(err)
+		return
 	}
 	cookie, err := r.Cookie("token") // Name the Cookie
 	if err != nil {
 		// http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		err := Error{Message: "Unauthorized", Code: http.StatusUnauthorized}
+		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(err)
 		return
 	}

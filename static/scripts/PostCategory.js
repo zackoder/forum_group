@@ -83,13 +83,11 @@ PostCategory()
 
 // }
 
-
-
-async function SubmitPost(e) {
-    e.preventDefault();  // Prevent the default form submission
+document.getElementById("postForm").addEventListener("submit", async function (event) {
+    event.preventDefault();  // Prevent the form from submitting
 
     // Declare validation flags
-    let isValidTitle = false;
+    let isValidTitle = true;
     let isValidContent = false;
     let isValidCheckboxes = false;
 
@@ -105,14 +103,14 @@ async function SubmitPost(e) {
     });
 
     // Title validation
-    if (Title === "") {
-        document.getElementById("errorTitle").innerHTML = "Title is required";
-        document.getElementById("errorTitle").style.color = "red";
-        isValidTitle = false;
-    } else {
-        document.getElementById("errorTitle").innerHTML = "";
-        isValidTitle = true;
-    }
+    // if (Title === "") {
+    //     document.getElementById("errorTitle").innerHTML = "Title is required";
+    //     document.getElementById("errorTitle").style.color = "red";
+    //     isValidTitle = false;
+    // } else {
+    //     document.getElementById("errorTitle").innerHTML = "";
+    //     isValidTitle = true;
+    // }
 
     // Content validation
     if (Content === "") {
@@ -136,17 +134,33 @@ async function SubmitPost(e) {
 
     // If all validations are successful, submit the form
     if (isValidTitle && isValidContent && isValidCheckboxes) {
-        // Optionally, set hidden inputs for category names before form submission
-        document.getElementById("categoryNames").value = categoryName.join(", ");
+        try {
+            const res = await fetch("http://localhost:8001/add-post", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    Title: Title,
+                    Content: Content,
+                    categoryName: categoryName
+                }).toString()
+            });
 
-        // Submit the form normally
-        document.getElementById("myForm").submit();
+            if (res.ok) {
+                alert('Post successfully submitted');
 
-       const res =await fetch("/add-post")
-        // Parse JSON response
-        const data =await res.json()
-        console.log(data);
-        
-
+                // After the alert closes, redirect after a short delay (e.g., 500 milliseconds)
+                setTimeout(function () {
+                    window.location.href = res.url; // Redirect to the URL from the response
+                }, 500);
+            } else {
+                alert("Failed to submit post");
+                console.log(res);
+            }
+        } catch (error) {
+            alert("Error: " + error.message);
+        }
     }
-}
+});
+
