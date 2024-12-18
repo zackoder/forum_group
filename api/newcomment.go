@@ -10,9 +10,6 @@ import (
 
 func NewComment(w http.ResponseWriter, r *http.Request) {
 	var comment utils.Comment
-	if r.Method != "POST" {
-		fmt.Println("error method not allowd!")
-	}
 	token, tokenErr := r.Cookie("token")
 	if tokenErr != nil {
 		fmt.Println(tokenErr.Error())
