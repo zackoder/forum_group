@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -10,21 +9,6 @@ import (
 
 	"forum/utils"
 )
-
-type PostsResult struct {
-	UserName   string
-	UserImage  string
-	Title      string
-	Content    string
-	Image      string
-	Categories []string
-	Date       string
-	Reactions  struct {
-		Likes    int
-		Dislikes int
-		Action   string
-	}
-}
 
 type FilterPostsCategory struct {
 	UserId     int
@@ -36,21 +20,15 @@ type FilterPostsCategory struct {
 }
 
 func FilterByCategory(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		err := errors.New("method not allowed")
-		if utils.HandleError(utils.Error{Err: err,Code: http.StatusMethodNotAllowed },w) {
-			return
-		}
-	}
 	id := r.PathValue("CategoryId")
 	category_id, num_err := strconv.Atoi(id)
 	if num_err != nil {
 		fmt.Println(num_err.Error())
 		return
 	}
-	var contents []PostsResult
+	var posts []utils.PostsResult
 	query := `
-		SELECT p.user_id,p.title,p.content,p.categories,p.date, u.username
+		SELECT p.id,p.user_id,p.title,p.content,p.categories,p.date, u.username
 		FROM posts p JOIN posts_categories pc
 		ON p.id = pc.post_id AND pc.category_id = ? 
 		JOIN users u ON u.id = p.user_id;
@@ -63,13 +41,16 @@ func FilterByCategory(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var user_id int
 		var categories string
-		var c PostsResult
-		if err = rows.Scan(&user_id, &c.Title, &c.Content, &categories, &c.Date, &c.UserName); err != nil {
+		var p utils.PostsResult // this is a post im use p for short var
+		if err = rows.Scan(&p.Id, &user_id, &p.Title, &p.Content, &categories, &p.Date, &p.UserName); err != nil {
 			fmt.Println(err.Error())
 			return
 		}
-		c.Categories = strings.Split(categories, ",")
-		contents = append(contents, c)
+		p.Categories = strings.Split(categories, ",")
+		posts = append(posts, p)
 	}
-	json.NewEncoder(w).Encode(contents)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(posts)
 }

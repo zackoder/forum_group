@@ -39,11 +39,10 @@ type Post struct {
 }
 
 type PostsResult struct {
+	Id         int
 	UserName   string
-	UserImage  string
 	Title      string
 	Content    string
-	Image      string
 	Categories []string
 	Date       string
 	Reactions  struct {

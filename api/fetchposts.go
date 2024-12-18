@@ -11,10 +11,10 @@ import (
 )
 
 func FetchPosts(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-		return
-	}
+	// if r.Method != http.MethodGet {
+	// 	http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+	// 	return
+	// }
 	offset := r.URL.Query().Get("offset")
 	nbr_offset, err := strconv.Atoi(offset)
 	if err != nil {
