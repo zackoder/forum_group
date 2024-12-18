@@ -287,6 +287,17 @@ header {
   resize: none;
 }
 
+.category {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.catLabel {
+  padding-left: 5px;
+}
+
+
 @media (max-width: 1024px) {
   .post-container {
     width: 80%;

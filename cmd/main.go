@@ -31,10 +31,9 @@ func main() {
 
 	/* server mux router */
 	mux := http.NewServeMux()
-
-	/* serve static files */
+	/* run static files */
+	// mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 	mux.HandleFunc("/static/", controllers.Server)
-
 	/* pages handlers */
 	mux.HandleFunc("/", controllers.Home)
 	mux.HandleFunc("/add-post", middleware.Authorization(controllers.CreatePost))

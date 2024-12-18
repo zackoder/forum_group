@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"forum/utils"
@@ -15,55 +15,55 @@ import (
 
 func Login(w http.ResponseWriter, r *http.Request) {
 	pages := []string{"views/pages/login.html"}
-	if r.Method == http.MethodGet {
-		utils.ExecuteTemplate(w, pages, nil)
-	}
+	utils.ExecuteTemplate(w, pages, nil)
 }
 
 func SingIn(w http.ResponseWriter, r *http.Request) {
-	user := utils.User{}
-	err := json.NewDecoder(r.Body).Decode(&user)
-	if !IsValidEmail(user.Email) || user.Password == "" || err != nil {
+	if r.Method == http.MethodGet {
+		return
+	} else if r.Method != http.MethodPost {
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		return
+
+	}
+	userInf := r.FormValue("userInf")
+	userInf = strings.TrimLeft(userInf, " ")
+	passwd := r.FormValue("passwd")
+	if !IsValidEmail(userInf) && !IsValidUsername(userInf) || passwd == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]string{"error": "Inavlid input for login"})
+		fmt.Fprintf(w, "check you input")
 		return
 	}
-	id, err := Select(user.Email, user.Password)
+	id, err := Select(userInf, passwd)
 	if err != nil {
-		if id == -2 {
-			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(map[string]string{"error": "there are error in server try anthor time"})
-		} else {
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(map[string]string{"error": "user or password not correct"})
-		}
-
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprintf(w, "%v", err)
 		return
 	}
 	uid, err := uuid.NewV4()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]string{"error": "there are error in server try anthor time"})
+		fmt.Fprintf(w, "there are error in server try later please")
 		return
 	}
 	err = CraeteSession(id, uid.String())
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]string{"error": "there are error in server try anthor time"})
+		fmt.Fprintf(w, "there are error in server try later please")
 		return
 	}
 	http.SetCookie(w, &http.Cookie{
 		Name:     "token",
 		Value:    uid.String(),
-		MaxAge:   time.Now().Hour() + 24,
+		MaxAge:   int(time.Hour) * 24,
 		HttpOnly: true,
 		Path:     "/",
 	})
 }
 
 func Select(userIfo, passwd string) (int, error) {
-	query := `SELECT id , password FROM users
-		WHERE email = ?
+	query := `SELECT id , passwd FROM user
+		WHERE user_name = ? OR email = ?
 	`
 	stmt, err := utils.DB.Prepare(query)
 	if err != nil {
@@ -73,7 +73,7 @@ func Select(userIfo, passwd string) (int, error) {
 	defer stmt.Close()
 	var hashpasswd string
 	var id int
-	err = stmt.QueryRow(userIfo).Scan(&id, &hashpasswd)
+	err = stmt.QueryRow(userIfo, userIfo).Scan(&id, &hashpasswd)
 	if err == sql.ErrNoRows {
 		return -1, fmt.Errorf("user or password not correct")
 	} else if err != nil {
@@ -86,16 +86,16 @@ func Select(userIfo, passwd string) (int, error) {
 }
 
 func CraeteSession(userid int, session string) error {
-	query := `INSERT INTO sessions(user_id , token)
+	query := `INSERT INTO session(user_id , uid)
 		VALUES(?,?)
-		ON CONFLICT DO UPDATE SET token = EXCLUDED.token , date = CURRENT_TIMESTAMP
+		ON CONFLICT DO UPDATE SET uid = ?
 	`
 	stmt, err := utils.DB.Prepare(query)
 	if err != nil {
 		return err
 	}
 	defer stmt.Close()
-	_, err = stmt.Exec(userid, session)
+	_, err = stmt.Exec(userid, session, session)
 
 	return err
 }

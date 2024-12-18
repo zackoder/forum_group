@@ -39,12 +39,10 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 
 	title := r.FormValue("Title")
 	content := r.FormValue("Content")
-	categories := r.Form["options"]
-	fmt.Println(categories)
+	categories := strings.Split(r.FormValue("options"), ",")
 	// for i := 0; i < len(categories); i++ {
 	// 	fmt.Printf(categories[i])
 	// }
-
 
 	var userId int
 
@@ -76,7 +74,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(err)
 		return
 	}
-	result, err := utils.DB.Exec("INSERT INTO posts(user_id, title, content, categories) VALUES(?, ?, ?, ?)", userId, title, strings.ReplaceAll(content, "\r\n", "<br>"), strings.Join(categories, ", "))
+	result, err := utils.DB.Exec("INSERT INTO posts(user_id, title, content, categories) VALUES(?, ?, ?, ?)", userId, title, strings.ReplaceAll(content, "\r\n", "<br>"), strings.Join(categories, ","))
 	if err != nil {
 		err := Error{Message: "can insert in base donne", Code: http.StatusUnauthorized}
 		w.WriteHeader(http.StatusUnauthorized)
@@ -93,10 +91,12 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(err)
 		return
 	}
+	fmt.Println(categories)
 	for _, categ := range categories {
 		var category_id int
 		err := utils.DB.QueryRow("SELECT id FROM categories WHERE name = ?", categ).Scan(&category_id)
 		if err != nil {
+			fmt.Println(err, categ)
 			err := Error{Message: "Bad Request", Code: http.StatusBadRequest}
 			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode(err)

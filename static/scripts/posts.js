@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
   const postsContainer = document.getElementById("posts-container");
-  PostCategory()
+  PostCategory();
   // Event delegation for click events
   postsContainer.addEventListener("click", function (event) {
     const postElement = event.target.closest(".post-container");
@@ -48,7 +48,6 @@ function handleLike(postId, like) {
           "post_id": ${postId},
           "like":${like}
           }`,
-
   })
     .then((response) => {
       if (!response.ok) {
@@ -108,7 +107,7 @@ async function loadMorePosts(name = "home") {
 
   try {
     console.log("hello");
-    const response = await fetch(`/api/posts`);
+    const response = await fetch(`/api/posts?offset=${offset}`);
 
     const posts = await response.json();
     if (!posts || posts.length === 0) return;
@@ -124,10 +123,10 @@ async function loadMorePosts(name = "home") {
       posterName.className = "poster";
       const posterImg = createEle("img");
       posterImg.src =
-        "/css/466006304_871124095226532_8631138819273739648_n.jpg";
+        "/static/images/466006304_871124095226532_8631138819273739648_n.jpg";
       const nameContainer = createEle("span");
-      nameContainer.className = "usrname"
-      nameContainer.innerText = post.UserName;
+      nameContainer.className = "usrname";
+      nameContainer.innerText = post.Username;
       posterName.appendChild(posterImg);
       posterName.appendChild(nameContainer);
       postElement.appendChild(posterName);
@@ -157,7 +156,7 @@ async function loadMorePosts(name = "home") {
 
       /* create an img element to contain like icon */
       const likeIcon = createEle("img");
-      likeIcon.src = "/css/like.png";
+      likeIcon.src = "/static/images/like.png";
 
       likebnt.appendChild(likeIcon);
 
@@ -167,7 +166,7 @@ async function loadMorePosts(name = "home") {
 
       /* creating an img tag to containg dislike icon */
       const dislikeIcone = createEle("img");
-      dislikeIcone.src = "/css/dislike.png";
+      dislikeIcone.src = "/static/images/dislike.png";
 
       dislikebnt.appendChild(dislikeIcone);
 
@@ -200,7 +199,7 @@ async function loadMorePosts(name = "home") {
 
       const send_icon = createEle("img");
       send_icon.className = "sendimg";
-      send_icon.src = "/css/send-message.png";
+      send_icon.src = "/static/images/send-message.png";
       submit_comment.appendChild(send_icon);
       comment_form.appendChild(title_impt);
       comment_form.appendChild(submit_comment);
@@ -339,28 +338,25 @@ function handleScroll() {
     loadMorePosts();
   }
 }
-setInterval();
 
+const form = document.getElementById("postForm");
 
-
-
-document.getElementById("postForm").addEventListener("submit", async function (event) {
-  event.preventDefault();  // Prevent the form from submitting
-alert("eeee")
+form.addEventListener("submit", async function (event) {
+  event.preventDefault();
   // Declare validation flags
   let isValidTitle = true;
   let isValidContent = false;
   let isValidCheckboxes = false;
 
   // Get form values
-  let Title = document.getElementById("Title").value;
-  let Content = document.getElementById("Content").value;
+  let Title = document.getElementById("post").value;
+  let Content = document.getElementById("content").value;
   let categoryName = [];
 
   // Get selected checkboxes
   let checkboxes = document.querySelectorAll('input[name="options"]:checked');
-  checkboxes.forEach(checkbox => {
-      categoryName.push(checkbox.getAttribute('data-name'));
+  checkboxes.forEach((checkbox) => {
+    categoryName.push(checkbox.getAttribute("data-name"));
   });
 
   // Title validation
@@ -375,67 +371,64 @@ alert("eeee")
 
   // Content validation
   if (Content === "") {
-      document.getElementById("errorContent").innerHTML = "Content is required";
-      document.getElementById("errorContent").style.color = "red";
-      isValidContent = false;
+    document.getElementById("errorContent").innerHTML = "Content is required";
+    document.getElementById("errorContent").style.color = "red";
+    isValidContent = false;
   } else {
-      document.getElementById("errorContent").innerHTML = "";
-      isValidContent = true;
+    document.getElementById("errorContent").innerHTML = "";
+    isValidContent = true;
   }
 
   // Checkbox validation
   if (categoryName.length === 0) {
-      document.getElementById("errorcategory").innerHTML = "Please select at least one category";
-      document.getElementById("errorcategory").style.color = "red";
-      isValidCheckboxes = false;
+    document.getElementById("errorcategory").innerHTML =
+      "Please select at least one category";
+    document.getElementById("errorcategory").style.color = "red";
+    isValidCheckboxes = false;
   } else {
-      document.getElementById("errorcategory").innerHTML = "";
-      isValidCheckboxes = true;
+    document.getElementById("errorcategory").innerHTML = "";
+    isValidCheckboxes = true;
   }
 
   // If all validations are successful, submit the form
   if (isValidTitle && isValidContent && isValidCheckboxes) {
-      try {
-          const res = await fetch("http://localhost:8001/add-post", {
-              method: "POST",
-              headers: {
-                  'Content-Type': 'application/x-www-form-urlencoded'
-              },
-              body: new URLSearchParams({
-                  "Title": Title,
-                  "Content": Content,
-                  "options": categoryName
-              })
-          });
+    try {
+      const res = await fetch("http://localhost:8001/add-post", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          Title: Title,
+          Content: Content,
+          options: categoryName,
+        }),
+      });
 
-          if (res.ok) {
-              alert('Post successfully submitted');
-
-              setTimeout(function () {
-                  window.location.href = res.url; 
-              }, 500);
-          } else {
-              alert("Failed to submit post");
-              console.log(res);
-          }
-      } catch (error) {
-          alert("Error: " + error.message);
+      if (res.ok) {
+        window.location.href = res.url;
+      } else {
+        alert("Failed to submit post");
+        console.log(res);
       }
+    } catch (error) {
+      alert("Error: " + error.message);
+    }
   }
 });
 
-
-
-
 async function PostCategory() {
-  let category = document.getElementById("category")
+  let category = document.getElementById("category");
   try {
-    const res = await fetch("http://localhost:8001/api/category/list")
-    const data = await res.json()
-    data.forEach(catg => {
+    const res = await fetch("http://localhost:8001/api/category/list");
+    const data = await res.json();
+    data.forEach((catg) => {
       category.innerHTML += `
-      <input type="checkbox" name="options" id="" value="${catg.Name}" data-name="${catg.Name}">${catg.Name}<br>
-      `
+      <label class="catLabel" for="${catg.Name}">
+        <input type="checkbox" name="options" id="${catg.Name}" value="${catg.Name}" data-name="${catg.Name}"> <splan>${catg.Name}</span>
+      </label>
+
+      `;
     });
   } catch {
     console.log("erroure");
