@@ -1,33 +1,26 @@
 {{define "style"}}
-<link rel="stylesheet" href="/static/styles/home.css">
+<link rel="stylesheet" href="/static/styles/home.css" />
+{{end}} {{define "title"}}Forum{{end}} {{define "content"}} {{ if .Logdin }}
+<div class="lay-out"></div>
+<h1 class="greeting">Welcome, {{.Name}}</h1>
+<button class="show-postForm">hi</button>
+<form class="postForm" action="/posts" method="post">
+  <label class="create_Post" for="post">Create Post:</label>
+  <input
+    class="title_inpt"
+    type="text"
+    id="post"
+    name="title"
+    placeholder="Post Title"
+    required
+  />
+  <textarea class="post_contant" name="content" id="content"></textarea>
+  <input name="filename" type="file" />
+  <button type="submit">Submit</button>
+</form>
 {{end}}
-
-{{define "title"}}Forum{{end}}
-
-{{define "content"}}
-    {{ if .Logdin }}
-    <div class="lay-out"></div>
-    <h1 class="greeting">Welcome, {{.Name}}</h1>
-    <button class="show-postForm">hi</button>
-    <form class="postForm" action="/posts" method="post">
-      <label class="create_Post" for="post">Create Post:</label>
-      <input
-        class="title_inpt"
-        type="text"
-        id="post"
-        name="title"
-        placeholder="Post Title"
-        required
-      />
-      <textarea class="post_contant" name="content" id="content"></textarea>
-      <input name="filename" type="file" />
-      <button type="submit">Submit</button>
-    </form>
-    {{end}}
-    <section id="posts-container"></section>
-{{end}}
-
-{{define "script"}}
+<section id="posts-container"></section>
+{{end}} {{define "script"}}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-min.js"></script>
-    <script src="/static/scripts/posts.js"></script>
+<script src="/static/scripts/posts.js"></script>
 {{end}}

@@ -17,9 +17,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  postsContainer.addEventListener("submit", function (event) {    
+  postsContainer.addEventListener("submit", function (event) {
     if (event.target.classList.contains("comment_form")) {
-
       const postElement = event.target.closest(".post-container");
       event.preventDefault();
 
@@ -98,15 +97,13 @@ const limit = 20;
 let loading = false;
 
 async function loadMorePosts(name) {
-  console.log(name);
-  if (name !== "home" || name !== "profile") name = "home";
-  if (loading) return;
-  loading = true;
+  // console.log(name);
+  // if (name !== "home" || name !== "profile") name = "home";
+  // if (loading) return;
+  // loading = true;
 
   try {
-    const response = await fetch(
-      `http://localhost:8080/fetch-posts?offset=0&name=home`
-    )
+    const response = await fetch(`http://localhost:8001/api/posts`)
       .then((res) => {
         console.log(res.json());
       })
