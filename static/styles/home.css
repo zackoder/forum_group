@@ -112,7 +112,7 @@ header {
   border-radius: 50%;
 }
 
-.poster span {
+.poster .usrname {
   position: absolute;
   top: 25%;
   left: 8%;
@@ -151,12 +151,6 @@ header {
 
 .disliked {
   background-color: var(--dislike-hover);
-}
-
-span {
-  margin-left: 15px;
-  position: absolute;
-  top: 25px;
 }
 
 .content {

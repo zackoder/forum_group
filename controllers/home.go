@@ -6,18 +6,22 @@ import (
 	"forum/utils"
 )
 
+type User struct {
+	Name string
+}
+
 func Home(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" { // handle invalid path (error 404)
 		utils.ExecuteTemplate(w, []string{"views/pages/error.html"}, nil)
 		return
 	}
 
-	token_cookie := http.Cookie{
-		Name: "token",
-		Value: "123456789abcdefghijklmnopqrstuvwxyz",
-	}
+	// token_cookie := http.Cookie{
+	// 	Name: "token",
+	// 	Value: "123456789abcdefghijklmnopqrstuvwxyz",
+	// }
 
-	http.SetCookie(w,&token_cookie)
+	// http.SetCookie(w,&token_cookie)
 
 	pages := []string{
 		"views/pages/home.html",

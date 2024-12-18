@@ -9,20 +9,18 @@ document.addEventListener("DOMContentLoaded", function () {
     const postId = postElement.getAttribute("data-post-id");
 
     if (event.target.classList.contains("like-btn")) {
-      console.log("Like Post ID:", postId);
       handleLike(postId, true);
     } else if (event.target.classList.contains("dislike-btn")) {
-      console.log("Dislike Post ID:", postId);
       handleLike(postId, false);
     }
   });
 
   postsContainer.addEventListener("submit", function (event) {
+    const postElement = event.target.closest(".post-container");
     if (event.target.classList.contains("comment_form")) {
-      const postElement = event.target.closest(".post-container");
       event.preventDefault();
-
       const form = event.target;
+
       const postId = postElement.getAttribute("data-post-id");
       const commentText = form.querySelector(".comment").value.trim();
 
@@ -46,7 +44,11 @@ function handleLike(postId, like) {
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
     },
-    body: `post_id=${postId}&like=${like}`,
+    body: `{
+          "post_id": ${postId},
+          "like":${like}
+          }`,
+
   })
     .then((response) => {
       if (!response.ok) {
@@ -90,32 +92,26 @@ if (profile) {
   profile.addEventListener("click", () => {
     loadMorePosts(profile);
   });
+} else {
+  document.getElementById("posts-container").style.paddingTop = "120px";
 }
 
 let offset = 0;
 const limit = 20;
 let loading = false;
 
-async function loadMorePosts(name) {
-  // console.log(name);
-  // if (name !== "home" || name !== "profile") name = "home";
-  // if (loading) return;
-  // loading = true;
+async function loadMorePosts(name = "home") {
+  console.log(name);
+
+  if (loading) return;
+  loading = true;
 
   try {
-    const response = await fetch(`http://localhost:8001/api/posts`)
-      .then((res) => {
-        console.log(res.json());
-      })
-      .catch((err) => {
-        alert(err);
-        console.log(err);
-      });
+    console.log("hello");
+    const response = await fetch(`/api/posts`);
 
-    if (!response.ok) alert("not ok");
     const posts = await response.json();
-    // if (!posts || posts.length === 0) return;
-    console.log(posts);
+    if (!posts || posts.length === 0) return;
 
     const postsContainer = document.getElementById("posts-container");
     posts.forEach((post) => {
@@ -130,8 +126,10 @@ async function loadMorePosts(name) {
       posterImg.src =
         "/css/466006304_871124095226532_8631138819273739648_n.jpg";
       const nameContainer = createEle("span");
+      nameContainer.className = "usrname"
       nameContainer.innerText = post.UserName;
-      posterName.append(posterImg, nameContainer);
+      posterName.appendChild(posterImg);
+      posterName.appendChild(nameContainer);
       postElement.appendChild(posterName);
 
       /* creating a div that will contain all the elements bellow */
@@ -179,9 +177,14 @@ async function loadMorePosts(name) {
       /* appending like container to the post contaner */
       pc.appendChild(like_dislike_container);
 
+      /* adding a button to see comments */
+      const seecomments = createEle("button");
+      seecomments.className = "see_comments";
+      seecomments.innerText = "see comments";
+      pc.appendChild(seecomments);
       /* creating the form that sends comments */
       const comment_form = createEle("form");
-      comment_form.method = "post";
+      comment_form.method = "POST";
       comment_form.className = "comment_form";
 
       const title_impt = createEle("input");
@@ -193,12 +196,14 @@ async function loadMorePosts(name) {
 
       const submit_comment = createEle("button");
       submit_comment.className = "send_comment";
+      submit_comment.type = "submit";
 
       const send_icon = createEle("img");
       send_icon.className = "sendimg";
       send_icon.src = "/css/send-message.png";
+      submit_comment.appendChild(send_icon);
       comment_form.appendChild(title_impt);
-      comment_form.appendChild(send_icon);
+      comment_form.appendChild(submit_comment);
 
       pc.appendChild(comment_form);
       postElement.appendChild(pc);
@@ -217,35 +222,114 @@ async function loadMorePosts(name) {
 function createEle(elename) {
   return document.createElement(elename);
 }
-let lay_outbtn = document.querySelector(".show-postForm");
 
-lay_outbtn.addEventListener("click", () => {
-  let layOutDiv = document.querySelector(".lay-out");
-  let postForm = document.querySelector(".postForm");
+const showPostFormButton = document.querySelector(".show-postForm");
+const postForm = document.querySelector(".postForm");
+const layout = document.querySelector(".lay-out"); // Optional dimmed background
 
-  if (layOutDiv.classList.contains("active")) {
-    layOutDiv.classList.remove("active");
-    postForm.classList.remove("active");
-    layOutDiv.style.display = "none";
-    postForm.style.display = "none";
-  } else if (!layOutDiv.classList.contains("active")) {
-    layOutDiv.classList.add("active");
-    postForm.classList.add("active");
-    layOutDiv.style.display = "block";
-    postForm.style.display = "flex";
-    document.body.style.overflow = "hidden";
-  }
+// Show the form
+showPostFormButton.addEventListener("click", () => {
+  postForm.style.display = "flex";
+  layout.style.display = "block";
+  document.body.style.overflow = "hidden";
 });
 
-document.body.addEventListener("keyup", (e) => {
-  if (e.key === "Escape") {
-    document.body.style.overflow = "";
-    document.querySelectorAll(".active").forEach((btn) => {
-      btn.classList.remove("active");
-      btn.style.display = "none";
+// Hide the form when clicking outside or on a cancel button
+layout.addEventListener("click", () => {
+  postForm.style.display = "none";
+  layout.style.display = "none";
+  document.body.style.overflow = "";
+});
+
+/*   let lay_outbtn = document.querySelector(".show-postForm");
+
+  lay_outbtn.addEventListener("click", () => {
+    let layOutDiv = document.querySelector(".lay-out");
+    let postForm = document.querySelector(".postForm");
+
+    if (layOutDiv.classList.contains("active")) {
+      layOutDiv.classList.remove("active");
+      postForm.classList.remove("active");
+      layOutDiv.style.display = "none";
+      postForm.style.display = "none";
+    } else if (!layOutDiv.classList.contains("active")) {
+      layOutDiv.classList.add("active");
+      postForm.classList.add("active");
+      layOutDiv.style.display = "block";
+      postForm.style.display = "flex";
+      document.body.style.overflow = "hidden";
+    }
+  }); */
+
+document.addEventListener("DOMContentLoaded", () => {
+  const postsContainer = document.getElementById("posts-container");
+  const profileLink = document.getElementById("profile");
+
+  if (profileLink) {
+    profileLink.addEventListener("click", async (event) => {
+      event.preventDefault(); // Prevent default navigation
+
+      // Clear existing posts
+      postsContainer.innerHTML = "";
+
+      // Fetch posts for the profile
+      try {
+        const response = await fetch("/api/posts");
+        if (!response.ok) {
+          throw new Error(
+            `Error fetching profile posts: ${response.statusText}`
+          );
+        }
+
+        const posts = await response.json();
+        renderPosts(posts, postsContainer);
+      } catch (error) {
+        console.error("Failed to fetch profile posts:", error);
+        postsContainer.innerHTML =
+          "<p>Error loading profile posts. Please try again later.</p>";
+      }
     });
   }
 });
+
+// function renderPosts(posts, container) {
+//   if (!posts || posts.length === 0) {
+//     container.innerHTML = "<p>No posts to show.</p>";
+//     return;
+//   }
+
+//   posts.forEach((post) => {
+//     const postElement = document.createElement("div");
+//     postElement.className = "post-container";
+//     postElement.dataset.postId = post.ID;
+
+//     const posterName = document.createElement("h2");
+//     posterName.className = "poster";
+//     const posterImg = document.createElement("img");
+//     posterImg.src =
+//       "/css/466006304_871124095226532_8631138819273739648_n.jpg"; // Example image
+//     const nameContainer = document.createElement("span");
+//     nameContainer.innerText = post.UserName;
+//     posterName.append(posterImg, nameContainer);
+//     postElement.appendChild(posterName);
+
+//     const pc = document.createElement("div");
+//     pc.className = "pc";
+
+//     const title = document.createElement("h3");
+//     title.className = "title";
+//     title.innerText = post.Title;
+
+//     const content = document.createElement("p");
+//     content.className = "content";
+//     content.innerText = post.Content;
+
+//     pc.append(title, content);
+//     postElement.appendChild(pc);
+
+//     container.appendChild(postElement);
+//   });
+// }
 
 function handleScroll() {
   const scrollPosition = window.scrollY + window.innerHeight;
@@ -255,4 +339,6 @@ function handleScroll() {
     loadMorePosts();
   }
 }
-setInterval();
+setInterval(() => {
+  loadMorePosts();
+}, 5000);

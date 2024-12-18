@@ -1,10 +1,10 @@
 package utils
 
 type User struct {
-	Id       int
-	Username string
-	Email    string
-	Password string
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	ConfPass string `json:"password_config"`
 }
 
 type Session struct {
@@ -30,11 +30,27 @@ type Comment struct {
 type Post struct {
 	Id         int
 	UserId     int
+	Username   string
 	Title      string
 	Content    string
 	Image      string
 	Categories string
 	Date       string
+}
+
+type PostsResult struct {
+	UserName   string
+	UserImage  string
+	Title      string
+	Content    string
+	Image      string
+	Categories []string
+	Date       string
+	Reactions  struct {
+		Likes    int
+		Dislikes int
+		Action   string
+	}
 }
 
 type Reaction struct {
@@ -48,8 +64,4 @@ type Reaction struct {
 type PostCategory struct {
 	PostId     int
 	CategoryId int
-}
-
-type Error struct {
-	ErrorMs string
 }

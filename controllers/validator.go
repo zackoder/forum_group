@@ -8,24 +8,8 @@ import (
 )
 
 func IsValidUsername(username string) bool {
-	if username == "" {
-		return false
-	}
-	last := []rune(username)[0]
-	for _, c := range username {
-		if c == '_' {
-			if last == '_' {
-				return false
-			}
-			last = c
-			continue
-		}
-		if !unicode.IsLetter(c) && !unicode.IsDigit(c) {
-			return false
-		}
-		last = c
-	}
-	return true
+	username_RGX := regexp.MustCompile(`^[a-zA-Z0-9_-]{3,20}$`)
+	return username_RGX.MatchString(username)
 }
 
 // This for valid email
@@ -42,4 +26,25 @@ func HasPassowd(password string) (string, error) {
 		return "", err
 	}
 	return string(hashpassord), nil
+}
+
+func isValidPassword(password string) bool {
+	hasUpper := false
+	hasLower := false
+	hasDigit := false
+	hasSpecial := false
+
+	for _, ch := range password {
+		if unicode.IsUpper(ch) {
+			hasUpper = true
+		} else if unicode.IsLower(ch) {
+			hasLower = true
+		} else if unicode.IsDigit(ch) {
+			hasDigit = true
+		} else if !unicode.IsLetter(ch) && !unicode.IsDigit(ch) {
+			hasSpecial = true
+		}
+	}
+
+	return hasUpper && hasLower && hasDigit && hasSpecial
 }

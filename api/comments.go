@@ -8,32 +8,52 @@ import (
 	"forum/utils"
 )
 
+type CommentType struct {
+	Id        int
+	Username  string
+	UserImage string
+	Comment   string
+	Date      string
+	Reaction  struct {
+		Likes    int
+		Dislikes int
+		Action   string
+	}
+}
+
 func Comments(w http.ResponseWriter, r *http.Request) {
-	var comments []utils.Comment
+	var comments []CommentType
 	if r.Method != "GET" {
 		fmt.Println("status 405 method not allowd!")
 		return
 	}
-	query := `SELECT comment FROM comments;`
+	query := `SELECT id,user_id,comment,date FROM comments;`
 	rows, err := utils.DB.Query(query)
 	if err != nil {
 		fmt.Println("query error!")
 		return
 	}
-	c, er := r.Cookie("token")
-	if er != nil {
-		fmt.Println(er)
-		return
-	}
-	fmt.Println(c.Value)
 	for rows.Next() {
-		var comment utils.Comment
-		if cm_err := rows.Scan(&comment.Comment); cm_err != nil {
-			fmt.Println("data parse error!")
+		var comment CommentType
+		var user_id int
+		if cm_err := rows.Scan(&comment.Id, &user_id, &comment.Comment, &comment.Date); cm_err != nil {
+			fmt.Println("data parse error!", cm_err.Error())
 			return
 		}
+		comment.Username = GetUsername(user_id)
 		comments = append(comments, comment)
 	}
 	w.Header().Set("Content-type", "application/json")
 	json.NewEncoder(w).Encode(comments)
+}
+
+func GetUsername(id int) string {
+	var username string
+	query := `SELECT (username) FROM users WHERE id= ?`
+	err := utils.DB.QueryRow(query, id).Scan(&username)
+	if err != nil {
+		fmt.Println(err.Error())
+		return ""
+	}
+	return username
 }

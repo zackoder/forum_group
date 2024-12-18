@@ -8,7 +8,7 @@ import (
 
 	"forum/api"
 	"forum/controllers"
-	"forum/middlewares"
+	"forum/middleware"
 	"forum/models"
 	"forum/utils"
 
@@ -35,16 +35,25 @@ func main() {
 	mux.HandleFunc("/", controllers.Home)
 	mux.HandleFunc("/register", controllers.Register)
 	mux.HandleFunc("/login", controllers.Login)
-	mux.HandleFunc("/add-post", middlewares.Authorization(controllers.AddPost))
-	// mux.HandleFunc("/comment", middlewares.Authorization(controllers.Comments))
+	mux.HandleFunc("/add-post", middleware.Authorization(controllers.CreatePost))
+	mux.HandleFunc("/user/singup", controllers.SingIn)
+	// mux.HandleFunc("/createpost", controllers.CreatePost)
+	// mux.HandleFunc("/comment", middleware.Authorization(middleware.Comments))
 
 	/* api handlers */
-	mux.HandleFunc("/user/singup", controllers.SingIn)
 	mux.HandleFunc(`/api/{PostId}/comments`, api.Comments)
-	mux.HandleFunc("/api/posts", api.Posts)
-	mux.HandleFunc("/api/reaction", api.Reactions)
-	mux.HandleFunc("/api/{PostId}/comment/new", middlewares.Authorization(api.NewComment))
+	mux.HandleFunc("/api/posts", api.FetchPosts)
+	mux.HandleFunc("/api/{PostId}/comment/new", middleware.Authorization(api.NewComment))
+	// mux.HandleFunc("/api/{PostId}/", api.PostReaction)
+	// mux.HandleFunc("", api.CommentReaction)
 
+	/* filters */
+	mux.HandleFunc("/api/category/filter/{CategoryId}", api.FilterByCategory)
+	mux.HandleFunc("/api/created/posts", api.CreatedPosts)
+	mux.HandleFunc("/api/liked/posts", api.LikedPosts)
+
+	mux.HandleFunc("/Register", controllers.RegisterUser)
+	mux.HandleFunc("/Login", controllers.SingIn)
 	/* run server */
 	fmt.Printf("server running on http://localhost%s\n", port)
 	server_err := http.ListenAndServe(port, mux)

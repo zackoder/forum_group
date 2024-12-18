@@ -1,10 +1,10 @@
 {{define "style"}}
 <link rel="stylesheet" href="/static/styles/home.css" />
-{{end}} {{define "title"}}Forum{{end}} {{define "content"}} {{ if .Logdin }}
+{{end}} {{define "title"}}Forum{{end}} {{define "content"}}
 <div class="lay-out"></div>
-<h1 class="greeting">Welcome, {{.Name}}</h1>
-<button class="show-postForm">hi</button>
-<form class="postForm" action="/posts" method="post">
+<h1 class="greeting">Welcome,</h1>
+<button class="show-postForm"><img src="/static/images/add.png" /></button>
+<form id="postForm" class="postForm">
   <label class="create_Post" for="post">Create Post:</label>
   <input
     class="title_inpt"
@@ -16,9 +16,24 @@
   />
   <textarea class="post_contant" name="content" id="content"></textarea>
   <input name="filename" type="file" />
+  <div class="checkbox-container">
+    <label class="checkbox-wrapper">
+      <input type="checkbox" class="checkbox-input" />
+      <span class="custom-checkbox">developpment</span>
+    </label>
+
+    <label class="checkbox-wrapper">
+      <input type="checkbox" class="checkbox-input" />
+      <span class="custom-checkbox">technology</span>
+    </label>
+
+    <label class="checkbox-wrapper">
+      <input type="checkbox" class="checkbox-input" />
+      <span class="custom-checkbox">news</span>
+    </label>
+  </div>
   <button type="submit">Submit</button>
 </form>
-{{end}}
 <section id="posts-container"></section>
 {{end}} {{define "script"}}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-min.js"></script>
