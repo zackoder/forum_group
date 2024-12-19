@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -20,12 +19,13 @@ type FilterPostsCategory struct {
 }
 
 func FilterByCategory(w http.ResponseWriter, r *http.Request) {
+	/* ------------------------------- Handle Category Id ------------------------------- */
 	id := r.PathValue("CategoryId")
 	category_id, num_err := strconv.Atoi(id)
-	if num_err != nil {
-		fmt.Println(num_err.Error())
+	if utils.HandleError(utils.Error{Err: num_err, Code: http.StatusNotFound}, w) {
 		return
 	}
+
 	var posts []utils.PostsResult
 	query := `
 		SELECT p.id,p.user_id,p.title,p.content,p.categories,p.date, u.username
@@ -33,17 +33,20 @@ func FilterByCategory(w http.ResponseWriter, r *http.Request) {
 		ON p.id = pc.post_id AND pc.category_id = ? 
 		JOIN users u ON u.id = p.user_id;
 	`
-	rows, err := utils.DB.Query(query, category_id)
-	if err != nil {
-		fmt.Println(err.Error())
+	stmt, stmt_err := utils.DB.Prepare(query)
+	if utils.HandleError(utils.Error{Err: stmt_err, Code: http.StatusInternalServerError}, w) {
+		return
+	}
+	rows, rows_err := stmt.Query(category_id)
+	if utils.HandleError(utils.Error{Err: rows_err, Code: http.StatusInternalServerError}, w) {
 		return
 	}
 	for rows.Next() {
 		var user_id int
 		var categories string
 		var p utils.PostsResult // this is a post im use p for short var
-		if err = rows.Scan(&p.Id, &user_id, &p.Title, &p.Content, &categories, &p.Date, &p.UserName); err != nil {
-			fmt.Println(err.Error())
+		err := rows.Scan(&p.Id, &user_id, &p.Title, &p.Content, &categories, &p.Date, &p.UserName)
+		if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
 			return
 		}
 		p.Categories = strings.Split(categories, ",")

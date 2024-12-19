@@ -1,49 +1,81 @@
 package api
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"forum/utils"
 )
 
 func NewComment(w http.ResponseWriter, r *http.Request) {
 	var comment utils.Comment
+	/* ----------------------------- token validation ----------------------------- */
 	token, tokenErr := r.Cookie("token")
 	if tokenErr != nil {
 		fmt.Println(tokenErr.Error())
 		return
 	}
+
+	/* ----------------------------- handle post_id ----------------------------- */
 	postId := r.PathValue("PostId")
 	var postIdErr error
 	comment.PostId, postIdErr = strconv.Atoi(postId)
-	if postIdErr != nil || CheckPost(comment.PostId){
+	if postIdErr != nil || CheckPost(comment.PostId) {
 		fmt.Println("Post id errrrrrrrrrrrrrrrrrrrrrrrrrr")
 		fmt.Println(comment.PostId)
 		return
 	}
+	/* ----------------------------- Prepare query for get user_id ----------------------------- */
 	getUserIdQuery := `SELECT user_id FROM sessions WHERE token=?;`
-	queryErr := utils.DB.QueryRow(getUserIdQuery, token.Value).Scan(&comment.UserId)
-	if queryErr != nil {
-		fmt.Println("get user_id from db errrrrrrrrrrrrrrrrrrrrrr")
-		fmt.Println(queryErr.Error())
+	stmt, stmt_err := utils.DB.Prepare(getUserIdQuery)
+	if utils.HandleError(utils.Error{Err: stmt_err, Code: http.StatusInternalServerError}, w) {
 		return
 	}
-	comment.Comment = r.FormValue("comment")
+
+	/* ----------------------------- Get user_id from DB ----------------------------- */
+	queryErr := stmt.QueryRow(getUserIdQuery, token.Value).Scan(&comment.UserId)
+	if utils.HandleError(utils.Error{Err: queryErr, Code: http.StatusInternalServerError}, w) {
+		return
+	}
+
+	/* ----------------------------- Handle comment data ----------------------------- */
+	comment.Comment = strings.TrimSpace(r.FormValue("comment"))
+	if len(comment.Comment) < 1 || len(comment.Comment) > 500 {
+		err := errors.New("bad request empty comment")
+		if utils.HandleError(utils.Error{Err: err, Code: http.StatusBadRequest}, w) {
+			return
+		}
+	}
+
+	/* ----------------------------- Prepare create comment query ----------------------------- */
 	query := `INSERT INTO comments(user_id,post_id,comment) VALUES (?,?,?);`
-	_, err := utils.DB.Exec(query, comment.UserId, comment.PostId, comment.Comment)
-	if err != nil {
-		fmt.Println("create comment errrrrrrrrrrrrrrrrrrrrrr")
-		fmt.Println(err.Error())
+	stmt, stmt_err = utils.DB.Prepare(query)
+	if utils.HandleError(utils.Error{Err: stmt_err, Code: http.StatusInternalServerError}, w) {
 		return
 	}
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	_, err := stmt.Exec(comment.UserId, comment.PostId, comment.Comment)
+	if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
+		return
+	}
+
+	/* ----------------------------- this response if comment is created ----------------------------- */
+	response := map[string]int{http.StatusText(http.StatusCreated): http.StatusCreated}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(response)
 }
 
 func CheckPost(postId int) bool {
-	query := `SELECT id FROM posts WHERE id=?;`
-	var id int
-	err := utils.DB.QueryRow(query, postId).Scan(&id)
+	/* ----------------------------- Check post ----------------------------- */
+	var exist int
+	query := `SELECT EXISTS(SELECT 1 FROM posts WHERE id=?);`
+	err := utils.DB.QueryRow(query, postId).Scan(&exist)
+	if exist == 0 {
+		err = errors.New("post not exist")
+	}
 	return err != nil
 }
