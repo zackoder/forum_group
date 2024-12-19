@@ -13,8 +13,6 @@ document.addEventListener("DOMContentLoaded", function () {
     } else if (event.target.classList.contains("dislike-btn")) {
       handleLike(postId, false);
     }
-    
-
   });
 
   postsContainer.addEventListener("submit", function (event) {
@@ -100,6 +98,9 @@ if (profile) {
 let offset = 0;
 const limit = 20;
 let loading = false;
+const onehour = 1000 * 60 * 60;
+const oneday = 1000 * 60 * 60 * 24;
+const onemin = 1000 * 60;
 
 async function loadMorePosts(name = "home") {
   console.log(name);
@@ -130,32 +131,27 @@ async function loadMorePosts(name = "home") {
       nameContainer.className = "usrname";
       nameContainer.innerText = post.Username;
       const createdat = createEle("span");
-      const date = +new Date(post.Date);
-      const curontTime = +new Date();
-      // alert(curontTime - data);
-      console.log("minets", Math.floor((curontTime - date) / 1000 / 60));
-      console.log("hours", Math.floor((curontTime - date) / 1000 / 60 / 60));
-      console.log(
-        "hours",
-        Math.floor((curontTime - date) / 1000 / 60 / 60 / 24)
-      );
+      let date = new Date(post.Date).getTime();
+      const currentTime = Date.now();
+      const elapsed = currentTime - date;
 
-      if (Math.floor((curontTime - date) / 1000 / 60 / 60) > 24) {
-        createdat.innerText += `${Math.floor(
-          (curontTime - date) / 1000 / 60 / 60 / 24
-        )}d`;
+      const days = Math.floor(elapsed / oneday);
+      const hours = Math.floor((elapsed % oneday) / onehour);
+      const minutes = Math.floor((elapsed % onehour) / onemin);
+
+      let timeText = "";
+
+      if (days > 0) {
+        timeText += `${days}d `;
       }
-      if (Math.floor((curontTime - date) / 1000 / 60 / 60) !== 0) {
-        createdat.innerText += `${Math.floor(
-          (curontTime - date) / 1000 / 60 / 60
-        )}h`;
+      if (hours > 0) {
+        timeText += `${hours}h `;
       }
-      if ((curontTime - date) / 1000 / 60 !== 0) {
-        createdat.innerText += `${Math.floor(
-          (curontTime - date) / 1000 / 60
-        )}min`;
+      if (minutes > 0) {
+        timeText += `${minutes}min`;
       }
 
+      createdat.innerText = timeText;
       createdat.className = "creationdate";
       posterName.appendChild(posterImg);
       posterName.appendChild(nameContainer);
