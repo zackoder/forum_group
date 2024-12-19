@@ -1,10 +1,13 @@
 document.addEventListener("DOMContentLoaded", function () {
   const postsContainer = document.getElementById("posts-container");
   PostCategory();
+
   // Event delegation for click events
   postsContainer.addEventListener("click", function (event) {
+
     const postElement = event.target.closest(".post-container");
     if (!postElement) return;
+
 
     const postId = postElement.getAttribute("data-post-id");
 
@@ -13,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
     } else if (event.target.classList.contains("dislike-btn")) {
       handleLike(postId, false);
     }
-    
+
 
   });
 
@@ -28,13 +31,41 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (commentText === "") {
         alert("Comment cannot be empty.");
+
         return;
       }
 
       handleComment(postId, commentText);
       form.reset();
     }
+
+
+
+
+
+
   });
+
+  postsContainer.addEventListener("click", function (event) {
+
+    const postElement = event.target.closest(".post-container");
+    if (!postElement) return;
+
+
+    const postId = postElement.getAttribute("data-post-id");
+
+
+    console.log(postId);
+    let CommentClass = event.target.classList.contains("see_comments")
+    if (CommentClass) {
+      alert(CommentClass)
+      GetComments(postId, "see_comments")
+    }
+
+
+  });
+
+
 
   loadMorePosts();
   window.addEventListener("scroll", _.throttle(handleScroll, 500));
@@ -78,13 +109,14 @@ function handleComment(postId, comment) {
       return response.json();
     })
     .then((data) => {
-      if (data.success) {
-        alert("Comment added successfully!");
-      } else {
-        alert("Failed to add comment.");
-      }
+      console.log(data)
+      if (data.message != 200) {
+        
+        alert(" faild to add Comment");
+      } 
     })
-    .catch((error) => console.error("Error submitting comment:", error));
+    .catch((error) => alert("Error submitting comment:", error));
+    
 }
 
 let home = "home";
@@ -400,5 +432,27 @@ async function PostCategory() {
     });
   } catch {
     console.log("erroure");
+  }
+}
+
+
+
+
+async function GetComments(idPost, str) {
+  alert(idPost)
+  alert(str)
+  try {
+    const response = await fetch(`http://localhost:8001/api/${idPost}/comments`)
+
+    if (response.ok) {
+      const data = await response.json();
+
+      console.log(data);
+    } else {
+      console.error("Request failed with status:", response.status);
+      // document.getElementById("responseMessage").innerText = "Error fetching comments.";
+    }
+  } catch (error) {
+
   }
 }
