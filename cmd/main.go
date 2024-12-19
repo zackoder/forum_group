@@ -31,10 +31,9 @@ func main() {
 
 	/* server mux router */
 	mux := http.NewServeMux()
-
-	/* serve static files */
+	/* run static files */
+	// mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 	mux.HandleFunc("/static/", controllers.Server)
-
 	/* pages handlers */
 	mux.HandleFunc("/", controllers.Home)
 	mux.HandleFunc("/add-post", middleware.Authorization(controllers.CreatePost))
@@ -43,7 +42,8 @@ func main() {
 	mux.HandleFunc("/Register", auth.RegisterUser)
 	mux.HandleFunc("/Login", auth.SingIn)
 	mux.HandleFunc("/register", controllers.Register)
-	mux.HandleFunc("/login", controllers.Login)
+	mux.HandleFunc("/login", controllers.Login)	
+	mux.HandleFunc("/createpost", controllers.CreatePosts)
 
 	/* api handlers */
 	mux.HandleFunc(`/api/{PostId}/comments`, api.Comments) // comments list

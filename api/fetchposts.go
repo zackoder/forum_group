@@ -18,7 +18,9 @@ func FetchPosts(w http.ResponseWriter, r *http.Request) {
 	offset := r.URL.Query().Get("offset")
 	nbr_offset, err := strconv.Atoi(offset)
 	if err != nil {
-		nbr_offset = 0
+		// http.Redirect(w, r, "/", http.StatusSeeOther)
+		json.NewEncoder(w).Encode(nil)
+		return
 	}
 	//, image, categories, date
 	query := "SELECT id, user_id, title, content, image, categories, date FROM posts ORDER BY id DESC LIMIT ? OFFSET ?"

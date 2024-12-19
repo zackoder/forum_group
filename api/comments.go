@@ -47,6 +47,7 @@ func Comments(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		comment.Username = GetUsername(user_id)
+		fmt.Println(comment)
 		comments = append(comments, comment)
 	}
 	w.Header().Set("Content-type", "application/json")

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -41,7 +42,10 @@ func NewComment(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err.Error())
 		return
 	}
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	res :=make(map[string]int)
+	res["message"]=200
+	json.NewEncoder(w).Encode(res)
+	// http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 func CheckPost(postId int) bool {

@@ -1,41 +1,71 @@
 document.addEventListener("DOMContentLoaded", function () {
   const postsContainer = document.getElementById("posts-container");
+  PostCategory();
 
   // Event delegation for click events
   postsContainer.addEventListener("click", function (event) {
-    const postElement = event.target.closest(".post-container"); // Find the nearest post-container
+
+    const postElement = event.target.closest(".post-container");
     if (!postElement) return;
+
 
     const postId = postElement.getAttribute("data-post-id");
 
     if (event.target.classList.contains("like-btn")) {
-      console.log("Like Post ID:", postId);
       handleLike(postId, true);
     } else if (event.target.classList.contains("dislike-btn")) {
-      console.log("Dislike Post ID:", postId);
       handleLike(postId, false);
     }
+
+
   });
 
   postsContainer.addEventListener("submit", function (event) {
+    const postElement = event.target.closest(".post-container");
     if (event.target.classList.contains("comment_form")) {
       event.preventDefault();
-
       const form = event.target;
-      const postId = form
-        .querySelector(".comment")
-        .getAttribute("data-post-id");
+
+      const postId = postElement.getAttribute("data-post-id");
       const commentText = form.querySelector(".comment").value.trim();
 
       if (commentText === "") {
         alert("Comment cannot be empty.");
+
         return;
       }
 
       handleComment(postId, commentText);
       form.reset();
     }
+
+
+
+
+
+
   });
+
+  postsContainer.addEventListener("click", function (event) {
+
+    const postElement = event.target.closest(".post-container");
+    if (!postElement) return;
+
+
+    const postId = postElement.getAttribute("data-post-id");
+
+
+    console.log(postId);
+    let CommentClass = event.target.classList.contains("see_comments")
+    if (CommentClass) {
+      alert(CommentClass)
+      GetComments(postId, "see_comments")
+    }
+
+
+  });
+
+
 
   loadMorePosts();
   window.addEventListener("scroll", _.throttle(handleScroll, 500));
@@ -47,7 +77,10 @@ function handleLike(postId, like) {
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
     },
-    body: `post_id=${postId}&like=${like}`,
+    body: `{
+          "post_id": ${postId},
+          "like":${like}
+          }`,
   })
     .then((response) => {
       if (!response.ok) {
@@ -62,12 +95,12 @@ function handleLike(postId, like) {
 }
 
 function handleComment(postId, comment) {
-  fetch("/comments", {
+  fetch(`api/${postId}/comment/new`, {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
     },
-    body: `post_id=${postId}&comment=${comment}`,
+    body: `comment=${comment}`,
   })
     .then((response) => {
       if (!response.ok) {
@@ -76,24 +109,32 @@ function handleComment(postId, comment) {
       return response.json();
     })
     .then((data) => {
-      if (data.success) {
-        alert("Comment added successfully!");
-      } else {
-        alert("Failed to add comment.");
-      }
+      console.log(data)
+      if (data.message != 200) {
+        
+        alert(" faild to add Comment");
+      } 
     })
-    .catch((error) => console.error("Error submitting comment:", error));
+    .catch((error) => alert("Error submitting comment:", error));
+    
 }
 
 let home = "home";
 let profile = document.getElementById("profile");
-profile.addEventListener("click", () => {
-  loadMorePosts(profile);
-});
+if (profile) {
+  profile.addEventListener("click", () => {
+    loadMorePosts(profile);
+  });
+} else {
+  document.getElementById("posts-container").style.paddingTop = "120px";
+}
 
 let offset = 0;
 const limit = 20;
 let loading = false;
+const onehour = 1000 * 60 * 60;
+const oneday = 1000 * 60 * 60 * 24;
+const onemin = 1000 * 60;
 
 async function loadMorePosts(name = "home") {
   console.log(name);
@@ -103,7 +144,7 @@ async function loadMorePosts(name = "home") {
 
   try {
     console.log("hello");
-    const response = await fetch(`/fetch-posts?offset=${offset}&name=${name}`);
+    const response = await fetch(`/api/posts?offset=${offset}`);
 
     const posts = await response.json();
     if (!posts || posts.length === 0) return;
@@ -112,18 +153,44 @@ async function loadMorePosts(name = "home") {
     posts.forEach((post) => {
       const postElement = document.createElement("div");
       postElement.className = "post-container";
-      postElement.dataset.postId = post.ID;
+      postElement.dataset.postId = post.Id;
 
       /* h2 will contain the image and name of the persen who posted */
       const posterName = createEle("h2");
       posterName.className = "poster";
       const posterImg = createEle("img");
       posterImg.src =
-        "/css/466006304_871124095226532_8631138819273739648_n.jpg";
+        "/static/images/466006304_871124095226532_8631138819273739648_n.jpg";
       const nameContainer = createEle("span");
-      nameContainer.innerText = post.UserName;
-      posterName.append(posterImg, nameContainer);
+      nameContainer.className = "usrname";
+      nameContainer.innerText = post.Username;
+      const createdat = createEle("span");
+      let date = new Date(post.Date).getTime();
+      const currentTime = Date.now();
+      const elapsed = currentTime - date;
+
+      const days = Math.floor(elapsed / oneday);
+      const hours = Math.floor((elapsed % oneday) / onehour);
+      const minutes = Math.floor((elapsed % onehour) / onemin);
+
+      let timeText = "";
+
+      if (days > 0) {
+        timeText += `${days}d `;
+      }
+      if (hours > 0) {
+        timeText += `${hours}h `;
+      }
+      if (minutes > 0) {
+        timeText += `${minutes}min`;
+      }
+
+      createdat.innerText = timeText;
+      createdat.className = "creationdate";
+      posterName.appendChild(posterImg);
+      posterName.appendChild(nameContainer);
       postElement.appendChild(posterName);
+      postElement.appendChild(createdat);
 
       /* creating a div that will contain all the elements bellow */
       const pc = createEle("div");
@@ -140,6 +207,16 @@ async function loadMorePosts(name = "home") {
       content.innerText = post.Content;
       pc.append(title, content);
 
+      const categories_container = createEle("div");
+      categories_container.className = "categories";
+
+      for (let cate of post.Categories.split(",")) {
+        const span = createEle("span");
+        span.className = "category";
+        span.innerText = cate;
+        categories_container.appendChild(span);
+      }
+      pc.appendChild(categories_container);
       /* creating like and dislike button */
       const like_dislike_container = createEle("div");
       like_dislike_container.className = "like-dislike-container";
@@ -150,7 +227,7 @@ async function loadMorePosts(name = "home") {
 
       /* create an img element to contain like icon */
       const likeIcon = createEle("img");
-      likeIcon.src = "/css/like.png";
+      likeIcon.src = "/static/images/like.png";
 
       likebnt.appendChild(likeIcon);
 
@@ -160,7 +237,7 @@ async function loadMorePosts(name = "home") {
 
       /* creating an img tag to containg dislike icon */
       const dislikeIcone = createEle("img");
-      dislikeIcone.src = "/css/dislike.png";
+      dislikeIcone.src = "/static/images/dislike.png";
 
       dislikebnt.appendChild(dislikeIcone);
 
@@ -170,9 +247,14 @@ async function loadMorePosts(name = "home") {
       /* appending like container to the post contaner */
       pc.appendChild(like_dislike_container);
 
+      /* adding a button to see comments */
+      const seecomments = createEle("button");
+      seecomments.className = "see_comments";
+      seecomments.innerText = "see comments";
+      pc.appendChild(seecomments);
       /* creating the form that sends comments */
       const comment_form = createEle("form");
-      comment_form.method = "post";
+      comment_form.method = "POST";
       comment_form.className = "comment_form";
 
       const title_impt = createEle("input");
@@ -184,12 +266,14 @@ async function loadMorePosts(name = "home") {
 
       const submit_comment = createEle("button");
       submit_comment.className = "send_comment";
+      submit_comment.type = "submit";
 
       const send_icon = createEle("img");
       send_icon.className = "sendimg";
-      send_icon.src = "/css/send-message.png";
+      send_icon.src = "/static/images/send-message.png";
+      submit_comment.appendChild(send_icon);
       comment_form.appendChild(title_impt);
-      comment_form.appendChild(send_icon);
+      comment_form.appendChild(submit_comment);
 
       pc.appendChild(comment_form);
       postElement.appendChild(pc);
@@ -208,32 +292,51 @@ async function loadMorePosts(name = "home") {
 function createEle(elename) {
   return document.createElement(elename);
 }
-let lay_outbtn = document.querySelector(".show-postForm");
 
-lay_outbtn.addEventListener("click", () => {
-  let layOutDiv = document.querySelector(".lay-out");
-  let postForm = document.querySelector(".postForm");
+const showPostFormButton = document.querySelector(".show-postForm");
+const postForm = document.querySelector(".postForm");
+const layout = document.querySelector(".lay-out"); // Optional dimmed background
 
-  if (layOutDiv.classList.contains("active")) {
-    layOutDiv.classList.remove("active");
-    postForm.classList.remove("active");
-    layOutDiv.style.display = "none";
-    postForm.style.display = "none";
-  } else if (!layOutDiv.classList.contains("active")) {
-    layOutDiv.classList.add("active");
-    postForm.classList.add("active");
-    layOutDiv.style.display = "block";
-    postForm.style.display = "flex";
-    document.body.style.overflow = "hidden";
-  }
+// Show the form
+showPostFormButton.addEventListener("click", () => {
+  postForm.style.display = "flex";
+  layout.style.display = "block";
+  document.body.style.overflow = "hidden";
 });
 
-document.body.addEventListener("keyup", (e) => {
-  if (e.key === "Escape") {
-    document.body.style.overflow = "";
-    document.querySelectorAll(".active").forEach((btn) => {
-      btn.classList.remove("active");
-      btn.style.display = "none";
+// Hide the form when clicking outside or on a cancel button
+layout.addEventListener("click", () => {
+  postForm.style.display = "none";
+  layout.style.display = "none";
+  document.body.style.overflow = "";
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const postsContainer = document.getElementById("posts-container");
+  const profileLink = document.getElementById("profile");
+
+  if (profileLink) {
+    profileLink.addEventListener("click", async (event) => {
+      event.preventDefault(); // Prevent default navigation
+      let offset = 0;
+      postsContainer.innerHTML = "";
+
+      // Fetch posts for the profile
+      try {
+        const response = await fetch(`/api/posts?offset=${offset}`);
+        if (!response.ok) {
+          throw new Error(
+            `Error fetching profile posts: ${response.statusText}`
+          );
+        }
+
+        const posts = await response.json();
+        renderPosts(posts, postsContainer);
+      } catch (error) {
+        console.error("Failed to fetch profile posts:", error);
+        postsContainer.innerHTML =
+          "<p>Error loading profile posts. Please try again later.</p>";
+      }
     });
   }
 });
@@ -246,4 +349,108 @@ function handleScroll() {
     loadMorePosts();
   }
 }
-setInterval();
+
+const form = document.getElementById("postForm");
+
+form.addEventListener("submit", async function (event) {
+  event.preventDefault();
+  // Declare validation flags
+  let isValidTitle = true;
+  let isValidContent = false;
+  let isValidCheckboxes = false;
+
+  // Get form values
+  let Title = document.getElementById("post").value;
+  let Content = document.getElementById("content").value;
+  let categoryName = [];
+
+  // Get selected checkboxes
+  let checkboxes = document.querySelectorAll('input[name="options"]:checked');
+  checkboxes.forEach((checkbox) => {
+    categoryName.push(checkbox.getAttribute("data-name"));
+  });
+
+  if (Content === "") {
+    document.getElementById("errorContent").innerHTML = "Content is required";
+    document.getElementById("errorContent").style.color = "red";
+    isValidContent = false;
+  } else {
+    document.getElementById("errorContent").innerHTML = "";
+    isValidContent = true;
+  }
+
+  if (categoryName.length === 0) {
+    document.getElementById("errorcategory").innerHTML =
+      "Please select at least one category";
+    document.getElementById("errorcategory").style.color = "red";
+    isValidCheckboxes = false;
+  } else {
+    document.getElementById("errorcategory").innerHTML = "";
+    isValidCheckboxes = true;
+  }
+
+  if (isValidTitle && isValidContent && isValidCheckboxes) {
+    try {
+      const res = await fetch("http://localhost:8001/add-post", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          Title: Title,
+          Content: Content,
+          options: categoryName,
+        }),
+      });
+
+      if (res.ok) {
+        window.location.href = res.url;
+      } else {
+        alert("Failed to submit post");
+        console.log(res);
+      }
+    } catch (error) {
+      alert("Error: " + error.message);
+    }
+  }
+});
+
+async function PostCategory() {
+  let category = document.getElementById("category");
+  try {
+    const res = await fetch("http://localhost:8001/api/category/list");
+    const data = await res.json();
+    data.forEach((catg) => {
+      category.innerHTML += `
+      <label class="catLabel" for="${catg.Name}">
+        <input type="checkbox" name="options" id="${catg.Name}" value="${catg.Name}" data-name="${catg.Name}"> <splan>${catg.Name}</span>
+      </label>
+
+      `;
+    });
+  } catch {
+    console.log("erroure");
+  }
+}
+
+
+
+
+async function GetComments(idPost, str) {
+  alert(idPost)
+  alert(str)
+  try {
+    const response = await fetch(`http://localhost:8001/api/${idPost}/comments`)
+
+    if (response.ok) {
+      const data = await response.json();
+
+      console.log(data);
+    } else {
+      console.error("Request failed with status:", response.status);
+      // document.getElementById("responseMessage").innerText = "Error fetching comments.";
+    }
+  } catch (error) {
+
+  }
+}

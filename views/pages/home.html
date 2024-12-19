@@ -1,25 +1,29 @@
 {{define "style"}}
-<link rel="stylesheet" href="/static/styles/home.css">
-
-{{end}}
-{{define "title"}}Home{{end}}
-{{define "content"}}
+<link rel="stylesheet" href="/static/styles/home.css" />
+{{end}} {{define "title"}}Forum{{end}} {{define "content"}}
 <div class="lay-out"></div>
-<h1 class="greeting">Welcome, {{.}}</h1>
-<button class="show-postForm">hi</button>
-<form class="postForm" action="/add-post" method="post">
+<button class="show-postForm"><img src="/static/images/add.png"></button>
+<form id="postForm" class="postForm">
   <label class="create_Post" for="post">Create Post:</label>
-  <input class="title_inpt" type="text" id="post" name="title" placeholder="Post Title" required />
+  <input
+    class="title_inpt"
+    type="text"
+    id="post"
+    name="title"
+    placeholder="Post Title"
+    required
+  />
+  <p id="errorTitle"></p>
   <textarea class="post_contant" name="content" id="content"></textarea>
-  <input name="filename" type="file" />
-  <button type="submit">Submit</button>
+  <p id="errorContent"></p>
+
+  <div id="category"></div>
+  <p id="errorcategory"></p>
+
+  <button type="submit" class="submit">Submit</button><br />
 </form>
-{{ block "comment_form" . }} {{end}}
 <section id="posts-container"></section>
-{{end}}
-{{define "script"}}
-
-
+{{end}} {{define "script"}}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-min.js"></script>
 <script src="/static/scripts/posts.js"></script>
 {{end}}
