@@ -47,21 +47,29 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   postsContainer.addEventListener("click", function (event) {
-
     const postElement = event.target.closest(".post-container");
-    if (!postElement) return;
 
 
-    const postId = postElement.getAttribute("data-post-id");
+    const postId = postElement ? postElement.getAttribute("data-post-id") : null;
+
+    console.log(postId); // For debugging
+
+    // Check if the clicked element has the "see_comments" class
+    const CommentClass = event.target.classList.contains("see_comments");
+
+    // Find the div where the comments will be inserted
+    const divcomments = document.querySelector(".divcomments" + postId);
+
+    // Temporary placeholder text
 
 
-    console.log(postId);
-    let CommentClass = event.target.classList.contains("see_comments")
-    if (CommentClass) {
-      alert(CommentClass)
-      GetComments(postId, "see_comments")
+    // If the element clicked has the "see_comments" class, load the comments
+    if (CommentClass && postId) {
+
+
+      // Make sure to pass the actual div (not a string) to GetComments
+      GetComments(postId, divcomments);
     }
-
 
   });
 
@@ -111,12 +119,12 @@ function handleComment(postId, comment) {
     .then((data) => {
       console.log(data)
       if (data.message != 200) {
-        
+
         alert(" faild to add Comment");
-      } 
+      }
     })
     .catch((error) => alert("Error submitting comment:", error));
-    
+
 }
 
 let home = "home";
@@ -151,6 +159,7 @@ async function loadMorePosts(name = "home") {
 
     const postsContainer = document.getElementById("posts-container");
     posts.forEach((post) => {
+
       const postElement = document.createElement("div");
       postElement.className = "post-container";
       postElement.dataset.postId = post.Id;
@@ -246,6 +255,15 @@ async function loadMorePosts(name = "home") {
 
       /* appending like container to the post contaner */
       pc.appendChild(like_dislike_container);
+
+
+
+      ////add div comments
+      const divcomments = createEle("div");
+      divcomments.className = `divcomments${post.Id}`;
+
+      pc.appendChild(divcomments);
+
 
       /* adding a button to see comments */
       const seecomments = createEle("button");
@@ -437,15 +455,57 @@ async function PostCategory() {
 
 
 async function GetComments(idPost, str) {
-  alert(idPost)
-  alert(str)
+
+
   try {
     const response = await fetch(`http://localhost:8001/api/${idPost}/comments`)
 
     if (response.ok) {
       const data = await response.json();
+      if (data == null) {
+        str.innerHTML = "there is no comments"
+      } else {
+        const comments = createEle("div")
+        comments.className = "commentsDiv"
 
+        data.forEach(e => {
+          const commentC = createEle('div')
+          commentC.className = "commentC"
+
+          const commentH = createEle('h6')
+          commentH.className = "commentH"
+          commentH.innerText = e.Username
+
+          const commentP = createEle('p')
+          commentP.className = "commentp"
+          commentP.innerText = e.Comment
+
+
+
+
+          commentC.append(commentH, commentP)
+          comments.appendChild(commentC)
+          // const commentHTML = `
+          //   <div class="comment">
+          //     <h6>${e.Username}</h6>
+          //     <p>${e.Comment}</p>
+          //   </div>
+          // `;
+
+          // Append the new comment HTML to str's innerHTML
+          // Use += to append instead of overwriting
+        });
+        str.appendChild(comments)
+        str.style.border = "1px solid #ccc";
+        str.style.padding = "5px";
+        str.style.marginBottom = "5px";
+        str.style.backgroundColor = "#f9f9f9";
+        str.style.borderRadius = "5px";
+        str.style.width = "100%";
+        str.style.height = "auto";
+      }
       console.log(data);
+
     } else {
       console.error("Request failed with status:", response.status);
       // document.getElementById("responseMessage").innerText = "Error fetching comments.";
@@ -453,4 +513,5 @@ async function GetComments(idPost, str) {
   } catch (error) {
 
   }
+
 }

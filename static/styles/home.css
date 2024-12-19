@@ -39,6 +39,7 @@ header {
   font-size: 1.2rem;
   color: white;
   transition: color 200ms ease-in-out;
+
 }
 
 .navbar .navlinks:hover {
