@@ -249,9 +249,14 @@ header {
   background: none;
   border: none;
   position: fixed;
-  top: 120px;
-  right: 20px;
+  top: 150px;
+  right: 80px;
   cursor: pointer;
+}
+
+.show-postForm img {
+  width: 40px;
+  height: 40px;
 }
 
 .lay-out {
@@ -295,6 +300,19 @@ header {
 
 .catLabel {
   padding-left: 5px;
+}
+
+.creationdate {
+  text-align: end;
+}
+
+.categories {
+  width: 100%;
+  margin-bottom: 5px;
+}
+.category {
+  padding: 10px;
+  display: inline;
 }
 
 

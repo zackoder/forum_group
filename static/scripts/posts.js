@@ -13,6 +13,8 @@ document.addEventListener("DOMContentLoaded", function () {
     } else if (event.target.classList.contains("dislike-btn")) {
       handleLike(postId, false);
     }
+    
+
   });
 
   postsContainer.addEventListener("submit", function (event) {
@@ -62,12 +64,12 @@ function handleLike(postId, like) {
 }
 
 function handleComment(postId, comment) {
-  fetch("/comments", {
+  fetch(`api/${postId}/comment/new`, {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
     },
-    body: `post_id=${postId}&comment=${comment}`,
+    body: `comment=${comment}`,
   })
     .then((response) => {
       if (!response.ok) {
@@ -116,7 +118,7 @@ async function loadMorePosts(name = "home") {
     posts.forEach((post) => {
       const postElement = document.createElement("div");
       postElement.className = "post-container";
-      postElement.dataset.postId = post.ID;
+      postElement.dataset.postId = post.Id;
 
       /* h2 will contain the image and name of the persen who posted */
       const posterName = createEle("h2");
@@ -127,9 +129,38 @@ async function loadMorePosts(name = "home") {
       const nameContainer = createEle("span");
       nameContainer.className = "usrname";
       nameContainer.innerText = post.Username;
+      const createdat = createEle("span");
+      const date = +new Date(post.Date);
+      const curontTime = +new Date();
+      // alert(curontTime - data);
+      console.log("minets", Math.floor((curontTime - date) / 1000 / 60));
+      console.log("hours", Math.floor((curontTime - date) / 1000 / 60 / 60));
+      console.log(
+        "hours",
+        Math.floor((curontTime - date) / 1000 / 60 / 60 / 24)
+      );
+
+      if (Math.floor((curontTime - date) / 1000 / 60 / 60) > 24) {
+        createdat.innerText += `${Math.floor(
+          (curontTime - date) / 1000 / 60 / 60 / 24
+        )}d`;
+      }
+      if (Math.floor((curontTime - date) / 1000 / 60 / 60) !== 0) {
+        createdat.innerText += `${Math.floor(
+          (curontTime - date) / 1000 / 60 / 60
+        )}h`;
+      }
+      if ((curontTime - date) / 1000 / 60 !== 0) {
+        createdat.innerText += `${Math.floor(
+          (curontTime - date) / 1000 / 60
+        )}min`;
+      }
+
+      createdat.className = "creationdate";
       posterName.appendChild(posterImg);
       posterName.appendChild(nameContainer);
       postElement.appendChild(posterName);
+      postElement.appendChild(createdat);
 
       /* creating a div that will contain all the elements bellow */
       const pc = createEle("div");
@@ -146,6 +177,16 @@ async function loadMorePosts(name = "home") {
       content.innerText = post.Content;
       pc.append(title, content);
 
+      const categories_container = createEle("div");
+      categories_container.className = "categories";
+
+      for (let cate of post.Categories.split(",")) {
+        const span = createEle("span");
+        span.className = "category";
+        span.innerText = cate;
+        categories_container.appendChild(span);
+      }
+      pc.appendChild(categories_container);
       /* creating like and dislike button */
       const like_dislike_container = createEle("div");
       like_dislike_container.className = "like-dislike-container";
@@ -240,26 +281,6 @@ layout.addEventListener("click", () => {
   document.body.style.overflow = "";
 });
 
-/*   let lay_outbtn = document.querySelector(".show-postForm");
-
-  lay_outbtn.addEventListener("click", () => {
-    let layOutDiv = document.querySelector(".lay-out");
-    let postForm = document.querySelector(".postForm");
-
-    if (layOutDiv.classList.contains("active")) {
-      layOutDiv.classList.remove("active");
-      postForm.classList.remove("active");
-      layOutDiv.style.display = "none";
-      postForm.style.display = "none";
-    } else if (!layOutDiv.classList.contains("active")) {
-      layOutDiv.classList.add("active");
-      postForm.classList.add("active");
-      layOutDiv.style.display = "block";
-      postForm.style.display = "flex";
-      document.body.style.overflow = "hidden";
-    }
-  }); */
-
 document.addEventListener("DOMContentLoaded", () => {
   const postsContainer = document.getElementById("posts-container");
   const profileLink = document.getElementById("profile");
@@ -267,13 +288,12 @@ document.addEventListener("DOMContentLoaded", () => {
   if (profileLink) {
     profileLink.addEventListener("click", async (event) => {
       event.preventDefault(); // Prevent default navigation
-
-      // Clear existing posts
+      let offset = 0;
       postsContainer.innerHTML = "";
 
       // Fetch posts for the profile
       try {
-        const response = await fetch("/api/posts");
+        const response = await fetch(`/api/posts?offset=${offset}`);
         if (!response.ok) {
           throw new Error(
             `Error fetching profile posts: ${response.statusText}`
@@ -290,45 +310,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
-
-// function renderPosts(posts, container) {
-//   if (!posts || posts.length === 0) {
-//     container.innerHTML = "<p>No posts to show.</p>";
-//     return;
-//   }
-
-//   posts.forEach((post) => {
-//     const postElement = document.createElement("div");
-//     postElement.className = "post-container";
-//     postElement.dataset.postId = post.ID;
-
-//     const posterName = document.createElement("h2");
-//     posterName.className = "poster";
-//     const posterImg = document.createElement("img");
-//     posterImg.src =
-//       "/css/466006304_871124095226532_8631138819273739648_n.jpg"; // Example image
-//     const nameContainer = document.createElement("span");
-//     nameContainer.innerText = post.UserName;
-//     posterName.append(posterImg, nameContainer);
-//     postElement.appendChild(posterName);
-
-//     const pc = document.createElement("div");
-//     pc.className = "pc";
-
-//     const title = document.createElement("h3");
-//     title.className = "title";
-//     title.innerText = post.Title;
-
-//     const content = document.createElement("p");
-//     content.className = "content";
-//     content.innerText = post.Content;
-
-//     pc.append(title, content);
-//     postElement.appendChild(pc);
-
-//     container.appendChild(postElement);
-//   });
-// }
 
 function handleScroll() {
   const scrollPosition = window.scrollY + window.innerHeight;
@@ -359,17 +340,6 @@ form.addEventListener("submit", async function (event) {
     categoryName.push(checkbox.getAttribute("data-name"));
   });
 
-  // Title validation
-  // if (Title === "") {
-  //     document.getElementById("errorTitle").innerHTML = "Title is required";
-  //     document.getElementById("errorTitle").style.color = "red";
-  //     isValidTitle = false;
-  // } else {
-  //     document.getElementById("errorTitle").innerHTML = "";
-  //     isValidTitle = true;
-  // }
-
-  // Content validation
   if (Content === "") {
     document.getElementById("errorContent").innerHTML = "Content is required";
     document.getElementById("errorContent").style.color = "red";
@@ -379,7 +349,6 @@ form.addEventListener("submit", async function (event) {
     isValidContent = true;
   }
 
-  // Checkbox validation
   if (categoryName.length === 0) {
     document.getElementById("errorcategory").innerHTML =
       "Please select at least one category";
@@ -390,7 +359,6 @@ form.addEventListener("submit", async function (event) {
     isValidCheckboxes = true;
   }
 
-  // If all validations are successful, submit the form
   if (isValidTitle && isValidContent && isValidCheckboxes) {
     try {
       const res = await fetch("http://localhost:8001/add-post", {
