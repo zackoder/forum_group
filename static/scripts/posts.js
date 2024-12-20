@@ -54,20 +54,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
     console.log(postId); // For debugging
 
-    // Check if the clicked element has the "see_comments" class
+    
     const CommentClass = event.target.classList.contains("see_comments");
 
-    // Find the div where the comments will be inserted
+    
     const divcomments = document.querySelector(".divcomments" + postId);
 
-    // Temporary placeholder text
 
 
-    // If the element clicked has the "see_comments" class, load the comments
+
+    
     if (CommentClass && postId) {
 
 
-      // Make sure to pass the actual div (not a string) to GetComments
+   
       GetComments(postId, divcomments);
     }
 
@@ -122,6 +122,9 @@ function handleComment(postId, comment) {
 
         alert(" faild to add Comment");
       }
+      let comment_form=".divcomments"+postId
+      let commentElement = document.querySelector(comment_form);
+      GetComments(postId,commentElement)
     })
     .catch((error) => alert("Error submitting comment:", error));
 
@@ -174,27 +177,8 @@ async function loadMorePosts(name = "home") {
       nameContainer.className = "usrname";
       nameContainer.innerText = post.Username;
       const createdat = createEle("span");
-      let date = new Date(post.Date).getTime();
-      const currentTime = Date.now();
-      const elapsed = currentTime - date;
 
-      const days = Math.floor(elapsed / oneday);
-      const hours = Math.floor((elapsed % oneday) / onehour);
-      const minutes = Math.floor((elapsed % onehour) / onemin);
-
-      let timeText = "";
-
-      if (days > 0) {
-        timeText += `${days}d `;
-      }
-      if (hours > 0) {
-        timeText += `${hours}h `;
-      }
-      if (minutes > 0) {
-        timeText += `${minutes}min`;
-      }
-
-      createdat.innerText = timeText;
+      createdat.innerText = formDate(post.Date)
       createdat.className = "creationdate";
       posterName.appendChild(posterImg);
       posterName.appendChild(nameContainer);
@@ -260,7 +244,7 @@ async function loadMorePosts(name = "home") {
 
       ////add div comments
       const divcomments = createEle("div");
-      divcomments.className = `divcomments${post.Id}`;
+      divcomments.className = `divcomments${post.Id} divcomments`;
 
       pc.appendChild(divcomments);
 
@@ -275,7 +259,7 @@ async function loadMorePosts(name = "home") {
       comment_form.method = "POST";
       comment_form.className = "comment_form";
 
-      const title_impt = createEle("input");
+      const title_impt = createEle("textarea");
       title_impt.className = "comment";
       title_impt.name = "comment";
       title_impt.type = "text";
@@ -305,6 +289,29 @@ async function loadMorePosts(name = "home") {
   } finally {
     loading = false;
   }
+}
+
+function formDate(date) {
+  let creationD = new Date(date).getTime();
+  const currentTime = Date.now();
+  const elapsed = currentTime - creationD;
+
+  const days = Math.floor(elapsed / oneday);
+  const hours = Math.floor((elapsed % oneday) / onehour);
+  const minutes = Math.floor((elapsed % onehour) / onemin);
+
+  let timeText = "";
+
+  if (days > 0) {
+    timeText += `${days}d `;
+  }
+  if (hours > 0) {
+    timeText += `${hours}h `;
+  }
+  if (minutes > 0) {
+    timeText += `${minutes}min`;
+  }
+  return timeText
 }
 
 function createEle(elename) {
@@ -455,8 +462,10 @@ async function PostCategory() {
 
 
 async function GetComments(idPost, str) {
-
-
+alert(str)
+alert("ok")
+str.innerHTML=""
+str.style.display="block"
   try {
     const response = await fetch(`http://localhost:8001/api/${idPost}/comments`)
 
@@ -472,9 +481,17 @@ async function GetComments(idPost, str) {
           const commentC = createEle('div')
           commentC.className = "commentC"
 
-          const commentH = createEle('h6')
+
+          const commentHe = createEle('div')
+          commentHe.className = "commentHe"
+
+          const commentH = createEle('h3')
           commentH.className = "commentH"
           commentH.innerText = e.Username
+
+          const commentTime = createEle('p')
+          commentTime.className = "commentTime"
+          commentTime.innerText = formDate(e.Date)
 
           const commentP = createEle('p')
           commentP.className = "commentp"
@@ -482,27 +499,40 @@ async function GetComments(idPost, str) {
 
 
 
+          const like_dislike_container = createEle("div");
+          like_dislike_container.className = "like-dislike-container";
+    
+          /* creating of the like button */
+          const likebnt = createEle("button");
+          likebnt.className = "like-btn";
+    
+          /* create an img element to contain like icon */
+          const likeIcon = createEle("img");
+          likeIcon.src = "/static/images/like.png";
+    
+          likebnt.appendChild(likeIcon);
+    
+          /* creationg of the dislike button */
+          const dislikebnt = createEle("button");
+          dislikebnt.className = "dislike-btn";
+    
+          /* creating an img tag to containg dislike icon */
+          const dislikeIcone = createEle("img");
+          dislikeIcone.src = "/static/images/dislike.png";
+    
+          dislikebnt.appendChild(dislikeIcone);
+    
+          /* appending like and dislike buttons to like container */
+          like_dislike_container.append(likebnt, dislikebnt);
 
-          commentC.append(commentH, commentP)
+        
+          commentHe.append(commentH,commentTime)
+          commentC.append(commentHe, commentP,like_dislike_container)
           comments.appendChild(commentC)
-          // const commentHTML = `
-          //   <div class="comment">
-          //     <h6>${e.Username}</h6>
-          //     <p>${e.Comment}</p>
-          //   </div>
-          // `;
 
-          // Append the new comment HTML to str's innerHTML
-          // Use += to append instead of overwriting
         });
         str.appendChild(comments)
-        str.style.border = "1px solid #ccc";
-        str.style.padding = "5px";
-        str.style.marginBottom = "5px";
-        str.style.backgroundColor = "#f9f9f9";
-        str.style.borderRadius = "5px";
-        str.style.width = "100%";
-        str.style.height = "auto";
+
       }
       console.log(data);
 
