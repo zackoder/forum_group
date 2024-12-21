@@ -57,7 +57,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const CommentClass = event.target.classList.contains("see_comments");
 
-
+    if (event.target.classList.contains('see_comments')) {
+      event.target.disabled = true;
+  }
     const divcomments = document.querySelector(".divcomments" + postId);
     if (CommentClass && postId) {
       GetComments(postId, divcomments);
