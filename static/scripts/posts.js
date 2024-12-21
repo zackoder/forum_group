@@ -54,23 +54,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     console.log(postId); // For debugging
 
-    
+
     const CommentClass = event.target.classList.contains("see_comments");
 
-    
+
     const divcomments = document.querySelector(".divcomments" + postId);
-
-
-
-
-    
     if (CommentClass && postId) {
-
-
-   
       GetComments(postId, divcomments);
     }
-
   });
 
 
@@ -122,9 +113,9 @@ function handleComment(postId, comment) {
 
         alert(" faild to add Comment");
       }
-      let comment_form=".divcomments"+postId
+      let comment_form = ".divcomments" + postId
       let commentElement = document.querySelector(comment_form);
-      GetComments(postId,commentElement)
+      GetComments(postId, commentElement)
     })
     .catch((error) => alert("Error submitting comment:", error));
 
@@ -462,10 +453,9 @@ async function PostCategory() {
 
 
 async function GetComments(idPost, str) {
-alert(str)
-alert("ok")
-str.innerHTML=""
-str.style.display="block"
+
+  str.innerHTML = ""
+  str.style.display = "block"
   try {
     const response = await fetch(`http://localhost:8001/api/${idPost}/comments`)
 
@@ -501,33 +491,33 @@ str.style.display="block"
 
           const like_dislike_container = createEle("div");
           like_dislike_container.className = "like-dislike-container";
-    
+
           /* creating of the like button */
           const likebnt = createEle("button");
           likebnt.className = "like-btn";
-    
+
           /* create an img element to contain like icon */
           const likeIcon = createEle("img");
           likeIcon.src = "/static/images/like.png";
-    
+
           likebnt.appendChild(likeIcon);
-    
+
           /* creationg of the dislike button */
           const dislikebnt = createEle("button");
           dislikebnt.className = "dislike-btn";
-    
+
           /* creating an img tag to containg dislike icon */
           const dislikeIcone = createEle("img");
           dislikeIcone.src = "/static/images/dislike.png";
-    
+
           dislikebnt.appendChild(dislikeIcone);
-    
+
           /* appending like and dislike buttons to like container */
           like_dislike_container.append(likebnt, dislikebnt);
 
-        
-          commentHe.append(commentH,commentTime)
-          commentC.append(commentHe, commentP,like_dislike_container)
+
+          commentHe.append(commentH, commentTime)
+          commentC.append(commentHe, commentP, like_dislike_container)
           comments.appendChild(commentC)
 
         });
