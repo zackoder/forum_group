@@ -47,11 +47,7 @@ func CommentReaction(w http.ResponseWriter, r *http.Request) {
 	if utils.HandleError(utils.Error{Err: stm_err, Code: http.StatusInternalServerError}, w) {
 		return
 	}
-	result, data_err := stm.Exec(cookie.Value)
-	if utils.HandleError(utils.Error{Err: data_err, Code: http.StatusInternalServerError}, w) {
-		return
-	}
-	user_id, err := result.RowsAffected()
+	err := stm.QueryRow(cookie.Value).Scan(&reactInfo.user_id)
 	if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
 		return
 	}
@@ -70,7 +66,7 @@ func CommentReaction(w http.ResponseWriter, r *http.Request) {
 		if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
 			return
 		}
-		row_err := stm.QueryRow(user_id, reactInfo.comment_id).Scan(&exist)
+		row_err := stm.QueryRow(reactInfo.user_id, reactInfo.comment_id).Scan(&exist)
 		if utils.HandleError(utils.Error{Err: row_err, Code: http.StatusInternalServerError}, w) {
 			return
 		}
@@ -92,7 +88,7 @@ func CommentReaction(w http.ResponseWriter, r *http.Request) {
 			if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
 				return
 			}
-			_, row_err = stm.Exec(query, &reactInfo.action, &reactInfo.user_id, &reactInfo.comment_id)
+			_, row_err = stm.Exec(&reactInfo.action, &reactInfo.user_id, &reactInfo.comment_id)
 			if utils.HandleError(utils.Error{Err: row_err, Code: http.StatusInternalServerError}, w) {
 				return
 			}
