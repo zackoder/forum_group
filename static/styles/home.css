@@ -39,6 +39,7 @@ header {
   font-size: 1.2rem;
   color: white;
   transition: color 200ms ease-in-out;
+
 }
 
 .navbar .navlinks:hover {
@@ -252,6 +253,7 @@ header {
   top: 150px;
   right: 80px;
   cursor: pointer;
+  z-index: 3;
 }
 
 .show-postForm img {
@@ -375,4 +377,38 @@ header {
     font-size: 16px;
     width: 50px;
   }
+}
+
+
+.commentHe {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.commentC {
+
+  display: block;
+  height: auto;
+  margin: 2%;
+  border-bottom: 1px solid black;
+}
+
+.commentp {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  height: auto;
+}
+
+
+.divcomments {
+  display: none;
+  border: 1px solid rgb(204, 204, 204);
+  padding: 5px;
+  margin-bottom: 5px;
+  background-color: rgba(235, 235, 235, 0.767);
+  border-radius: 5px;
+  width: 100%;
+  height: auto;
+  z-index: 0;
 }

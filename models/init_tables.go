@@ -35,6 +35,11 @@ func InitTables(db *sql.DB) {
 			date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			FOREIGN KEY (user_id) REFERENCES users(id)
 		);
+
+
+
+
+
 		
 		CREATE TABLE IF NOT EXISTS categories (
 			id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
