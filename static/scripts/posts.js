@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const postId = postElement.getAttribute("data-post-id");
 
     if (event.target.classList.contains("like-btn")) {
+      alert("action")
       handleLike(postId, true);
     } else if (event.target.classList.contains("dislike-btn")) {
       handleLike(postId, false);
@@ -147,7 +148,7 @@ async function loadMorePosts(name = "home") {
       if (hours > 0) {
         timeText += `${hours}h `;
       }
-      if (minutes > 0) {
+      if (minutes > 0 && (days == 0 || hours == 0)) {
         timeText += `${minutes}min`;
       }
 
