@@ -39,14 +39,25 @@ type Post struct {
 }
 
 type PostsResult struct {
+	Id         int
 	UserName   string
-	UserImage  string
 	Title      string
 	Content    string
-	Image      string
 	Categories []string
 	Date       string
 	Reactions  struct {
+		Likes    int
+		Dislikes int
+		Action   string
+	}
+}
+type CommentType struct {
+	Id        int
+	Username  string
+	UserImage string
+	Comment   string
+	Date      string
+	Reaction  struct {
 		Likes    int
 		Dislikes int
 		Action   string

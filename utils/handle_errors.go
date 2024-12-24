@@ -13,7 +13,7 @@ func HandleError(err Error, w http.ResponseWriter) bool {
 			Message string
 			Code    int
 		}{http.StatusText(err.Code), err.Code}
-		w.Header().Add("Content-Type", "application/json")
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(err.Code)
 		json.NewEncoder(w).Encode(res_err)
 		return true
