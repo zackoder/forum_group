@@ -173,3 +173,32 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 		Path:     "/",
 	})
 }
+
+func LogUot(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie("token")
+	if err != nil {
+		utils.ExecuteTemplate(w, []string{"views/pages/error.html"}, nil)
+		return
+	}
+	err = DelectSeoin(cookie.Value)
+	if err != nil {
+		utils.ExecuteTemplate(w, []string{"views/pages/error.html"}, nil)
+		return
+	}
+	http.SetCookie(w, &http.Cookie{
+		HttpOnly: false,
+		Value:    "",
+		Name:     "token",
+		MaxAge:   0,
+		Path:     "/",
+	})
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func DelectSeoin(token string) error {
+	query := `
+		DELETE FROM sessions WHERE token = ?
+	`
+	_, err := utils.DB.Exec(query, token)
+	return err
+}
