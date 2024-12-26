@@ -96,7 +96,7 @@ function handleLike(postId, like) {
 }
 
 function handleComment(postId, comment) {
-  fetch(`api/${postId}/comment/new`, {
+  fetch(`/api/${postId}/comment/new`, {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",

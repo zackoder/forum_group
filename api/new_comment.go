@@ -37,7 +37,7 @@ func NewComment(w http.ResponseWriter, r *http.Request) {
 	}
 
 	/* ----------------------------- Get user_id from DB ----------------------------- */
-	queryErr := stmt.QueryRow(getUserIdQuery, token.Value).Scan(&comment.UserId)
+	queryErr := stmt.QueryRow(token.Value).Scan(&comment.UserId)
 	if utils.HandleError(utils.Error{Err: queryErr, Code: http.StatusInternalServerError}, w) {
 		return
 	}
