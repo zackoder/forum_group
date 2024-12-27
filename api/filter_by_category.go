@@ -3,7 +3,6 @@ package api
 import (
 	"database/sql"
 	"encoding/json"
-	"errors"
 	"net/http"
 	"strconv"
 	"strings"
@@ -78,14 +77,14 @@ func FilterByCategory(w http.ResponseWriter, r *http.Request) {
 		p.Categories = strings.Split(categories, ",")
 		posts = append(posts, p)
 	}
-	
-	/* -------------------------- handle error no content -------------------------- */
-	if len(posts) == 0 {
-		err := errors.New("no posts")
-		if utils.HandleError(utils.Error{Err: err, Code: http.StatusNoContent}, w) {
-			return
-		}
-	}
+
+	// /* -------------------------- handle error no content -------------------------- */
+	// if len(posts) == 0 {
+	// 	err := errors.New("no posts")
+	// 	if utils.HandleError(utils.Error{Err: err, Code: http.StatusNoContent}, w) {
+	// 		return
+	// 	}
+	// }
 
 	/* -------------------------- Set result in json response -------------------------- */
 	w.Header().Set("Content-Type", "application/json")
