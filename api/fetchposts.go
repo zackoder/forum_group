@@ -11,6 +11,11 @@ import (
 	"forum/utils"
 )
 
+type Error struct {
+	Message string
+	Code    int
+}
+
 func FetchPosts(w http.ResponseWriter, r *http.Request) {
 	// if r.Method != http.MethodGet {
 	// 	http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
@@ -55,13 +60,17 @@ func FetchPosts(w http.ResponseWriter, r *http.Request) {
 		// 		Action   string
 		// 	}
 		// }
-		if err := rows.Scan(&post.Id, &user_id, &post.Title, &post.Content, &categories, &post.Categories, &date); err != nil {
+
+		if err := rows.Scan(&post.Id, &user_id, &post.Title, &post.Content, &categories, &date); err != nil {
 			// log.Printf("Error scanning row %v", err)
+
 			fmt.Println(err)
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
+
 		post.Categories = strings.Split(categories, ",")
+
 		// if image.Valid {
 		// 	post.Image = image.String
 		// } else {
@@ -77,9 +86,46 @@ func FetchPosts(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
+		//Get Likes the this post
+		get_likes := `SELECT COUNT(*) FROM reactions WHERE (post_id = ? AND type = "like");`
+		if err := utils.DB.QueryRow(get_likes, post.Id).Scan(&post.Reactions.Likes); err != nil {
+			error := Error{Message: http.StatusText(http.StatusInternalServerError), Code: http.StatusInternalServerError}
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(error)
+			return
+		}
+		get_dislikes := `SELECT COUNT(*) FROM reactions WHERE (post_id = ? AND type = "dislike");`
+		if err := utils.DB.QueryRow(get_dislikes, post.Id).Scan(&post.Reactions.Dislikes); err != nil {
+			error := Error{Message: http.StatusText(http.StatusInternalServerError), Code: http.StatusInternalServerError}
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(error)
+			return
+		}
+
+		if user_id > 0 {
+			get_action := `SELECT type FROM reactions WHERE (post_id = ? AND user_id = ?);`
+			err_action := utils.DB.QueryRow(get_action, post.Id, user_id).Scan(&post.Reactions.Action)
+			if err_action != nil {
+				// fmt.Println(err_action.Error())
+				if err_action == sql.ErrNoRows {
+					post.Reactions.Action = ""
+
+				} else {
+					fmt.Println("error")
+					error := Error{Message: http.StatusText(http.StatusInternalServerError), Code: http.StatusInternalServerError}
+					w.WriteHeader(http.StatusInternalServerError)
+					json.NewEncoder(w).Encode(error)
+					return
+				}
+
+			}
+
+		}
 		posts = append(posts, post)
+		// fmt.Println(posts)
 
 	}
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(posts)
 }
