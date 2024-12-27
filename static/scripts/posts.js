@@ -62,10 +62,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // }
     const divcomments = document.querySelector(".divcomments" + postId);
     if (divcomments.innerText !== "" && CommentClass) {
-      // divcomments.style.display="none"
-      // if (event.target.classList.contains('see_comments')) {
-      //   event.target.style.display = "none"
-      // }
       divcomments.innerText = ""
       divcomments.style.display = "none"
 
@@ -472,20 +468,34 @@ async function PostCategory() {
 
 async function GetComments(idPost, str) {
 
-  str.innerHTML = ""
+console.log(idPost,"idPost");
+str.innerText=""
   str.style.display = "block"
   try {
     const response = await fetch(`http://localhost:8001/api/${idPost}/comments`)
 
-    if (response.ok) {
+    if (response.status!==204) {
+    console.log(response.status);
+
+       if (response.statusText === "no comments") {
+        str.innerHTML = "there is no comments"
+        
+      }else {
+        const data = await response.json();
+        console.log(data);
+
+      }
+
       const data = await response.json();
-      if (data == null) {
+      
+      if (data ==null) {
         str.innerHTML = "there is no comments"
       } else {
         const comments = createEle("div")
         comments.className = "commentsDiv"
 
         data.forEach(e => {
+          console.log(data);
           const commentC = createEle('div')
           commentC.className = "commentC"
 
@@ -521,7 +531,7 @@ async function GetComments(idPost, str) {
           likebnt.appendChild(likeIcon);
 
           const likeNmb = createEle("p");
-          likeNmb.innerText = e.Reaction.Likes;
+          likeNmb.innerText = e.Reactions.Likes;
           likebnt.appendChild(likeNmb);
 
           /* creationg of the dislike button */
@@ -535,7 +545,7 @@ async function GetComments(idPost, str) {
           dislikebnt.appendChild(dislikeIcone);
 
           const dislikeNmb = createEle("p");
-          dislikeNmb.innerText = e.Reaction.Dislikes;
+          dislikeNmb.innerText = e.Reactions.Dislikes;
           dislikebnt.appendChild(dislikeNmb);
 
           /* appending like and dislike buttons to like container */
@@ -557,7 +567,7 @@ async function GetComments(idPost, str) {
       // document.getElementById("responseMessage").innerText = "Error fetching comments.";
     }
   } catch (error) {
-
+console.error(error)
   }
 
 }
