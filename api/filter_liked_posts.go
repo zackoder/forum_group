@@ -27,7 +27,7 @@ func LikedPosts(w http.ResponseWriter, r *http.Request) {
 	if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
 		return
 	}
-	get_posts := `SELECT p.id,p.title,p.content,p.categories,p.date,u.username FROM posts p JOIN users u LEFT JOIN reactions r ON r.user_id = ?`
+	get_posts := `SELECT p.id,p.title,p.content,p.categories,p.date,u.username FROM posts p JOIN users u ON p.user_id = u.id JOIN reactions r ON (r.user_id = ? AND r.post_id = p.id)`
 	rows, rows_err := utils.DB.Query(get_posts, user_id)
 	if utils.HandleError(utils.Error{Err: rows_err, Code: http.StatusInternalServerError}, w) {
 		return
