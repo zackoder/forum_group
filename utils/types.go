@@ -57,7 +57,7 @@ type CommentType struct {
 	UserImage string
 	Comment   string
 	Date      string
-	Reaction  struct {
+	Reactions struct {
 		Likes    int
 		Dislikes int
 		Action   string
