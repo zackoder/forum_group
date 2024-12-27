@@ -57,13 +57,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const CommentClass = event.target.classList.contains("see_comments");
 
-    if (event.target.classList.contains('see_comments')) {
-      event.target.disabled = true;
-  }
+    //   if (event.target.classList.contains('see_comments')) {
+    //     event.target.disabled = true;
+    // }
     const divcomments = document.querySelector(".divcomments" + postId);
-    if (CommentClass && postId) {
-      GetComments(postId, divcomments);
+    if (divcomments.innerText !== "" && CommentClass) {
+      // divcomments.style.display="none"
+      // if (event.target.classList.contains('see_comments')) {
+      //   event.target.style.display = "none"
+      // }
+      divcomments.innerText = ""
+      divcomments.style.display = "none"
+
+
+    } else {
+      if (CommentClass && postId) {
+        GetComments(postId, divcomments);
+      }
     }
+
   });
 
 
@@ -151,6 +163,8 @@ async function loadMorePosts(name = "home") {
     const response = await fetch(`/api/posts?offset=${offset}`);
 
     const posts = await response.json();
+    console.log(posts);
+
     if (!posts || posts.length === 0) return;
 
     const postsContainer = document.getElementById("posts-container");
@@ -214,6 +228,9 @@ async function loadMorePosts(name = "home") {
       /* create an img element to contain like icon */
       const likeIcon = createEle("img");
       likeIcon.src = "/static/images/like.png";
+
+      // const kileBtn=createEle("p");
+      // kileBtn.innerText=post.
 
       likebnt.appendChild(likeIcon);
 
@@ -504,6 +521,10 @@ async function GetComments(idPost, str) {
 
           likebnt.appendChild(likeIcon);
 
+          const likeNmb = createEle("p");
+          likeNmb.innerText = e.Reaction.Likes;
+          likebnt.appendChild(likeNmb);
+
           /* creationg of the dislike button */
           const dislikebnt = createEle("button");
           dislikebnt.className = "dislike-btn";
@@ -513,6 +534,10 @@ async function GetComments(idPost, str) {
           dislikeIcone.src = "/static/images/dislike.png";
 
           dislikebnt.appendChild(dislikeIcone);
+
+          const dislikeNmb = createEle("p");
+          dislikeNmb.innerText = e.Reaction.Dislikes;
+          dislikebnt.appendChild(dislikeNmb);
 
           /* appending like and dislike buttons to like container */
           like_dislike_container.append(likebnt, dislikebnt);
