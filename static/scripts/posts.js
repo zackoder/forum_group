@@ -12,9 +12,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const postId = postElement.getAttribute("data-post-id");
 
     if (event.target.classList.contains("like-btn")) {
-      handleLike(postId, true);
+      handleLike(postId, "like");
     } else if (event.target.classList.contains("dislike-btn")) {
-      handleLike(postId, false);
+      handleLike(postId, "dislike");
     }
 
 
@@ -85,14 +85,13 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function handleLike(postId, like) {
-  fetch("/like-post", {
+  fetch(`api/comment/reaction/${postId}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
     },
     body: `{
-          "post_id": ${postId},
-          "like":${like}
+          "action":${like}
           }`,
   })
     .then((response) => {
