@@ -25,16 +25,6 @@ func CommentReaction(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
-	/* ------------------------------ handle action ------------------------------ */
-	reactInfo.action = r.FormValue("action")
-	actions := []string{"like", "dislike"}
-	if !slices.Contains(actions, reactInfo.action) {
-		err := errors.New("invalid action")
-		if utils.HandleError(utils.Error{Err: err, Code: http.StatusBadRequest}, w) {
-			return
-		}
-	}
-
 	/* ------------------------------ handle user_id ------------------------------ */
 	/* get cookie */
 	cookie, cookie_err := r.Cookie("token")
@@ -62,6 +52,16 @@ func CommentReaction(w http.ResponseWriter, r *http.Request) {
 
 	/* ------------------------------ handle comment reaction ------------------------------ */
 	if r.Method == http.MethodPost {
+		fmt.Println("ok")
+		/* ------------------------------ handle action ------------------------------ */
+		reactInfo.action = r.FormValue("action")
+		actions := []string{"like", "dislike"}
+		if !slices.Contains(actions, reactInfo.action) {
+			err := errors.New("invalid action")
+			if utils.HandleError(utils.Error{Err: err, Code: http.StatusBadRequest}, w) {
+				return
+			}
+		}
 		var exist int
 		query := `SELECT EXISTS(SELECT 1 FROM reactions WHERE (user_id = ? AND comment_id = ?));`
 		stm, err := utils.DB.Prepare(query)
@@ -76,7 +76,7 @@ func CommentReaction(w http.ResponseWriter, r *http.Request) {
 			query = `INSERT INTO reactions(user_id,comment_id,type) VALUES (?,?,?)`
 			stm, err := utils.DB.Prepare(query)
 			if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
-				return/* get user_id with token start */
+				return /* get user_id with token start */
 			}
 			_, err = stm.Exec(&reactInfo.user_id, &reactInfo.comment_id, &reactInfo.action)
 			if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {

@@ -6,10 +6,10 @@ document.addEventListener("DOMContentLoaded", function () {
   postsContainer.addEventListener("click", function (event) {
 
     const postElement = event.target.closest(".post-container");
-    if (!postElement) return;
 
 
-    const postId = postElement.getAttribute("data-post-id");
+
+    const postId = postElement ? postElement.getAttribute("data-post-id") : null;
 
     if (event.target.classList.contains("like-btn")) {
       handleLike(postId, "like");
@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const postId = postElement ? postElement.getAttribute("data-post-id") : null;
 
-    console.log(postId); // For debugging
+    // console.log(postId); // For debugging
 
 
     const CommentClass = event.target.classList.contains("see_comments");
@@ -74,6 +74,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
   });
 
+  postsContainer.addEventListener("click", function (event) {
+
+    const postElement = event.target.closest(".post-container");
+    if (!postElement) return;
+
+
+    const postId = postElement.getAttribute("data-comment-id");
+
+    if (event.target.classList.contains("like-btn-comment")) {
+      handleLike(postId, "like");
+    } else if (event.target.classList.contains("dislike-btn-comment")) {
+      handleLike(postId, "dislike");
+    }
+
+
+  });
 
 
   loadMorePosts();
@@ -81,25 +97,31 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function handleLike(postId, like) {
-  fetch(`api/comment/reaction/${postId}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: `{
-          "action":${like}
-          }`,
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return response.json();
-    })
-    .then((data) => {
-      console.log("Like/Dislike updated:", data);
-    })
-    .catch((error) => console.error("Error updating like/dislike:", error));
+  console.log("postId",postId);
+  console.log("like",postId);
+  
+  // fetch(`/api/comment/reaction/${postId}`, {
+  //   method: "POST",
+  //   headers: {
+  //     "Content-Type": "application/x-www-form-urlencoded",
+  //   },
+  //   body: `action:${like}`,
+  // })
+  //   .then((response) => {
+  //     console.log(response);
+      
+  //     if (!response.ok) {
+  //       throw new Error(`HTTP error! status: ${response.status}`);
+  //     }
+  //     return response.json();
+  //   })
+  //   .then((data) => {
+  //     console.log("Like/Dislike updated:", data);
+  //   })
+  //   .catch((error) => console.error("Error updating like/dislike:", error));
+
+
+
 }
 
 function handleComment(postId, comment) {
@@ -474,17 +496,11 @@ str.innerText=""
   try {
     const response = await fetch(`http://localhost:8001/api/${idPost}/comments`)
 
-    if (response.status!==204) {
-    console.log(response.status);
+    if (response.ok) {
 
-       if (response.statusText === "no comments") {
-        str.innerHTML = "there is no comments"
-        
-      }else {
-        const data = await response.json();
-        console.log(data);
 
-      }
+       
+       
 
       const data = await response.json();
       
@@ -498,6 +514,7 @@ str.innerText=""
           console.log(data);
           const commentC = createEle('div')
           commentC.className = "commentC"
+          commentC.dataset.commentId = e.Id; 
 
 
           const commentHe = createEle('div')
@@ -518,11 +535,11 @@ str.innerText=""
 
 
           const like_dislike_container = createEle("div");
-          like_dislike_container.className = "like-dislike-container";
+          like_dislike_container.className = "like-dislike-container-comment";
 
           /* creating of the like button */
           const likebnt = createEle("button");
-          likebnt.className = "like-btn";
+          likebnt.className = "like-btn-comment";
 
           /* create an img element to contain like icon */
           const likeIcon = createEle("img");
@@ -536,7 +553,7 @@ str.innerText=""
 
           /* creationg of the dislike button */
           const dislikebnt = createEle("button");
-          dislikebnt.className = "dislike-btn";
+          dislikebnt.className = "dislike-btn-comment";
 
           /* creating an img tag to containg dislike icon */
           const dislikeIcone = createEle("img");

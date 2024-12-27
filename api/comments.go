@@ -3,7 +3,6 @@ package api
 import (
 	"database/sql"
 	"encoding/json"
-	"errors"
 	"net/http"
 	"strconv"
 
@@ -60,12 +59,7 @@ func Comments(w http.ResponseWriter, r *http.Request) {
 	}
 
 	/* -------------------------- handle error no content -------------------------- */
-	if len(comments) == 0 {
-		err := errors.New("no comments")
-		if utils.HandleError(utils.Error{Err: err, Code: http.StatusNoContent}, w) {
-			return
-		}
-	}
+
 
 	/* -------------------------- Set result in json response -------------------------- */
 	w.WriteHeader(http.StatusOK)
