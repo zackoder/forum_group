@@ -4,20 +4,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Event delegation for click events
   postsContainer.addEventListener("click", function (event) {
-
     const postElement = event.target.closest(".post-container");
+    const commentEl = event.target.closest(".commentC");
 
-
-
-    const postId = postElement ? postElement.getAttribute("data-post-id") : null;
+    const postId = postElement.getAttribute("data-post-id");
+    const commentId = commentEl.getAttribute("data-comment-id");
+    console.log(commentId);
 
     if (event.target.classList.contains("like-btn")) {
       handleLike(postId, "like");
     } else if (event.target.classList.contains("dislike-btn")) {
       handleLike(postId, "dislike");
     }
-
-
+    if (event.target.classList.contains("like-btn-comment")) {
+      handleLike(commentId, "like");
+      console.log(commentId);
+    } else if (event.target.classList.contains("dislike-btn-comment")) {
+      console.log(commentId);
+      handleLike(commentId, "dislike");
+    }
   });
 
   postsContainer.addEventListener("submit", function (event) {
@@ -38,22 +43,16 @@ document.addEventListener("DOMContentLoaded", function () {
       handleComment(postId, commentText);
       form.reset();
     }
-
-
-
-
-
-
   });
 
   postsContainer.addEventListener("click", function (event) {
     const postElement = event.target.closest(".post-container");
 
-
-    const postId = postElement ? postElement.getAttribute("data-post-id") : null;
+    const postId = postElement
+      ? postElement.getAttribute("data-post-id")
+      : null;
 
     // console.log(postId); // For debugging
-
 
     const CommentClass = event.target.classList.contains("see_comments");
 
@@ -62,23 +61,18 @@ document.addEventListener("DOMContentLoaded", function () {
     // }
     const divcomments = document.querySelector(".divcomments" + postId);
     if (divcomments.innerText !== "" && CommentClass) {
-      divcomments.innerText = ""
-      divcomments.style.display = "none"
-
-
+      divcomments.innerText = "";
+      divcomments.style.display = "none";
     } else {
       if (CommentClass && postId) {
         GetComments(postId, divcomments);
       }
     }
-
   });
 
   postsContainer.addEventListener("click", function (event) {
-
     const postElement = event.target.closest(".post-container");
     if (!postElement) return;
-
 
     const postId = postElement.getAttribute("data-comment-id");
 
@@ -87,19 +81,16 @@ document.addEventListener("DOMContentLoaded", function () {
     } else if (event.target.classList.contains("dislike-btn-comment")) {
       handleLike(postId, "dislike");
     }
-
-
   });
-
 
   loadMorePosts();
   window.addEventListener("scroll", _.throttle(handleScroll, 500));
 });
 
 function handleLike(postId, like) {
-  console.log("postId",postId);
-  console.log("like",postId);
-  
+  console.log("postId", postId);
+  console.log("like", postId);
+
   // fetch(`/api/comment/reaction/${postId}`, {
   //   method: "POST",
   //   headers: {
@@ -109,7 +100,7 @@ function handleLike(postId, like) {
   // })
   //   .then((response) => {
   //     console.log(response);
-      
+
   //     if (!response.ok) {
   //       throw new Error(`HTTP error! status: ${response.status}`);
   //     }
@@ -119,9 +110,6 @@ function handleLike(postId, like) {
   //     console.log("Like/Dislike updated:", data);
   //   })
   //   .catch((error) => console.error("Error updating like/dislike:", error));
-
-
-
 }
 
 function handleComment(postId, comment) {
@@ -139,17 +127,15 @@ function handleComment(postId, comment) {
       return response.json();
     })
     .then((data) => {
-      console.log(data)
+      console.log(data);
       if (data.message != 200) {
-
         alert(" faild to add Comment");
       }
-      let comment_form = ".divcomments" + postId
+      let comment_form = ".divcomments" + postId;
       let commentElement = document.querySelector(comment_form);
-      GetComments(postId, commentElement)
+      GetComments(postId, commentElement);
     })
     .catch((error) => alert("Error submitting comment:", error));
-
 }
 
 let home = "home";
@@ -186,7 +172,6 @@ async function loadMorePosts(name = "home") {
 
     const postsContainer = document.getElementById("posts-container");
     posts.forEach((post) => {
-
       const postElement = document.createElement("div");
       postElement.className = "post-container";
       postElement.dataset.postId = post.Id;
@@ -202,7 +187,7 @@ async function loadMorePosts(name = "home") {
       nameContainer.innerText = post.Username;
       const createdat = createEle("span");
 
-      createdat.innerText = formDate(post.Date)
+      createdat.innerText = formDate(post.Date);
       createdat.className = "creationdate";
       posterName.appendChild(posterImg);
       posterName.appendChild(nameContainer);
@@ -267,14 +252,11 @@ async function loadMorePosts(name = "home") {
       /* appending like container to the post contaner */
       pc.appendChild(like_dislike_container);
 
-
-
       ////add div comments
       const divcomments = createEle("div");
       divcomments.className = `divcomments${post.Id} divcomments`;
 
       pc.appendChild(divcomments);
-
 
       /* adding a button to see comments */
       const seecomments = createEle("button");
@@ -338,7 +320,7 @@ function formDate(date) {
   if (minutes > 0) {
     timeText += `${minutes}min`;
   }
-  return timeText
+  return timeText;
 }
 
 function createEle(elename) {
@@ -485,54 +467,44 @@ async function PostCategory() {
   }
 }
 
-
-
-
 async function GetComments(idPost, str) {
-
-console.log(idPost,"idPost");
-str.innerText=""
-  str.style.display = "block"
+  console.log(idPost, "idPost");
+  str.innerText = "";
+  str.style.display = "block";
   try {
-    const response = await fetch(`http://localhost:8001/api/${idPost}/comments`)
+    const response = await fetch(
+      `http://localhost:8001/api/${idPost}/comments`
+    );
 
     if (response.ok) {
-
-
-       
-       
-
       const data = await response.json();
-      
-      if (data ==null) {
-        str.innerHTML = "there is no comments"
+
+      if (data == null) {
+        str.innerHTML = "there is no comments";
       } else {
-        const comments = createEle("div")
-        comments.className = "commentsDiv"
+        const comments = createEle("div");
+        comments.className = "commentsDiv";
 
-        data.forEach(e => {
+        data.forEach((e) => {
           console.log(data);
-          const commentC = createEle('div')
-          commentC.className = "commentC"
-          commentC.dataset.commentId = e.Id; 
+          const commentC = createEle("div");
+          commentC.className = "commentC";
+          commentC.dataset.commentId = e.Id;
 
+          const commentHe = createEle("div");
+          commentHe.className = "commentHe";
 
-          const commentHe = createEle('div')
-          commentHe.className = "commentHe"
+          const commentH = createEle("h3");
+          commentH.className = "commentH";
+          commentH.innerText = e.Username;
 
-          const commentH = createEle('h3')
-          commentH.className = "commentH"
-          commentH.innerText = e.Username
+          const commentTime = createEle("p");
+          commentTime.className = "commentTime";
+          commentTime.innerText = formDate(e.Date);
 
-          const commentTime = createEle('p')
-          commentTime.className = "commentTime"
-          commentTime.innerText = formDate(e.Date)
-
-          const commentP = createEle('p')
-          commentP.className = "commentp"
-          commentP.innerText = e.Comment
-
-
+          const commentP = createEle("p");
+          commentP.className = "commentp";
+          commentP.innerText = e.Comment;
 
           const like_dislike_container = createEle("div");
           like_dislike_container.className = "like-dislike-container-comment";
@@ -568,23 +540,18 @@ str.innerText=""
           /* appending like and dislike buttons to like container */
           like_dislike_container.append(likebnt, dislikebnt);
 
-
-          commentHe.append(commentH, commentTime)
-          commentC.append(commentHe, commentP, like_dislike_container)
-          comments.appendChild(commentC)
-
+          commentHe.append(commentH, commentTime);
+          commentC.append(commentHe, commentP, like_dislike_container);
+          comments.appendChild(commentC);
         });
-        str.appendChild(comments)
-
+        str.appendChild(comments);
       }
       console.log(data);
-
     } else {
       console.error("Request failed with status:", response.status);
       // document.getElementById("responseMessage").innerText = "Error fetching comments.";
     }
   } catch (error) {
-console.error(error)
+    console.error(error);
   }
-
 }
