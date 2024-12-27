@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -38,6 +39,21 @@ func Comments(w http.ResponseWriter, r *http.Request) {
 		}
 		comment.Username, err = GetUsername(user_id, w)
 		if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
+			return
+		}
+		get_likes := `SELECT COUNT(*) FROM reactions WHERE (comment_id = ? AND type = "like")`
+		err = utils.DB.QueryRow(get_likes, comment.Id).Scan(&comment.Reactions.Likes)
+		if err != sql.ErrNoRows && utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
+			return
+		}
+		get_dislikes := `SELECT COUNT(*) FROM reactions WHERE (comment_id = ? AND type = "dislike")`
+		err = utils.DB.QueryRow(get_dislikes, comment.Id).Scan(&comment.Reactions.Dislikes)
+		if err != sql.ErrNoRows && utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
+			return
+		}
+		get_action := `SELECT type FROM reactions WHERE (user_id = ? AND comment_id = ?)`
+		err = utils.DB.QueryRow(get_action, user_id, comment.Id).Scan(&comment.Reactions.Action)
+		if err != sql.ErrNoRows && utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
 			return
 		}
 		comments = append(comments, comment)
