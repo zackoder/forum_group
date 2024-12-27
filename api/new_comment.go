@@ -25,9 +25,10 @@ func NewComment(w http.ResponseWriter, r *http.Request) {
 	var postIdErr error
 	comment.PostId, postIdErr = strconv.Atoi(postId)
 	if postIdErr != nil || CheckPost(comment.PostId) {
-		fmt.Println("Post id errrrrrrrrrrrrrrrrrrrrrrrrrr")
-		fmt.Println(comment.PostId)
-		return
+		err := errors.New("post_id not valid")
+		if utils.HandleError(utils.Error{Err: err, Code: http.StatusBadRequest},w) {
+			return
+		}
 	}
 	/* ----------------------------- Prepare query for get user_id ----------------------------- */
 	getUserIdQuery := `SELECT user_id FROM sessions WHERE token=?;`
