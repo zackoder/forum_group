@@ -150,8 +150,15 @@ async function loadMorePosts(name = "home") {
 
     if (!posts || posts.length === 0) return;
 
+    
     const postsContainer = document.getElementById("posts-container");
     posts.forEach((post) => {
+<<<<<<< HEAD
+=======
+      console.log(post);
+      
+
+>>>>>>> 0e4af12f11cd8ed835f81c5411ba015876f305dc
       const postElement = document.createElement("div");
       postElement.className = "post-container";
       postElement.dataset.postId = post.Id;
@@ -164,7 +171,7 @@ async function loadMorePosts(name = "home") {
         "/static/images/466006304_871124095226532_8631138819273739648_n.jpg";
       const nameContainer = createEle("span");
       nameContainer.className = "usrname";
-      nameContainer.innerText = post.Username;
+      nameContainer.innerText = post.UserName;
       const createdat = createEle("span");
 
       createdat.innerText = formDate(post.Date);
@@ -192,7 +199,7 @@ async function loadMorePosts(name = "home") {
       const categories_container = createEle("div");
       categories_container.className = "categories";
 
-      for (let cate of post.Categories.split(",")) {
+      for (let cate of post.Categories) {
         const span = createEle("span");
         span.className = "category";
         span.innerText = cate;
@@ -211,10 +218,16 @@ async function loadMorePosts(name = "home") {
       const likeIcon = createEle("img");
       likeIcon.src = "/static/images/like.png";
 
+<<<<<<< HEAD
       // const kileBtn=createEle("p");
       // kileBtn.innerText=post.
+=======
+      const likeNbm = createEle("p");
+      likeNbm.innerText=post.Reactions.Likes
+>>>>>>> 0e4af12f11cd8ed835f81c5411ba015876f305dc
 
       likebnt.appendChild(likeIcon);
+      likebnt.appendChild(likeNbm);
 
       /* creationg of the dislike button */
       const dislikebnt = createEle("button");
@@ -224,7 +237,11 @@ async function loadMorePosts(name = "home") {
       const dislikeIcone = createEle("img");
       dislikeIcone.src = "/static/images/dislike.png";
 
+      const dislikeNbm = createEle("p");
+      dislikeNbm.innerText=post.Reactions.Dislikes
+
       dislikebnt.appendChild(dislikeIcone);
+      dislikebnt.appendChild(dislikeNbm);
 
       /* appending like and dislike buttons to like container */
       like_dislike_container.append(likebnt, dislikebnt);
