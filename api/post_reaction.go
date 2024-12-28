@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -29,7 +30,7 @@ func PostReaction(w http.ResponseWriter, r *http.Request) {
 
 	/* ----------------------------------- handle action ----------------------------------- */
 	reactPost.action = r.FormValue("action")
-
+	fmt.Println(r.FormValue("action"))
 	/* ----------------------------------- Handle User Id ----------------------------------- */
 	token, token_err := r.Cookie("token")
 	if utils.HandleError(utils.Error{Err: token_err, Code: http.StatusUnauthorized}, w) {

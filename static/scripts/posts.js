@@ -9,6 +9,13 @@ document.addEventListener("DOMContentLoaded", function () {
     if (commentEl) {
       const commentId = commentEl.getAttribute("data-comment-id");
       console.log(commentId);
+      if (event.target.classList.contains("like-btn-comment")) {
+        handleLike("comment", commentId, "like");
+        console.log(commentId);
+      } else if (event.target.classList.contains("dislike-btn-comment")) {
+        console.log(commentId);
+        handleLike("comment", commentId, "dislike");
+      }
     }
 
     const postId = postElement.getAttribute("data-post-id");
@@ -18,13 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
     } else if (event.target.classList.contains("dislike-btn")) {
       handleLike("posts", postId, "dislike");
     }
-    if (event.target.classList.contains("like-btn-comment")) {
-      handleLike("comment", commentId, "like");
-      console.log(commentId);
-    } else if (event.target.classList.contains("dislike-btn-comment")) {
-      console.log(commentId);
-      handleLike("comment", commentId, "dislike");
-    }
+  
   });
 
   postsContainer.addEventListener("submit", function (event) {
@@ -75,9 +76,7 @@ function handleLike(path, id, like) {
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
     },
-    body: new URLSearchParams({
-      action: like,
-    }).toString(),
+    body: `action=${like}`,
   })
 
     .then((response) => {

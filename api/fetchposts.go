@@ -120,7 +120,6 @@ func FetchPosts(w http.ResponseWriter, r *http.Request) {
 
 		}
 		posts = append(posts, post)
-		fmt.Println(posts)
 
 	}
 	w.Header().Set("Content-Type", "application/json")
