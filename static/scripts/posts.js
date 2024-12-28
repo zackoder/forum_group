@@ -153,12 +153,7 @@ async function loadMorePosts(name = "home") {
     
     const postsContainer = document.getElementById("posts-container");
     posts.forEach((post) => {
-<<<<<<< HEAD
-=======
-      console.log(post);
-      
 
->>>>>>> 0e4af12f11cd8ed835f81c5411ba015876f305dc
       const postElement = document.createElement("div");
       postElement.className = "post-container";
       postElement.dataset.postId = post.Id;
@@ -218,13 +213,10 @@ async function loadMorePosts(name = "home") {
       const likeIcon = createEle("img");
       likeIcon.src = "/static/images/like.png";
 
-<<<<<<< HEAD
-      // const kileBtn=createEle("p");
-      // kileBtn.innerText=post.
-=======
+
       const likeNbm = createEle("p");
       likeNbm.innerText=post.Reactions.Likes
->>>>>>> 0e4af12f11cd8ed835f81c5411ba015876f305dc
+
 
       likebnt.appendChild(likeIcon);
       likebnt.appendChild(likeNbm);
