@@ -86,7 +86,7 @@ func FetchPosts(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
-		//Get Likes the this post
+		// Get Likes the this post
 		get_likes := `SELECT COUNT(*) FROM reactions WHERE (post_id = ? AND type = "like");`
 		if err := utils.DB.QueryRow(get_likes, post.Id).Scan(&post.Reactions.Likes); err != nil {
 			error := Error{Message: http.StatusText(http.StatusInternalServerError), Code: http.StatusInternalServerError}
@@ -109,7 +109,6 @@ func FetchPosts(w http.ResponseWriter, r *http.Request) {
 				// fmt.Println(err_action.Error())
 				if err_action == sql.ErrNoRows {
 					post.Reactions.Action = ""
-
 				} else {
 					fmt.Println("error")
 					error := Error{Message: http.StatusText(http.StatusInternalServerError), Code: http.StatusInternalServerError}
@@ -117,12 +116,11 @@ func FetchPosts(w http.ResponseWriter, r *http.Request) {
 					json.NewEncoder(w).Encode(error)
 					return
 				}
-
 			}
 
 		}
 		posts = append(posts, post)
-		// fmt.Println(posts)
+		fmt.Println(posts)
 
 	}
 	w.Header().Set("Content-Type", "application/json")
