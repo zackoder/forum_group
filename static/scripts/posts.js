@@ -6,22 +6,24 @@ document.addEventListener("DOMContentLoaded", function () {
   postsContainer.addEventListener("click", function (event) {
     const postElement = event.target.closest(".post-container");
     const commentEl = event.target.closest(".commentC");
+    if (commentEl) {
+      const commentId = commentEl.getAttribute("data-comment-id");
+      console.log(commentId);
+    }
 
     const postId = postElement.getAttribute("data-post-id");
-    const commentId = commentEl.getAttribute("data-comment-id");
-    console.log(commentId);
 
     if (event.target.classList.contains("like-btn")) {
-      handleLike(postId, "like");
+      handleLike("posts", postId, "like");
     } else if (event.target.classList.contains("dislike-btn")) {
-      handleLike(postId, "dislike");
+      handleLike("posts", postId, "dislike");
     }
     if (event.target.classList.contains("like-btn-comment")) {
-      handleLike(commentId, "like");
+      handleLike("comment", commentId, "like");
       console.log(commentId);
     } else if (event.target.classList.contains("dislike-btn-comment")) {
       console.log(commentId);
-      handleLike(commentId, "dislike");
+      handleLike("comment", commentId, "dislike");
     }
   });
 
@@ -48,38 +50,16 @@ document.addEventListener("DOMContentLoaded", function () {
   postsContainer.addEventListener("click", function (event) {
     const postElement = event.target.closest(".post-container");
 
-    const postId = postElement
-      ? postElement.getAttribute("data-post-id")
-      : null;
-
-    // console.log(postId); // For debugging
+    const postId = postElement.getAttribute("data-post-id")
 
     const CommentClass = event.target.classList.contains("see_comments");
 
-    //   if (event.target.classList.contains('see_comments')) {
-    //     event.target.disabled = true;
-    // }
-    const divcomments = document.querySelector(".divcomments" + postId);
-    if (divcomments.innerText !== "" && CommentClass) {
-      divcomments.innerText = "";
-      divcomments.style.display = "none";
-    } else {
-      if (CommentClass && postId) {
-        GetComments(postId, divcomments);
-      }
+    if (event.target.classList.contains('see_comments')) {
+      event.target.disabled = true;
     }
-  });
-
-  postsContainer.addEventListener("click", function (event) {
-    const postElement = event.target.closest(".post-container");
-    if (!postElement) return;
-
-    const postId = postElement.getAttribute("data-comment-id");
-
-    if (event.target.classList.contains("like-btn-comment")) {
-      handleLike(postId, "like");
-    } else if (event.target.classList.contains("dislike-btn-comment")) {
-      handleLike(postId, "dislike");
+    const divcomments = document.querySelector(".divcomments" + postId);
+    if (CommentClass && postId) {
+      GetComments(postId, divcomments);
     }
   });
 
@@ -87,30 +67,33 @@ document.addEventListener("DOMContentLoaded", function () {
   window.addEventListener("scroll", _.throttle(handleScroll, 500));
 });
 
-function handleLike(postId, like) {
-  console.log("postId", postId);
-  console.log("like", postId);
+function handleLike(path, id, like) {
+  console.log(like);
 
-  // fetch(`/api/comment/reaction/${postId}`, {
-  //   method: "POST",
-  //   headers: {
-  //     "Content-Type": "application/x-www-form-urlencoded",
-  //   },
-  //   body: `action:${like}`,
-  // })
-  //   .then((response) => {
-  //     console.log(response);
+  fetch(`/api/${path}/reaction/${id}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: new URLSearchParams({
+      action: like,
+    }).toString(),
+  })
 
-  //     if (!response.ok) {
-  //       throw new Error(`HTTP error! status: ${response.status}`);
-  //     }
-  //     return response.json();
-  //   })
-  //   .then((data) => {
-  //     console.log("Like/Dislike updated:", data);
-  //   })
-  //   .catch((error) => console.error("Error updating like/dislike:", error));
+    .then((response) => {
+      console.log(response);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((data) => {
+      console.log("Like/Dislike updated:", data);
+    })
+    .catch((error) => console.error("Error updating like/dislike:", error));
 }
+
 
 function handleComment(postId, comment) {
   fetch(`/api/${postId}/comment/new`, {
@@ -156,13 +139,10 @@ const oneday = 1000 * 60 * 60 * 24;
 const onemin = 1000 * 60;
 
 async function loadMorePosts(name = "home") {
-  console.log(name);
-
   if (loading) return;
   loading = true;
 
   try {
-    console.log("hello");
     const response = await fetch(`/api/posts?offset=${offset}`);
 
     const posts = await response.json();
