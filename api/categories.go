@@ -8,18 +8,22 @@ import (
 )
 
 func CategoryList(w http.ResponseWriter, r *http.Request) {
+	/* ----------------------------------- category list ----------------------------------- */
 	query := `SELECT id,name FROM categories`
 	rows, err := utils.DB.Query(query)
 	if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
 		return
 	}
-	var categories []utils.Category
+	categories := []utils.Category{}
 	for rows.Next() {
-		var category utils.Category
-		if err = rows.Scan(&category.Id, &category.Name); utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
+		category := utils.Category{}
+		err = rows.Scan(&category.Id, &category.Name)
+		if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
 			return
 		}
 		categories = append(categories, category)
 	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(categories)
 }

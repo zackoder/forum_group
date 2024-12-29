@@ -12,6 +12,7 @@ type User struct {
 
 func Home(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" { // handle invalid path (error 404)
+		w.WriteHeader(http.StatusNotFound)
 		utils.ExecuteTemplate(w, []string{"views/pages/error.html"}, nil)
 		return
 	}

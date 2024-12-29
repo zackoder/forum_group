@@ -82,7 +82,7 @@ func LikedPosts(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 		post.Categories = strings.Split(categories, ",")
-		post.Reactions = GetReaction(r, post.Id, "post_id")
+		post.Reactions = GetReaction(userid, post.Id, "post_id")
 		posts = append(posts, post)
 	}
 	json.NewEncoder(w).Encode(posts)
@@ -100,7 +100,7 @@ func TakeuserId(secion string) int {
 	return id
 }
 
-func GetReaction(r *http.Request, id int, colom string) utils.Reactions {
+func GetReaction(userid, id int, colom string) utils.Reactions {
 	reaction := utils.Reactions{}
 	query := `
 		SELECT count(*) FROM reactions WHERE %s = ? AND type = ?
@@ -108,11 +108,6 @@ func GetReaction(r *http.Request, id int, colom string) utils.Reactions {
 	query = fmt.Sprintf(query, colom)
 	utils.DB.QueryRow(query, id, "like").Scan(&reaction.NumLike)
 	utils.DB.QueryRow(query, id, "dislike").Scan(&reaction.NumDisLike)
-	cookie, err := r.Cookie("token")
-	if err != nil {
-		return reaction
-	}
-	userid := TakeuserId(cookie.Value)
 	if userid < 1 {
 		return reaction
 	}

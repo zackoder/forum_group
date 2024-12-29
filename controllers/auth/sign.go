@@ -174,7 +174,7 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func LogUot(w http.ResponseWriter, r *http.Request) {
+func Logout(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("token")
 	if err != nil {
 		utils.ExecuteTemplate(w, []string{"views/pages/error.html"}, nil)
