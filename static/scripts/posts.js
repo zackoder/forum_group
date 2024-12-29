@@ -4,21 +4,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Event delegation for click events
   postsContainer.addEventListener("click", function (event) {
-
     const postElement = event.target.closest(".post-container");
     if (!postElement) return;
-
 
     const postId = postElement.getAttribute("data-post-id");
 
     if (event.target.classList.contains("like-btn")) {
-      alert("action")
+      alert("action");
       handleLike(postId, true);
     } else if (event.target.classList.contains("dislike-btn")) {
       handleLike(postId, false);
     }
-
-
   });
 
   postsContainer.addEventListener("submit", function (event) {
@@ -39,35 +35,27 @@ document.addEventListener("DOMContentLoaded", function () {
       handleComment(postId, commentText);
       form.reset();
     }
-
-
-
-
-
-
   });
 
   postsContainer.addEventListener("click", function (event) {
     const postElement = event.target.closest(".post-container");
 
+    const postId = postElement
+      ? postElement.getAttribute("data-post-id")
+      : null;
 
-    const postId = postElement ? postElement.getAttribute("data-post-id") : null;
-
-    console.log(postId); // For debugging
-
+    // console.log(postId);
 
     const CommentClass = event.target.classList.contains("see_comments");
 
-    if (event.target.classList.contains('see_comments')) {
+    if (event.target.classList.contains("see_comments")) {
       event.target.disabled = true;
-  }
+    }
     const divcomments = document.querySelector(".divcomments" + postId);
     if (CommentClass && postId) {
       GetComments(postId, divcomments);
     }
   });
-
-
 
   loadMorePosts();
   window.addEventListener("scroll", _.throttle(handleScroll, 500));
@@ -111,17 +99,15 @@ function handleComment(postId, comment) {
       return response.json();
     })
     .then((data) => {
-      console.log(data)
+      // console.log(data);
       if (data.message != 200) {
-
         alert(" faild to add Comment");
       }
-      let comment_form = ".divcomments" + postId
+      let comment_form = ".divcomments" + postId;
       let commentElement = document.querySelector(comment_form);
-      GetComments(postId, commentElement)
+      GetComments(postId, commentElement);
     })
     .catch((error) => alert("Error submitting comment:", error));
-
 }
 
 let home = "home";
@@ -142,24 +128,17 @@ const oneday = 1000 * 60 * 60 * 24;
 const onemin = 1000 * 60;
 
 async function loadMorePosts(name = "home") {
-  console.log(name);
-
   if (loading) return;
   loading = true;
 
   try {
-    console.log("hello");
     const response = await fetch(`/api/posts?offset=${offset}`);
 
     const posts = await response.json();
     if (!posts || posts.length === 0) return;
 
-    
     const postsContainer = document.getElementById("posts-container");
     posts.forEach((post) => {
-      console.log(post);
-      
-
       const postElement = document.createElement("div");
       postElement.className = "post-container";
       postElement.dataset.postId = post.Id;
@@ -174,26 +153,7 @@ async function loadMorePosts(name = "home") {
       nameContainer.className = "usrname";
       nameContainer.innerText = post.UserName;
       const createdat = createEle("span");
-      let date = new Date(post.Date).getTime();
-      const currentTime = Date.now();
-      const elapsed = currentTime - date;
-
-      const days = Math.floor(elapsed / oneday);
-      const hours = Math.floor((elapsed % oneday) / onehour);
-      const minutes = Math.floor((elapsed % onehour) / onemin);
-
-      let timeText = "";
-
-      if (days > 0) {
-        timeText += `${days}d `;
-      }
-      if (hours > 0) {
-        timeText += `${hours}h `;
-      }
-      if (minutes > 0 && (days == 0 || hours == 0)) {
-        timeText += `${minutes}min`;
-      }
-
+      let timeText = formDate(post.Date);
       createdat.innerText = timeText;
       createdat.className = "creationdate";
       posterName.appendChild(posterImg);
@@ -238,11 +198,12 @@ async function loadMorePosts(name = "home") {
       const likeIcon = createEle("img");
       likeIcon.src = "/static/images/like.png";
 
-      const likeNbm = createEle("p");
-      likeNbm.innerText=post.Reactions.Likes
+      const likeNbr = createEle("span");
+      likeNbr.className = "likeNbr";
+      likeNbr.innerText = post.Reactions.Likes;
 
       likebnt.appendChild(likeIcon);
-      likebnt.appendChild(likeNbm);
+      // likebnt.appendChild(likeNbm);
 
       /* creationg of the dislike button */
       const dislikebnt = createEle("button");
@@ -252,26 +213,24 @@ async function loadMorePosts(name = "home") {
       const dislikeIcone = createEle("img");
       dislikeIcone.src = "/static/images/dislike.png";
 
-      const dislikeNbm = createEle("p");
-      dislikeNbm.innerText=post.Reactions.Dislikes
+      const dislikeNbr = createEle("span");
+      dislikeNbr.className = "dislikeNbr";
+      dislikeNbr.innerText = post.Reactions.Dislikes;
 
       dislikebnt.appendChild(dislikeIcone);
-      dislikebnt.appendChild(dislikeNbm);
+      dislikebnt.appendChild(dislikeNbr);
 
       /* appending like and dislike buttons to like container */
-      like_dislike_container.append(likebnt, dislikebnt);
+      like_dislike_container.append(likebnt, likeNbr, dislikebnt, dislikeNbr);
 
       /* appending like container to the post contaner */
       pc.appendChild(like_dislike_container);
-
-
 
       ////add div comments
       const divcomments = createEle("div");
       divcomments.className = `divcomments${post.Id} divcomments`;
 
       pc.appendChild(divcomments);
-
 
       /* adding a button to see comments */
       const seecomments = createEle("button");
@@ -316,9 +275,9 @@ async function loadMorePosts(name = "home") {
 }
 
 function formDate(date) {
-  let creationD = new Date(date).getTime();
+  let CreattionDate = new Date(date).getTime();
   const currentTime = Date.now();
-  const elapsed = currentTime - creationD;
+  const elapsed = currentTime - CreattionDate;
 
   const days = Math.floor(elapsed / oneday);
   const hours = Math.floor((elapsed % oneday) / onehour);
@@ -332,10 +291,10 @@ function formDate(date) {
   if (hours > 0) {
     timeText += `${hours}h `;
   }
-  if (minutes > 0) {
+  if (minutes > 0 && (days == 0 || hours == 0)) {
     timeText += `${minutes}min`;
   }
-  return timeText
+  return timeText;
 }
 
 function createEle(elename) {
@@ -456,7 +415,7 @@ form.addEventListener("submit", async function (event) {
         window.location.href = res.url;
       } else {
         alert("Failed to submit post");
-        console.log(res);
+        // console.log(res);
       }
     } catch (error) {
       alert("Error: " + error.message);
@@ -482,89 +441,84 @@ async function PostCategory() {
   }
 }
 
-
-
-
 async function GetComments(idPost, str) {
-
-  str.innerHTML = ""
-  str.style.display = "block"
+  str.innerHTML = "";
+  str.style.display = "block";
   try {
-    const response = await fetch(`http://localhost:8001/api/${idPost}/comments`)
+    const response = await fetch(
+      `http://localhost:8001/api/${idPost}/comments`
+    );
 
     if (response.ok) {
       const data = await response.json();
       if (data == null) {
-        str.innerHTML = "there is no comments"
+        str.innerHTML = "there is no comments";
       } else {
-        const comments = createEle("div")
-        comments.className = "commentsDiv"
+        const comments = createEle("div");
+        comments.className = "commentsDiv";
 
-        data.forEach(e => {
-          const commentC = createEle('div')
-          commentC.className = "commentC"
+        data.forEach((e) => {
+          const commentC = createEle("div");
+          commentC.className = "commentC";
 
+          const commentHe = createEle("div");
+          commentHe.className = "commentHe";
 
-          const commentHe = createEle('div')
-          commentHe.className = "commentHe"
+          const commentH = createEle("h3");
+          commentH.className = "commentH";
+          commentH.innerText = e.Username;
 
-          const commentH = createEle('h3')
-          commentH.className = "commentH"
-          commentH.innerText = e.Username
+          const commentTime = createEle("p");
+          commentTime.className = "commentTime";
+          commentTime.innerText = formDate(e.Date);
 
-          const commentTime = createEle('p')
-          commentTime.className = "commentTime"
-          commentTime.innerText = formDate(e.Date)
-
-          const commentP = createEle('p')
-          commentP.className = "commentp"
-          commentP.innerText = e.Comment
-
-
+          const commentP = createEle("p");
+          commentP.className = "commentp";
+          commentP.innerText = e.Comment;
 
           const like_dislike_container = createEle("div");
           like_dislike_container.className = "like-dislike-container";
 
           /* creating of the like button */
           const likebnt = createEle("button");
-          likebnt.className = "like-btn";
+          likebnt.className = "like-btn-comment";
 
           /* create an img element to contain like icon */
           const likeIcon = createEle("img");
+          likeIcon.className = "likeicon-comment";
           likeIcon.src = "/static/images/like.png";
-
-          likebnt.appendChild(likeIcon);
+          const likeNbmC = createEle("span");
+          likeNbmC.className = "likeNbr";
+          likeNbmC.innerText = 5;
+          likebnt.append(likeIcon);
 
           /* creationg of the dislike button */
           const dislikebnt = createEle("button");
-          dislikebnt.className = "dislike-btn";
+          dislikebnt.className = "dislike-btn-comment";
 
           /* creating an img tag to containg dislike icon */
-          const dislikeIcone = createEle("img");
-          dislikeIcone.src = "/static/images/dislike.png";
+          const dislikeIcon = createEle("img");
+          dislikeIcon.className = "dislikeicon-comment";
+          dislikeIcon.src = "/static/images/dislike.png";
 
-          dislikebnt.appendChild(dislikeIcone);
+          dislikebnt.appendChild(dislikeIcon);
+          const dislikeNbmC = createEle("span");
+          dislikeNbmC.className = "dislikeNbr";
+          dislikeNbmC.innerText = 5;
 
           /* appending like and dislike buttons to like container */
-          like_dislike_container.append(likebnt, dislikebnt);
+          like_dislike_container.append(likebnt, likeNbmC, dislikebnt, dislikeNbmC);
 
-
-          commentHe.append(commentH, commentTime)
-          commentC.append(commentHe, commentP, like_dislike_container)
-          comments.appendChild(commentC)
-
+          commentHe.append(commentH, commentTime);
+          commentC.append(commentHe, commentP, like_dislike_container);
+          comments.appendChild(commentC);
         });
-        str.appendChild(comments)
-
+        str.appendChild(comments);
       }
-      console.log(data);
-
+      // console.log(data);
     } else {
       console.error("Request failed with status:", response.status);
       // document.getElementById("responseMessage").innerText = "Error fetching comments.";
     }
-  } catch (error) {
-
-  }
-
+  } catch (error) {}
 }
