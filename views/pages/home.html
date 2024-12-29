@@ -2,7 +2,8 @@
 <link rel="stylesheet" href="/static/styles/home.css" />
 {{end}} {{define "title"}}Forum{{end}} {{define "content"}}
 <div class="lay-out"></div>
-<button class="show-postForm"><img src="/static/images/add.png"></button>
+{{if .}}
+<button class="show-postForm"><img src="/static/images/add.png" /></button>
 <form id="postForm" class="postForm">
   <label class="create_Post" for="post">Create Post:</label>
   <input
@@ -22,6 +23,7 @@
 
   <button type="submit" class="submit">Submit</button><br />
 </form>
+{{end}}
 <section id="posts-container"></section>
 {{end}} {{define "script"}}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-min.js"></script>

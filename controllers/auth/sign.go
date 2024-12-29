@@ -175,25 +175,17 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func Logout(w http.ResponseWriter, r *http.Request) {
-	cookie, err := r.Cookie("token")
-	if err != nil {
-		utils.ErrorHandler(w, http.StatusNotFound, "Page not Found", "The page you are looking for is not available!", nil)
-		return
-	}
-	err = DelectSeoin(cookie.Value)
-	if err != nil {
-		utils.ErrorHandler(w, http.StatusNotFound, "Page not Found", "The page you are looking for is not available!", nil)
-		return
-	}
+	cookie, _ := r.Cookie("token")
+	DeletSeoin(cookie.Value)
 	http.SetCookie(w, &http.Cookie{
-		Value:    "",
-		Name:     "token",
-		MaxAge:   -1,
+		Value:  "",
+		Name:   "token",
+		MaxAge: -1,
 	})
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-func DelectSeoin(token string) error {
+func DeletSeoin(token string) error {
 	query := `
 		DELETE FROM sessions WHERE token = ?
 	`
