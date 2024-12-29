@@ -11,7 +11,6 @@ type User struct {
 }
 
 func Home(w http.ResponseWriter, r *http.Request) {
-	// userName := ""
 	if r.URL.Path != "/" { // handle invalid path (error 404)
 		utils.ErrorHandler(w, http.StatusNotFound, "Page not Found", "The page you are looking for is not available!", nil)
 		return
@@ -20,6 +19,11 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		utils.ErrorHandler(w, http.StatusMethodNotAllowed, http.StatusText(http.StatusMethodNotAllowed), "this Page doesn't support your Method", nil)
 		return
 	}
+	// userName := ""
+	// cookie, err := r.Cookie("token")
+	// if err == nil {
+	// 	userName, _ = api.GetUsername(api.TakeuserId(cookie.Value), nil)
+	// }
 	pages := []string{
 		"views/pages/home.html",
 		"views/components/new_comment.html",
