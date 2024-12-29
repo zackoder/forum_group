@@ -41,7 +41,7 @@ func CommentReaction(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("commant id not valid")
 		return
 	}
-	fmt.Println("ok")
+	// fmt.Println("ok")
 	like, err := CheckLIke(reactInfo.comment_id, reactInfo.user_id, "like", "comment_id ")
 	if err != nil {
 
@@ -51,8 +51,7 @@ func CommentReaction(w http.ResponseWriter, r *http.Request) {
 	}
 	dilike, err := CheckLIke(reactInfo.comment_id, reactInfo.user_id, "dislike", "comment_id")
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]string{"error": "error in server"})
+		utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w)
 		return
 	}
 	if reactInfo.action == "like" {
@@ -73,7 +72,7 @@ func CommentReaction(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]string{"error": "invalid format"})
+		json.NewEncoder(w).Encode(map[string]string{"message": "invalid format"})
 		return
 	}
 }
