@@ -39,6 +39,7 @@ type Post struct {
 }
 
 type PostsResult struct {
+	Id         int
 	UserName   string
 	UserImage  string
 	Title      string
@@ -46,11 +47,7 @@ type PostsResult struct {
 	Image      string
 	Categories []string
 	Date       string
-	Reactions  struct {
-		Likes    int
-		Dislikes int
-		Action   string
-	}
+	Reactions  Reactions
 }
 
 type Reaction struct {
@@ -61,6 +58,11 @@ type Reaction struct {
 	Type      string
 }
 
+type Reactions struct {
+	NumDisLike int
+	NumLike    int
+	Action     string
+}
 type PostCategory struct {
 	PostId     int
 	CategoryId int

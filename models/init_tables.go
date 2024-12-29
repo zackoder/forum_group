@@ -36,10 +36,6 @@ func InitTables(db *sql.DB) {
 			FOREIGN KEY (user_id) REFERENCES users(id)
 		);
 
-
-
-
-
 		
 		CREATE TABLE IF NOT EXISTS categories (
 			id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
