@@ -9,13 +9,25 @@ document.addEventListener("DOMContentLoaded", function () {
     if (commentEl) {
       const commentId = commentEl.getAttribute("data-comment-id");
       console.log(commentId);
+      if (event.target.classList.contains("like-btn-comment")) {
+        handleLike("comment", commentId, "like");
+        console.log(commentId);
+      } else if (event.target.classList.contains("dislike-btn-comment")) {
+        console.log(commentId);
+        handleLike("comment", commentId, "dislike");
+      }
     }
-
     const postId = postElement.getAttribute("data-post-id");
 
-    if (event.target.classList.contains("like-btn")) {
+    if (
+      event.target.classList.contains("like-btn") ||
+      event.target.classList.contains("likeIcon")
+    ) {
       handleLike("posts", postId, "like");
-    } else if (event.target.classList.contains("dislike-btn")) {
+    } else if (
+      event.target.classList.contains("dislike-btn") ||
+      event.target.classList.contains("dislikeIcon")
+    ) {
       handleLike("posts", postId, "dislike");
     }
     if (event.target.classList.contains("like-btn-comment")) {
@@ -38,7 +50,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (commentText === "") {
         alert("Comment cannot be empty.");
-
         return;
       }
 
@@ -58,6 +69,8 @@ document.addEventListener("DOMContentLoaded", function () {
       event.target.disabled = true;
     }
     const divcomments = document.querySelector(".divcomments" + postId);
+    console.log(divcomments);
+
     if (CommentClass && postId) {
       GetComments(postId, divcomments);
     }
@@ -75,9 +88,7 @@ function handleLike(path, id, like) {
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
     },
-    body: new URLSearchParams({
-      action: like,
-    }).toString(),
+    body: `action=${like}`,
   })
     .then((response) => {
       console.log(response);
@@ -119,7 +130,6 @@ function handleComment(postId, comment) {
     .catch((error) => alert("Error submitting comment:", error));
 }
 
-let home = "home";
 let profile = document.getElementById("profile");
 if (profile) {
   profile.addEventListener("click", () => {
@@ -207,6 +217,7 @@ async function loadMorePosts(name = "home") {
 
       /* create an img element to contain like icon */
       const likeIcon = createEle("img");
+      likeIcon.className = "likeIcon";
       likeIcon.src = "/static/images/like.png";
 
       const likeNbr = createEle("span");
@@ -221,15 +232,16 @@ async function loadMorePosts(name = "home") {
       dislikebnt.className = "dislike-btn";
 
       /* creating an img tag to containg dislike icon */
-      const dislikeIcone = createEle("img");
-      dislikeIcone.src = "/static/images/dislike.png";
+      const dislikeIcon = createEle("img");
+      dislikeIcon.className = "dislikeIcon";
+      dislikeIcon.src = "/static/images/dislike.png";
 
       const dislikeNbr = createEle("span");
       dislikeNbr.className = "dislikeNbr";
       dislikeNbr.innerText = post.Reactions.Dislikes;
 
-      dislikebnt.appendChild(dislikeIcone);
-      dislikebnt.appendChild(dislikeNbr);
+      dislikebnt.appendChild(dislikeIcon);
+      // dislikebnt.appendChild(dislikeNbr);
 
       if (post.Reactions.Action === "like") {
         likebnt.style.classList.add("liked");
@@ -443,14 +455,23 @@ async function PostCategory() {
   let category = document.getElementById("category");
   try {
     const res = await fetch("http://localhost:8001/api/category/list");
+    const categories = document.querySelector("#categories");
     const data = await res.json();
     data.forEach((catg) => {
+      console.log(catg);
+      
+      let li = createEle("li")
+      let a = createEle("a")
+      a.href = `/categoreis/${catg.Id}`;
+      a.innerText = catg.Name;
       category.innerHTML += `
       <label class="catLabel" for="${catg.Name}">
         <input type="checkbox" name="options" id="${catg.Name}" value="${catg.Name}" data-name="${catg.Name}"> <splan>${catg.Name}</span>
       </label>
 
       `;
+      li.append(a)
+      categories.append(li)
     });
   } catch {
     console.log("erroure");
@@ -458,7 +479,6 @@ async function PostCategory() {
 }
 
 async function GetComments(idPost, str) {
-  console.log(idPost, "idPost");
   str.innerText = "";
   str.style.display = "block";
   try {
@@ -476,7 +496,6 @@ async function GetComments(idPost, str) {
         comments.className = "commentsDiv";
 
         data.forEach((e) => {
-          console.log(data);
           const commentC = createEle("div");
           commentC.className = "commentC";
           commentC.dataset.commentId = e.Id;
@@ -510,9 +529,10 @@ async function GetComments(idPost, str) {
 
           likebnt.appendChild(likeIcon);
 
-          const likeNmb = createEle("p");
+          const likeNmb = createEle("span");
+          likeNmb.className = "likeNbr";
           likeNmb.innerText = e.Reactions.Likes;
-          likebnt.appendChild(likeNmb);
+          // likebnt.appendChild(likeNmb);
 
           /* creationg of the dislike button */
           const dislikebnt = createEle("button");
@@ -523,14 +543,20 @@ async function GetComments(idPost, str) {
           dislikeIcon.className = "dislikeicon-comment";
           dislikeIcon.src = "/static/images/dislike.png";
 
-          dislikebnt.appendChild(dislikeIcone);
+          dislikebnt.appendChild(dislikeIcon);
 
-          const dislikeNmb = createEle("p");
+          const dislikeNmb = createEle("span");
+          dislikeNmb.className = "dislikeNbr";
           dislikeNmb.innerText = e.Reactions.Dislikes;
-          dislikebnt.appendChild(dislikeNmb);
+          // dislikebnt.appendChild(dislikeNmb);
 
           /* appending like and dislike buttons to like container */
-          like_dislike_container.append(likebnt, dislikebnt);
+          like_dislike_container.append(
+            likebnt,
+            likeNmb,
+            dislikebnt,
+            dislikeNmb
+          );
 
           commentHe.append(commentH, commentTime);
           commentC.append(commentHe, commentP, like_dislike_container);
@@ -538,7 +564,6 @@ async function GetComments(idPost, str) {
         });
         str.appendChild(comments);
       }
-      console.log(data);
     } else {
       console.error("Request failed with status:", response.status);
       // document.getElementById("responseMessage").innerText = "Error fetching comments.";

@@ -2,10 +2,8 @@ package api
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
-	"slices"
 	"strconv"
 
 	"forum/utils"
@@ -17,12 +15,6 @@ func CommentReaction(w http.ResponseWriter, r *http.Request) {
 		comment_id int    // get from url
 		action     string // get from form
 	}
-
-	type Result struct {
-		Message string
-		Code    int
-	}
-
 	w.Header().Set("Content-Type", "application/json")
 
 	/* ------------------------------ handle user_id ------------------------------ */
@@ -42,80 +34,45 @@ func CommentReaction(w http.ResponseWriter, r *http.Request) {
 	if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
 		return
 	}
-
+	reactInfo.action = r.FormValue("action")
 	/* ------------------------------ handle comment_id ------------------------------ */
 	reactInfo.comment_id, err = strconv.Atoi(r.PathValue("CommentId"))
-	if utils.HandleError(utils.Error{Err: err, Code: http.StatusNotFound}, w) {
-		fmt.Println("post id not valid")
+	if utils.HandleError(utils.Error{Err: err, Code: http.StatusNotFound}, w) || CheckCommat(reactInfo.comment_id) != nil {
+		fmt.Println("commant id not valid")
 		return
 	}
+	// fmt.Println("ok")
+	like, err := CheckLIke(reactInfo.comment_id, reactInfo.user_id, "like", "comment_id ")
+	if err != nil {
 
-	/* ------------------------------ handle comment reaction ------------------------------ */
-	if r.Method == http.MethodPost {
-		fmt.Println("ok")
-		/* ------------------------------ handle action ------------------------------ */
-		reactInfo.action = r.FormValue("action")
-		actions := []string{"like", "dislike"}
-		if !slices.Contains(actions, reactInfo.action) {
-			err := errors.New("invalid action")
-			if utils.HandleError(utils.Error{Err: err, Code: http.StatusBadRequest}, w) {
-				return
-			}
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "error in server"})
+		return
+	}
+	dilike, err := CheckLIke(reactInfo.comment_id, reactInfo.user_id, "dislike", "comment_id")
+	if err != nil {
+		utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w)
+		return
+	}
+	if reactInfo.action == "like" {
+		if dilike {
+			UpdateLike(reactInfo.comment_id, reactInfo.user_id, "comment_id", "like")
+		} else if like {
+			DeletLike(reactInfo.comment_id, reactInfo.user_id, "comment_id")
+		} else {
+			InsertLike(reactInfo.comment_id, reactInfo.user_id, "comment_id", "like")
 		}
-		var exist int
-		query := `SELECT EXISTS(SELECT 1 FROM reactions WHERE (user_id = ? AND comment_id = ?));`
-		stm, err := utils.DB.Prepare(query)
-		if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
-			return
+	} else if reactInfo.action == "dislike" {
+		if like {
+			UpdateLike(reactInfo.comment_id, reactInfo.user_id, "comment_id", "dislike")
+		} else if dilike {
+			DeletLike(reactInfo.comment_id, reactInfo.user_id, "comment_id")
+		} else {
+			InsertLike(reactInfo.comment_id, reactInfo.user_id, "comment_id", "dislike")
 		}
-		row_err := stm.QueryRow(reactInfo.user_id, reactInfo.comment_id).Scan(&exist)
-		if utils.HandleError(utils.Error{Err: row_err, Code: http.StatusInternalServerError}, w) {
-			return
-		}
-		if exist == 0 { /* add reaction */
-			query = `INSERT INTO reactions(user_id,comment_id,type) VALUES (?,?,?)`
-			stm, err := utils.DB.Prepare(query)
-			if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
-				return /* get user_id with token start */
-			}
-			_, err = stm.Exec(&reactInfo.user_id, &reactInfo.comment_id, &reactInfo.action)
-			if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
-				return
-			}
-			w.WriteHeader(http.StatusCreated)
-			json.NewEncoder(w).Encode(Result{Message: http.StatusText(http.StatusCreated), Code: http.StatusCreated})
-		} else { /* edit reaction */
-			query = `UPDATE reactions SET type = ? WHERE user_id = ? AND comment_id = ?;`
-			stm, err := utils.DB.Prepare(query)
-			if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
-				return
-			}
-			_, row_err = stm.Exec(&reactInfo.action, &reactInfo.user_id, &reactInfo.comment_id)
-			if utils.HandleError(utils.Error{Err: row_err, Code: http.StatusInternalServerError}, w) {
-				return
-			}
-
-			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(Result{Message: http.StatusText(http.StatusOK), Code: http.StatusOK})
-		}
-	} else if r.Method == http.MethodDelete {
-		/* delete reaction */
-		query := `DELETE FROM reactions WHERE user_id = ? AND comment_id = ?;`
-		stmt, err := utils.DB.Prepare(query)
-		if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
-			return
-		}
-		_, err = stmt.Exec(reactInfo.user_id, reactInfo.comment_id)
-		if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
-			return
-		}
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(Result{Message: http.StatusText(http.StatusOK), Code: http.StatusOK})
 	} else {
-		/* handle error method not allowed */
-		err := errors.New("method not allowd")
-		if utils.HandleError(utils.Error{Err: err, Code: http.StatusMethodNotAllowed}, w) {
-			return
-		}
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"message": "invalid format"})
+		return
 	}
 }

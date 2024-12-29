@@ -45,11 +45,7 @@ type PostsResult struct {
 	Content    string
 	Categories []string
 	Date       string
-	Reactions  struct {
-		Likes    int
-		Dislikes int
-		Action   string
-	}
+	Reactions  Reactions
 }
 type CommentType struct {
 	Id        int
@@ -57,11 +53,7 @@ type CommentType struct {
 	UserImage string
 	Comment   string
 	Date      string
-	Reactions struct {
-		Likes    int
-		Dislikes int
-		Action   string
-	}
+	Reactions Reactions
 }
 
 type Reaction struct {
@@ -72,6 +64,11 @@ type Reaction struct {
 	Type      string
 }
 
+type Reactions struct {
+	Likes    int
+	Dislikes int
+	Action   string
+}
 type PostCategory struct {
 	PostId     int
 	CategoryId int

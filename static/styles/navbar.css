@@ -41,3 +41,11 @@ header {
   font-size: 1.2rem;
   color: white;
 }
+
+#filter {
+  position: fixed;
+  top: 90px;
+  left: 50%;
+  width: 60%;
+  transform: translateX(-50%);
+}

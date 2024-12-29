@@ -15,7 +15,6 @@ type Error struct {
 }
 
 func CreatePost(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("tttt")
 	if r.Method != http.MethodPost {
 		// http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		err := Error{Message: "Not Allowed", Code: http.StatusMethodNotAllowed}
@@ -69,8 +68,8 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	title = strings.TrimSpace(title)
 	content = strings.TrimSpace(content)
 	if title == "" || content == "" {
-		err := Error{Message: "Title or Content is", Code: http.StatusUnauthorized}
-		w.WriteHeader(http.StatusUnauthorized)
+		err := Error{Message: "Title or Content is empty", Code: http.StatusBadRequest}
+		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(err)
 		return
 	}
