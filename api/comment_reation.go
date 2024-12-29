@@ -52,6 +52,7 @@ func CommentReaction(w http.ResponseWriter, r *http.Request) {
 
 	/* ------------------------------ handle comment reaction ------------------------------ */
 	if r.Method == http.MethodPost {
+		fmt.Println("ok")
 		/* ------------------------------ handle action ------------------------------ */
 		reactInfo.action = r.FormValue("action")
 		actions := []string{"like", "dislike"}

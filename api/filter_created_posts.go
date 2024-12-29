@@ -55,6 +55,7 @@ func CreatedPosts(w http.ResponseWriter, r *http.Request) {
 		}
 		/* i'm not prepare this query because the post_id is not from user input */
 		get_likes := `SELECT COUNT(*) FROM reactions WHERE (post_id = ? AND type = "like")`
+
 		err := utils.DB.QueryRow(get_likes, p.Id).Scan(&p.Reactions.Likes)
 		if err != sql.ErrNoRows && utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
 			return
@@ -70,6 +71,7 @@ func CreatedPosts(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		p.Categories = strings.Split(categories, ",")
+
 		posts = append(posts, p)
 	}
 

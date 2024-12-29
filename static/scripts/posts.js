@@ -5,15 +5,25 @@ document.addEventListener("DOMContentLoaded", function () {
   // Event delegation for click events
   postsContainer.addEventListener("click", function (event) {
     const postElement = event.target.closest(".post-container");
-    if (!postElement) return;
+    const commentEl = event.target.closest(".commentC");
+    if (commentEl) {
+      const commentId = commentEl.getAttribute("data-comment-id");
+      console.log(commentId);
+    }
 
     const postId = postElement.getAttribute("data-post-id");
 
     if (event.target.classList.contains("like-btn")) {
-      alert("action");
-      handleLike(postId, true);
+      handleLike("posts", postId, "like");
     } else if (event.target.classList.contains("dislike-btn")) {
-      handleLike(postId, false);
+      handleLike("posts", postId, "dislike");
+    }
+    if (event.target.classList.contains("like-btn-comment")) {
+      handleLike("comment", commentId, "like");
+      console.log(commentId);
+    } else if (event.target.classList.contains("dislike-btn-comment")) {
+      console.log(commentId);
+      handleLike("comment", commentId, "dislike");
     }
   });
 
@@ -40,11 +50,7 @@ document.addEventListener("DOMContentLoaded", function () {
   postsContainer.addEventListener("click", function (event) {
     const postElement = event.target.closest(".post-container");
 
-    const postId = postElement
-      ? postElement.getAttribute("data-post-id")
-      : null;
-
-    // console.log(postId);
+    const postId = postElement.getAttribute("data-post-id");
 
     const CommentClass = event.target.classList.contains("see_comments");
 
@@ -61,18 +67,21 @@ document.addEventListener("DOMContentLoaded", function () {
   window.addEventListener("scroll", _.throttle(handleScroll, 500));
 });
 
-function handleLike(postId, like) {
-  fetch("/like-post", {
+function handleLike(path, id, like) {
+  console.log(like);
+
+  fetch(`/api/${path}/reaction/${id}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
     },
-    body: `{
-          "post_id": ${postId},
-          "like":${like}
-          }`,
+    body: new URLSearchParams({
+      action: like,
+    }).toString(),
   })
     .then((response) => {
+      console.log(response);
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -99,7 +108,7 @@ function handleComment(postId, comment) {
       return response.json();
     })
     .then((data) => {
-      // console.log(data);
+      console.log(data);
       if (data.message != 200) {
         alert(" faild to add Comment");
       }
@@ -135,6 +144,8 @@ async function loadMorePosts(name = "home") {
     const response = await fetch(`/api/posts?offset=${offset}`);
 
     const posts = await response.json();
+    console.log(posts);
+
     if (!posts || posts.length === 0) return;
 
     const postsContainer = document.getElementById("posts-container");
@@ -153,8 +164,8 @@ async function loadMorePosts(name = "home") {
       nameContainer.className = "usrname";
       nameContainer.innerText = post.UserName;
       const createdat = createEle("span");
-      let timeText = formDate(post.Date);
-      createdat.innerText = timeText;
+
+      createdat.innerText = formDate(post.Date);
       createdat.className = "creationdate";
       posterName.appendChild(posterImg);
       posterName.appendChild(nameContainer);
@@ -220,6 +231,11 @@ async function loadMorePosts(name = "home") {
       dislikebnt.appendChild(dislikeIcone);
       dislikebnt.appendChild(dislikeNbr);
 
+      if (post.Reactions.Action === "like") {
+        likebnt.style.classList.add("liked");
+      } else if (post.Reactions.Action === "dislike") {
+        dislikebnt.style.classList.add("disliked");
+      }
       /* appending like and dislike buttons to like container */
       like_dislike_container.append(likebnt, likeNbr, dislikebnt, dislikeNbr);
 
@@ -242,7 +258,7 @@ async function loadMorePosts(name = "home") {
       comment_form.method = "POST";
       comment_form.className = "comment_form";
 
-      const title_impt = createEle("textarea");
+      const title_impt = createEle("input");
       title_impt.className = "comment";
       title_impt.name = "comment";
       title_impt.type = "text";
@@ -442,7 +458,8 @@ async function PostCategory() {
 }
 
 async function GetComments(idPost, str) {
-  str.innerHTML = "";
+  console.log(idPost, "idPost");
+  str.innerText = "";
   str.style.display = "block";
   try {
     const response = await fetch(
@@ -451,6 +468,7 @@ async function GetComments(idPost, str) {
 
     if (response.ok) {
       const data = await response.json();
+
       if (data == null) {
         str.innerHTML = "there is no comments";
       } else {
@@ -458,8 +476,10 @@ async function GetComments(idPost, str) {
         comments.className = "commentsDiv";
 
         data.forEach((e) => {
+          console.log(data);
           const commentC = createEle("div");
           commentC.className = "commentC";
+          commentC.dataset.commentId = e.Id;
 
           const commentHe = createEle("div");
           commentHe.className = "commentHe";
@@ -477,7 +497,7 @@ async function GetComments(idPost, str) {
           commentP.innerText = e.Comment;
 
           const like_dislike_container = createEle("div");
-          like_dislike_container.className = "like-dislike-container";
+          like_dislike_container.className = "like-dislike-container-comment";
 
           /* creating of the like button */
           const likebnt = createEle("button");
@@ -487,10 +507,12 @@ async function GetComments(idPost, str) {
           const likeIcon = createEle("img");
           likeIcon.className = "likeicon-comment";
           likeIcon.src = "/static/images/like.png";
-          const likeNbmC = createEle("span");
-          likeNbmC.className = "likeNbr";
-          likeNbmC.innerText = 5;
-          likebnt.append(likeIcon);
+
+          likebnt.appendChild(likeIcon);
+
+          const likeNmb = createEle("p");
+          likeNmb.innerText = e.Reactions.Likes;
+          likebnt.appendChild(likeNmb);
 
           /* creationg of the dislike button */
           const dislikebnt = createEle("button");
@@ -501,13 +523,14 @@ async function GetComments(idPost, str) {
           dislikeIcon.className = "dislikeicon-comment";
           dislikeIcon.src = "/static/images/dislike.png";
 
-          dislikebnt.appendChild(dislikeIcon);
-          const dislikeNbmC = createEle("span");
-          dislikeNbmC.className = "dislikeNbr";
-          dislikeNbmC.innerText = 5;
+          dislikebnt.appendChild(dislikeIcone);
+
+          const dislikeNmb = createEle("p");
+          dislikeNmb.innerText = e.Reactions.Dislikes;
+          dislikebnt.appendChild(dislikeNmb);
 
           /* appending like and dislike buttons to like container */
-          like_dislike_container.append(likebnt, likeNbmC, dislikebnt, dislikeNbmC);
+          like_dislike_container.append(likebnt, dislikebnt);
 
           commentHe.append(commentH, commentTime);
           commentC.append(commentHe, commentP, like_dislike_container);
@@ -515,10 +538,12 @@ async function GetComments(idPost, str) {
         });
         str.appendChild(comments);
       }
-      // console.log(data);
+      console.log(data);
     } else {
       console.error("Request failed with status:", response.status);
       // document.getElementById("responseMessage").innerText = "Error fetching comments.";
     }
-  } catch (error) {}
+  } catch (error) {
+    console.error(error);
+  }
 }
