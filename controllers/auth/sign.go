@@ -177,20 +177,18 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 func Logout(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("token")
 	if err != nil {
-		utils.ExecuteTemplate(w, []string{"views/pages/error.html"}, nil)
+		utils.ErrorHandler(w, http.StatusNotFound, "Page not Found", "The page you are looking for is not available!", nil)
 		return
 	}
 	err = DelectSeoin(cookie.Value)
 	if err != nil {
-		utils.ExecuteTemplate(w, []string{"views/pages/error.html"}, nil)
+		utils.ErrorHandler(w, http.StatusNotFound, "Page not Found", "The page you are looking for is not available!", nil)
 		return
 	}
 	http.SetCookie(w, &http.Cookie{
-		HttpOnly: false,
 		Value:    "",
 		Name:     "token",
-		MaxAge:   0,
-		Path:     "/",
+		MaxAge:   -1,
 	})
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

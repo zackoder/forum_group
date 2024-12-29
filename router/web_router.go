@@ -20,6 +20,7 @@ func WebRouter() *http.ServeMux {
 	webMux.HandleFunc("/Login", auth.SingIn)
 	webMux.HandleFunc("/register", controllers.Register)
 	webMux.HandleFunc("/login", controllers.Login)
+	webMux.HandleFunc("/logout", auth.Logout)
 
 	return webMux
 }

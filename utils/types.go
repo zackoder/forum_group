@@ -78,3 +78,9 @@ type Error struct {
 	Err  error
 	Code int
 }
+
+type ErrorData struct {
+	Msg1       string
+	Msg2       string
+	StatusCode int
+}
