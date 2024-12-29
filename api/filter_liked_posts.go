@@ -13,7 +13,10 @@ import (
 func LikedPosts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodGet {
-		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		json.NewEncoder(w).Encode(map[string]string{
+			"message": http.StatusText(http.StatusMethodNotAllowed),
+		})
 		return
 	}
 	limit := r.URL.Query().Get("limit")
@@ -106,8 +109,8 @@ func GetReaction(userid, id int, colom string) utils.Reactions {
 		SELECT count(*) FROM reactions WHERE %s = ? AND type = ?
 	`
 	query = fmt.Sprintf(query, colom)
-	utils.DB.QueryRow(query, id, "like").Scan(&reaction.NumLike)
-	utils.DB.QueryRow(query, id, "dislike").Scan(&reaction.NumDisLike)
+	utils.DB.QueryRow(query, id, "like").Scan(&reaction.Likes)
+	utils.DB.QueryRow(query, id, "dislike").Scan(&reaction.Dislikes)
 	if userid < 1 {
 		return reaction
 	}

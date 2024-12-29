@@ -53,11 +53,7 @@ type CommentType struct {
 	UserImage string
 	Comment   string
 	Date      string
-	Reactions struct {
-		Likes    int
-		Dislikes int
-		Action   string
-	}
+	Reactions Reactions
 }
 
 type Reaction struct {
@@ -69,9 +65,9 @@ type Reaction struct {
 }
 
 type Reactions struct {
-	NumDisLike int
-	NumLike    int
-	Action     string
+	Likes    int
+	Dislikes int
+	Action   string
 }
 type PostCategory struct {
 	PostId     int
