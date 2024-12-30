@@ -3,7 +3,6 @@ package api
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -37,17 +36,13 @@ func FetchPosts(w http.ResponseWriter, r *http.Request) {
 	posts := []utils.PostsResult{}
 	// rows, err := stm.Query()
 	for rows.Next() {
-		// post := Post{}
 		var post utils.PostsResult
 		var user_id int
-		// var image sql.NullString
 		var date sql.NullString
 		var categories string
 
 		if err := rows.Scan(&post.Id, &user_id, &post.Title, &post.Content, &categories, &date); err != nil {
-			fmt.Println(err)
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			return
+			continue
 		}
 
 		post.Categories = strings.Split(categories, ",")
@@ -59,12 +54,10 @@ func FetchPosts(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if err := utils.DB.QueryRow("SELECT username FROM users WHERE id = ?", user_id).Scan(&post.UserName); err != nil {
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			return
+			continue
 		}
 		post.Reactions = GetReaction(user_id, post.Id, "post_id")
 		posts = append(posts, post)
-
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

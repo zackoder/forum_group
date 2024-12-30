@@ -48,4 +48,5 @@ header {
   left: 50%;
   width: 60%;
   transform: translateX(-50%);
+  font-size: 2rem;
 }

@@ -69,7 +69,6 @@ func FilterByCategory(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-
 	/* -------------------------- Set result in json response -------------------------- */
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
