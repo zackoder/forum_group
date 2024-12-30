@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"forum/api"
 	"forum/utils"
 )
 
@@ -23,7 +24,7 @@ func Categories(w http.ResponseWriter, r *http.Request) {
 	}
 	categoriesName := r.PathValue("nameCategory")
 	fmt.Println(categoriesName)
-	category := TakeCategories(categoriesName)
+	category := api.TakeCategories(categoriesName)
 	if category < 1 {
 		utils.ErrorHandler(w, http.StatusNotFound, "Page not Found", "The page you are looking for is not available!", nil)
 		return

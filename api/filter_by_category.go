@@ -26,11 +26,10 @@ func FilterByCategory(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-
-	/* ------------------------------- Handle Category Id ------------------------------- */
-	id := r.PathValue("CategoryId")
-	category_id, num_err := strconv.Atoi(id)
-	if utils.HandleError(utils.Error{Err: num_err, Code: http.StatusNotFound}, w) {
+	Category := r.PathValue("nameCategory")
+	category_id := TakeCategories(Category)
+	if category_id < 1 {
+		json.NewEncoder(w).Encode(nil)
 		return
 	}
 	limit := r.URL.Query().Get("limit")
@@ -83,4 +82,10 @@ func FilterByCategory(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(posts)
+}
+
+func TakeCategories(Category string) int {
+	category_id := -1
+	utils.DB.QueryRow("SELECT id FROM categories WHERE name = ?", Category).Scan(&category_id)
+	return category_id
 }
