@@ -9,9 +9,11 @@ import (
 
 func CreatedPosts(w http.ResponseWriter, r *http.Request) {
 	pages := []string{"views/pages/profile.html"}
-	if r.Method == http.MethodGet {
-		utils.ExecuteTemplate(w, pages, nil)
+	if r.Method != http.MethodGet {
+		utils.ErrorHandler(w, http.StatusMethodNotAllowed, http.StatusText(http.StatusMethodNotAllowed), "this Page doesn't support your Method", nil)
+		return
 	}
+	utils.ExecuteTemplate(w, pages, nil)
 }
 
 func Categories(w http.ResponseWriter, r *http.Request) {
@@ -27,7 +29,5 @@ func Categories(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	pages := []string{"views/pages/categories.html"}
-	if r.Method == http.MethodGet {
-		utils.ExecuteTemplate(w, pages, nil)
-	}
+	utils.ExecuteTemplate(w, pages, nil)
 }
