@@ -25,6 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
       console.log("Disliked comment ID:", commentId);
       handleLike("comment", commentId, "dislike");
     }
+<<<<<<< HEAD
   
   
   
@@ -42,6 +43,8 @@ document.addEventListener("DOMContentLoaded", function () {
       handleLike("posts", postId, "dislike");
     }
 
+=======
+>>>>>>> fedd5e1d1ad79d09b739642f2c21d6c90af6b512
   });
 
   postsContainer.addEventListener("submit", function (event) {
@@ -67,11 +70,11 @@ document.addEventListener("DOMContentLoaded", function () {
   postsContainer.addEventListener("click", function (event) {
     const postElement = event.target.closest(".post-container");
 
-    const postId = postElement.getAttribute("data-post-id")
+    const postId = postElement.getAttribute("data-post-id");
 
     const CommentClass = event.target.classList.contains("see_comments");
 
-    if (event.target.classList.contains('see_comments')) {
+    if (event.target.classList.contains("see_comments")) {
       event.target.disabled = true;
     }
     const divcomments = document.querySelector(".divcomments" + postId);
@@ -81,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   loadMorePosts();
-  window.addEventListener("scroll", _.throttle(handleScroll, 500));
+  window.addEventListener("scrollend", handleScroll);
 });
 
 function handleLike(path, id, like) {
@@ -94,7 +97,6 @@ function handleLike(path, id, like) {
     },
     body: `action=${like}`,
   })
-
     .then((response) => {
       console.log(response);
 
@@ -108,7 +110,6 @@ function handleLike(path, id, like) {
     })
     .catch((error) => console.error("Error updating like/dislike:", error));
 }
-
 
 function handleComment(postId, comment) {
   fetch(`/api/${postId}/comment/new`, {
@@ -165,10 +166,12 @@ async function loadMorePosts(name = "home") {
 
     if (!posts || posts.length === 0) return;
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> fedd5e1d1ad79d09b739642f2c21d6c90af6b512
     const postsContainer = document.getElementById("posts-container");
     posts.forEach((post) => {
-
       const postElement = document.createElement("div");
       postElement.className = "post-container";
       postElement.dataset.postId = post.Id;
@@ -228,10 +231,13 @@ async function loadMorePosts(name = "home") {
       const likeIcon = createEle("img");
       likeIcon.src = "/static/images/like.png";
 
-
       const likeNbm = createEle("p");
+<<<<<<< HEAD
       likeNbm.innerText = post.Reactions.Likes
 
+=======
+      likeNbm.innerText = post.Reactions.Likes;
+>>>>>>> fedd5e1d1ad79d09b739642f2c21d6c90af6b512
 
       likebnt.appendChild(likeIcon);
       likebnt.appendChild(likeNbm);
@@ -245,7 +251,11 @@ async function loadMorePosts(name = "home") {
       dislikeIcone.src = "/static/images/dislike.png";
 
       const dislikeNbm = createEle("p");
+<<<<<<< HEAD
       dislikeNbm.innerText = post.Reactions.Dislikes
+=======
+      dislikeNbm.innerText = post.Reactions.Dislikes;
+>>>>>>> fedd5e1d1ad79d09b739642f2c21d6c90af6b512
 
       dislikebnt.appendChild(dislikeIcone);
       dislikebnt.appendChild(dislikeNbm);

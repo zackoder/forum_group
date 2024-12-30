@@ -18,8 +18,8 @@ func CategoryList(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		category := utils.Category{}
 		err = rows.Scan(&category.Id, &category.Name)
-		if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
-			return
+		if err != nil {
+			continue
 		}
 		categories = append(categories, category)
 	}

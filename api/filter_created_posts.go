@@ -1,9 +1,9 @@
 package api
 
 import (
-	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -17,6 +17,14 @@ import (
 */
 
 func CreatedPosts(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	if r.Method != http.MethodGet {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		json.NewEncoder(w).Encode(map[string]string{
+			"message": http.StatusText(http.StatusMethodNotAllowed),
+		})
+		return
+	}
 	var posts []utils.PostsResult
 	/* ---------------------------- Handle token ---------------------------- */
 	token, token_err := r.Cookie("token")
@@ -24,7 +32,7 @@ func CreatedPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	/* ---------------------------- Get user_id from session ---------------------------- */
+	/* ---------------------------- Get   from session ---------------------------- */
 	var user_id int
 	query := `SELECT user_id FROM sessions WHERE token = ?;`
 	stmt, stmt_err := utils.DB.Prepare(query)
@@ -53,25 +61,9 @@ func CreatedPosts(w http.ResponseWriter, r *http.Request) {
 		if utils.HandleError(utils.Error{Err: row_err, Code: http.StatusInternalServerError}, w) {
 			return
 		}
-		/* i'm not prepare this query because the post_id is not from user input */
-		get_likes := `SELECT COUNT(*) FROM reactions WHERE (post_id = ? AND type = "like")`
-
-		err := utils.DB.QueryRow(get_likes, p.Id).Scan(&p.Reactions.Likes)
-		if err != sql.ErrNoRows && utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
-			return
-		}
-		get_dislikes := `SELECT COUNT(*) FROM reactions WHERE (post_id = ? AND type = "dislike")`
-		err = utils.DB.QueryRow(get_dislikes, p.Id).Scan(&p.Reactions.Dislikes)
-		if err != sql.ErrNoRows && utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
-			return
-		}
-		get_action := `SELECT type FROM reactions WHERE (user_id = ? AND post_id = ?)`
-		err = utils.DB.QueryRow(get_action, user_id, p.Id).Scan(&p.Reactions.Action)
-		if err != sql.ErrNoRows && utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
-			return
-		}
+		p.Reactions = GetReaction(user_id, p.Id, "post_id")
 		p.Categories = strings.Split(categories, ",")
-
+		fmt.Println(p.Categories)
 		posts = append(posts, p)
 	}
 
@@ -84,7 +76,6 @@ func CreatedPosts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	/* -------------------------- Set result in json response -------------------------- */
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(posts)
 }

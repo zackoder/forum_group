@@ -30,7 +30,7 @@ async function validlogin(e) {
   if (isValidpassword && isValidusrname) {
     try {
       // Send the POST request
-      const response = await fetch(`http://localhost:8001/Login`, {
+      const response = await fetch(`/user/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json; charset=UTF-8",

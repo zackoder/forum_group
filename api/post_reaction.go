@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -16,21 +15,15 @@ func PostReaction(w http.ResponseWriter, r *http.Request) {
 		post_id int    // get from url
 		action  string // get from form
 	}
-	type Result struct {
-		Message string
-		Code    int
-	}
-
-	/* ----------------------------------- Handle Post Id ----------------------------------- */
 	var err error
 	reactPost.post_id, err = strconv.Atoi(r.PathValue("PostId"))
-	if utils.HandleError(utils.Error{Err: err, Code: http.StatusNotFound}, w) {
+	if utils.HandleError(utils.Error{Err: err, Code: http.StatusNotFound}, w) || CheckPost(reactPost.post_id) {
 		return
 	}
 
 	/* ----------------------------------- handle action ----------------------------------- */
 	reactPost.action = r.FormValue("action")
-	fmt.Println(r.FormValue("action"))
+	// fmt.Println(r.FormValue("action"))
 	/* ----------------------------------- Handle User Id ----------------------------------- */
 	token, token_err := r.Cookie("token")
 	if utils.HandleError(utils.Error{Err: token_err, Code: http.StatusUnauthorized}, w) {
@@ -45,65 +38,84 @@ func PostReaction(w http.ResponseWriter, r *http.Request) {
 	if utils.HandleError(utils.Error{Err: stmt_err, Code: http.StatusInternalServerError}, w) {
 		return
 	}
+	like, err := CheckLIke(reactPost.post_id, reactPost.user_id, "like", "post_id")
+	if err != nil {
 
-	/* ------------------------------ handle post reaction ------------------------------ */
-	if r.Method == http.MethodPost {
-		var exist int
-		query := `SELECT EXISTS(SELECT 1 FROM reactions WHERE (user_id = ? AND post_id = ?));`
-		stm, err := utils.DB.Prepare(query)
-		if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
-			return
-		}
-		row_err := stm.QueryRow(reactPost.user_id, reactPost.post_id).Scan(&exist)
-		if utils.HandleError(utils.Error{Err: row_err, Code: http.StatusInternalServerError}, w) {
-			return
-		}
-		if exist == 0 { /* add reaction */
-			query = `INSERT INTO reactions(user_id,post_id,type) VALUES (?,?,?)`
-			stm, err := utils.DB.Prepare(query)
-			if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
-				return
-			}
-			_, err = stm.Exec(&reactPost.user_id, &reactPost.post_id, &reactPost.action)
-			if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
-				return
-			}
-			defer stm.Close()
-			w.WriteHeader(http.StatusCreated)
-			json.NewEncoder(w).Encode(Result{Message: http.StatusText(http.StatusCreated), Code: http.StatusCreated})
-		} else { /* edit reaction */
-			query = `UPDATE reactions SET type = ? WHERE user_id = ? AND post_id = ?;`
-			stm, err := utils.DB.Prepare(query)
-			if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
-				return
-			}
-			defer stm.Close()
-			_, row_err = stm.Exec(&reactPost.action, &reactPost.user_id, &reactPost.post_id)
-			if utils.HandleError(utils.Error{Err: row_err, Code: http.StatusInternalServerError}, w) {
-				return
-			}
-
-			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(Result{Message: http.StatusText(http.StatusOK), Code: http.StatusOK})
-		}
-	} else if r.Method == http.MethodDelete {
-		/* delete reaction */
-		query := `DELETE FROM reactions WHERE user_id = ? AND post_id = ?;`
-		stmt, err := utils.DB.Prepare(query)
-		if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
-			return
-		}
-		_, err = stmt.Exec(reactPost.user_id, reactPost.post_id)
-		if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
-			return
-		}
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(Result{Message: http.StatusText(http.StatusOK), Code: http.StatusOK})
-	} else {
-		/* handle error method not allowed */
-		err := errors.New("method not allowd")
-		if utils.HandleError(utils.Error{Err: err, Code: http.StatusMethodNotAllowed}, w) {
-			return
-		}
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "error in server"})
+		return
 	}
+	dilike, err := CheckLIke(reactPost.post_id, reactPost.user_id, "dislike", "post_id")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"error": "error in server"})
+		return
+	}
+	if reactPost.action == "like" {
+		if dilike {
+			UpdateLike(reactPost.post_id, reactPost.user_id, "post_id", "like")
+		} else if like {
+			DeletLike(reactPost.post_id, reactPost.user_id, "post_id")
+		} else {
+			InsertLike(reactPost.post_id, reactPost.user_id, "post_id", "like")
+		}
+	} else if reactPost.action == "dislike" {
+		if like {
+			UpdateLike(reactPost.post_id, reactPost.user_id, "post_id", "dislike")
+		} else if dilike {
+			DeletLike(reactPost.post_id, reactPost.user_id, "post_id")
+		} else {
+			InsertLike(reactPost.post_id, reactPost.user_id, "post_id", "dislike")
+		}
+	} else {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "invalid format"})
+		return
+	}
+}
+
+func UpdateLike(id, userid int, which, typ string) {
+	query := fmt.Sprintf(`
+		UPDATE  reactions
+		SET type = ?
+		WHERE %s = ?
+		AND user_id = ?
+	`, which)
+	_, err := utils.DB.Exec(query, typ, id, userid)
+	fmt.Println(err, "update")
+}
+
+func InsertLike(id, userid int, which, typ string) {
+	query := fmt.Sprintf(`
+		INSERT INTO reactions(%s ,user_id ,type)
+		VALUES( ? , ? , ? )
+	`, which)
+	_, err := utils.DB.Exec(query, id, userid, typ)
+	fmt.Println(err, "inser")
+}
+
+func DeletLike(id, userid int, which string) {
+	query := fmt.Sprintf(`
+		DELETE FROM reactions WHERE %s = ? AND user_id = ?
+	`, which)
+	_, err := utils.DB.Exec(query, id, userid)
+	fmt.Println(err, "del")
+}
+
+func CheckLIke(id, userId int, typ, column string) (bool, error) {
+	var like bool
+	query := fmt.Sprintf(`
+		SELECT EXISTS (
+			SELECT 1 
+			FROM reactions
+			WHERE %s = ? AND 
+			user_id = ? AND 
+			type = ?
+		)
+	`, column)
+	err := utils.DB.QueryRow(query, id, userId, typ).Scan(&like)
+	if err != nil {
+		return false, fmt.Errorf("query execution error: %w", err)
+	}
+	return like, nil
 }

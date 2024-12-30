@@ -71,7 +71,7 @@ async function validregister(e) {
   if (isValidpassword && isValidusername && isValidemail) {
     try {
       // Send the POST request
-      const response = await fetch(`http://localhost:8001/Register`, {
+      const response = await fetch(`/user/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json; charset=UTF-8",

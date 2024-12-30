@@ -57,28 +57,11 @@ func FilterByCategory(w http.ResponseWriter, r *http.Request) {
 		if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
 			return
 		}
-		/* i'm not prepare this query because the post_id is not from user input */
-		get_likes := `SELECT COUNT(*) FROM reactions WHERE (post_id = ? AND type = "like")`
-		err = utils.DB.QueryRow(get_likes, p.Id).Scan(&p.Reactions.Likes)
-		if err != sql.ErrNoRows && utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
-			return
-		}
-		get_dislikes := `SELECT COUNT(*) FROM reactions WHERE (post_id = ? AND type = "dislike")`
-		err = utils.DB.QueryRow(get_dislikes, p.Id).Scan(&p.Reactions.Dislikes)
-		if err != sql.ErrNoRows && utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
-			return
-		}
-		if logged_user > 0 {
-			get_action := `SELECT type FROM reactions WHERE (user_id = ? AND post_id = ?)`
-			err = utils.DB.QueryRow(get_action, logged_user, p.Id).Scan(&p.Reactions.Action)
-			if err != sql.ErrNoRows && utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
-				return
-			}
-		}
+		p.Reactions = GetReaction(logged_user, p.Id, "post_id")
 		p.Categories = strings.Split(categories, ",")
 		posts = append(posts, p)
 	}
-	
+
 	/* -------------------------- handle error no content -------------------------- */
 	if len(posts) == 0 {
 		err := errors.New("no posts")
@@ -86,7 +69,6 @@ func FilterByCategory(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-
 	/* -------------------------- Set result in json response -------------------------- */
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
