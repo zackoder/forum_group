@@ -8,18 +8,10 @@ import (
 
 func CreatedPosts(w http.ResponseWriter, r *http.Request) {
 	pages := []string{"views/pages/profile.html"}
-	if r.Method != http.MethodGet {
-		utils.ErrorHandler(w, http.StatusMethodNotAllowed, http.StatusText(http.StatusMethodNotAllowed), "this Page doesn't support your Method", nil)
-		return
-	}
 	utils.ExecuteTemplate(w, pages, nil)
 }
 
 func Categories(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		utils.ErrorHandler(w, http.StatusMethodNotAllowed, http.StatusText(http.StatusMethodNotAllowed), "this Page doesn't support your Method", nil)
-		return
-	}
 	// categoriesName := r.PathValue("nameCategory")
 	// fmt.Println(categoriesName)
 	// category := TakeCategories(categoriesName)
