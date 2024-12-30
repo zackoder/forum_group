@@ -64,7 +64,6 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	// 		return
 	// 	}
 	// }
-	fmt.Println(categories)
 	title = strings.TrimSpace(title)
 	content = strings.TrimSpace(content)
 	if title == "" || content == "" {

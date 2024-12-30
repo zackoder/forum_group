@@ -44,7 +44,6 @@ func CommentReaction(w http.ResponseWriter, r *http.Request) {
 	// fmt.Println("ok")
 	like, err := CheckLIke(reactInfo.comment_id, reactInfo.user_id, "like", "comment_id ")
 	if err != nil {
-
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]string{"error": "error in server"})
 		return
