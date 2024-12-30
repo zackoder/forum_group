@@ -115,7 +115,9 @@ func Insert(user utils.User) (int, int, error) {
 		latdID, _ := res.LastInsertId()
 		return http.StatusOK, int(latdID), nil
 	}
-	if strings.Contains(err.Error(), "email") {
+	if strings.Contains(err.Error(), "username") {
+		return http.StatusFound, -1, fmt.Errorf("user name already used try anther user name")
+	} else if strings.Contains(err.Error(), "email") {
 		return http.StatusFound, -1, fmt.Errorf("email already used try anther email")
 	}
 	return http.StatusInternalServerError, -1, fmt.Errorf("sorry but there are error in server try anther time")

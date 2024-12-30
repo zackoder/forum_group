@@ -12,7 +12,7 @@ func InitTables(db *sql.DB) {
 	query := `
 		CREATE TABLE IF NOT EXISTS users(
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			username varchar(255) NOT NULL,
+			username varchar(255) NOT NULL UNIQUE,
 			email varchar(255) NOT NULL UNIQUE,
 			password varchar(255) NOT NULL
 		);
