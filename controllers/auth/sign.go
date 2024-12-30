@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"forum/api"
 	"forum/utils"
 
 	"github.com/gofrs/uuid"
@@ -191,4 +192,14 @@ func DeletSeoin(token string) error {
 	`
 	_, err := utils.DB.Exec(query, token)
 	return err
+}
+
+func Islogin(r *http.Request) bool {
+	userName := 0
+	cookie, err := r.Cookie("token")
+	if err != nil {
+		return false
+	}
+	userName = api.TakeuserId(cookie.Value)
+	return userName > 0
 }
