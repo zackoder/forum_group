@@ -80,7 +80,6 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	last_post_id, err := result.LastInsertId()
-	fmt.Println(last_post_id)
 	if err != nil {
 		// http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		err := Error{Message: "Error", Code: http.StatusInternalServerError}
@@ -89,11 +88,9 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(err)
 		return
 	}
-	fmt.Println(categories)
 	for _, categ := range categories {
-		var category_id int
-		err := utils.DB.QueryRow("SELECT id FROM categories WHERE name = ?", categ).Scan(&category_id)
-		if err != nil {
+		category_id := TakeCategories(categ)
+		if category_id < 1 {
 			fmt.Println(err, categ)
 			err := Error{Message: "Bad Request", Code: http.StatusBadRequest}
 			w.WriteHeader(http.StatusBadRequest)
@@ -110,10 +107,10 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
 
-	// tmpl, err := template.ParseFiles("./templates/createpost.html")
-	// if err != nil {
-	// 	http.Error(w, "Error in the Parse File", http.StatusInternalServerError)
-	// }
-	// tmpl.Execute(w, nil)
+func TakeCategories(Category string) int {
+	category_id := -1
+	utils.DB.QueryRow("SELECT id FROM categories WHERE name = ?", Category).Scan(&category_id)
+	return category_id
 }

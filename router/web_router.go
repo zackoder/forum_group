@@ -16,13 +16,14 @@ func WebRouter() *http.ServeMux {
 	webMux.HandleFunc("/", controllers.Home)
 	webMux.HandleFunc("/add-post", m.Authorization(controllers.CreatePost))
 	/* --------------------------- login and register handlers --------------------------- */
-	webMux.HandleFunc("/Register", auth.RegisterUser)
-	webMux.HandleFunc("/Login", auth.SingIn)
+	webMux.HandleFunc("/user/register", auth.SingUp)
+	webMux.HandleFunc("/user/login", auth.SingIn)
 	webMux.HandleFunc("/register", controllers.Register)
 	webMux.HandleFunc("/login", controllers.Login)
 	webMux.HandleFunc("/logout", m.Authorization(auth.Logout))
-	webMux.HandleFunc("/liked-post", controllers.Home)
-	// webMux.HandleFunc("/liked-post", controllers.Home)
+	webMux.HandleFunc("/liked-post", m.Authorization(controllers.LikedPostsPage))
+	webMux.HandleFunc("/profile", m.Authorization(controllers.CreatedPosts))
+	webMux.HandleFunc("/categories/{nameCategory}", (controllers.Categories))
 
 	return webMux
 }

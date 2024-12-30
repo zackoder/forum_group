@@ -7,8 +7,38 @@ import (
 	"forum/utils"
 )
 
-type User struct {
-	Name string
+func Login(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		utils.ErrorHandler(w, http.StatusMethodNotAllowed, http.StatusText(http.StatusMethodNotAllowed), "this Page doesn't support your Method", nil)
+		return
+	}
+	cookie, err := r.Cookie("token")
+	if err == nil {
+		userId := api.TakeuserId(cookie.Value)
+		if userId > 0 {
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
+	}
+	pages := []string{"views/pages/login.html"}
+	utils.ExecuteTemplate(w, pages, nil)
+}
+
+func Register(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		utils.ErrorHandler(w, http.StatusMethodNotAllowed, http.StatusText(http.StatusMethodNotAllowed), "this Page doesn't support your Method", nil)
+		return
+	}
+	cookie, err := r.Cookie("token")
+	if err == nil {
+		userId := api.TakeuserId(cookie.Value)
+		if userId > 0 {
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
+	}
+	pages := []string{"views/pages/register.html"}
+	utils.ExecuteTemplate(w, pages, nil)
 }
 
 func Home(w http.ResponseWriter, r *http.Request) {
@@ -30,7 +60,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		"views/pages/home.html",
 		"views/components/new_comment.html",
 	}
-	utils.ExecuteTemplate(w, pages, userName > 1)
+	utils.ExecuteTemplate(w, pages, userName > 0)
 }
 
 func LikedPostsPage(w http.ResponseWriter, r *http.Request) {

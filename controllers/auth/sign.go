@@ -120,7 +120,7 @@ func Insert(user utils.User) (int, int, error) {
 	return http.StatusInternalServerError, -1, fmt.Errorf("sorry but there are error in server try anther time")
 }
 
-func RegisterUser(w http.ResponseWriter, r *http.Request) {
+func SingUp(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
