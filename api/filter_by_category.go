@@ -26,20 +26,18 @@ func FilterByCategory(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	Category := r.PathValue("nameCategory")
+	Category := r.PathValue("Category")
 	category_id := TakeCategories(Category)
 	if category_id < 1 {
 		json.NewEncoder(w).Encode(nil)
 		return
 	}
-	limit := r.URL.Query().Get("limit")
+
 	offset := r.URL.Query().Get("offset")
 
 	limitInt := 20
 	offsetInt := 0
-	if l, err := strconv.Atoi(limit); err == nil {
-		limitInt = l
-	}
+
 	if o, err := strconv.Atoi(offset); err == nil {
 		offsetInt = o
 	}

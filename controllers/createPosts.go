@@ -22,7 +22,7 @@ func Categories(w http.ResponseWriter, r *http.Request) {
 		utils.ErrorHandler(w, http.StatusMethodNotAllowed, http.StatusText(http.StatusMethodNotAllowed), "this Page doesn't support your Method", nil)
 		return
 	}
-	categoriesName := r.PathValue("nameCategory")
+	categoriesName := r.PathValue("Category")
 	fmt.Println(categoriesName)
 	category := api.TakeCategories(categoriesName)
 	if category < 1 {
