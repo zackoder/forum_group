@@ -1,6 +1,11 @@
 {{ define "navbar" }}
 <header>
   <p class="logo"><a href="/" class="logolink">Forum</a></p>
+
+  <nav id="filter">
+    <ul id="categories"></ul>
+  </nav>
+
   <ul class="navbar">
     {{if .}}
     <li><a class="navlinks" id="profile" href="/profile">Profile</a></li>
@@ -11,7 +16,4 @@
     {{end}}
   </ul>
 </header>
-<nav id="filter">
-  <ul id="categories"></ul>
-</nav>
 {{end}}

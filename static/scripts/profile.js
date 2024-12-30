@@ -1,5 +1,7 @@
 import { addEventOnPosts, handleScroll } from "./posts.js";
-let path = "/api/posts";
+path = "/api/created/posts";
+console.log(path);
+
 addEventOnPosts(path);
 
 window.addEventListener("scrollend", () => {

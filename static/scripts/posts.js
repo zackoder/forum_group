@@ -134,11 +134,6 @@ function handleComment(postId, comment) {
     .catch((error) => alert("Error submitting comment:", error));
 }
 
-let profile = document.getElementById("profile");
-if (!profile) {
-  document.getElementById("posts-container").style.paddingTop = "120px";
-}
-
 let offset = 0;
 const limit = 20;
 let loading = false;

@@ -6,16 +6,27 @@ import (
 	"forum/utils"
 )
 
-func CreatePosts(w http.ResponseWriter, r *http.Request) {
+func CreatedPosts(w http.ResponseWriter, r *http.Request) {
 	pages := []string{"views/pages/profile.html"}
-	if r.Method == http.MethodGet {
-		utils.ExecuteTemplate(w, pages, nil)
+	if r.Method != http.MethodGet {
+		utils.ErrorHandler(w, http.StatusMethodNotAllowed, http.StatusText(http.StatusMethodNotAllowed), "this Page doesn't support your Method", nil)
+		return
 	}
+	utils.ExecuteTemplate(w, pages, nil)
 }
 
-func LikedPosts(w http.ResponseWriter, r *http.Request) {
-	pages := []string{"views/pages/liked_posts.html"}
-	if r.Method == http.MethodGet {
-		utils.ExecuteTemplate(w, pages, nil)
+func Categories(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		utils.ErrorHandler(w, http.StatusMethodNotAllowed, http.StatusText(http.StatusMethodNotAllowed), "this Page doesn't support your Method", nil)
+		return
 	}
+	// categoriesName := r.PathValue("nameCategory")
+	// fmt.Println(categoriesName)
+	// category := TakeCategories(categoriesName)
+	// if category < 1 {
+	// 	utils.ErrorHandler(w, http.StatusNotFound, "Page not Found", "The page you are looking for is not available!", nil)
+	// 	return
+	// }
+	pages := []string{"views/pages/categories.html"}
+	utils.ExecuteTemplate(w, pages, nil)
 }

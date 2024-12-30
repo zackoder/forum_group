@@ -42,11 +42,10 @@ header {
   color: white;
 }
 
-#filter {
+/* #filter {
   position: fixed;
-  top: 90px;
+  top: 20px;
   left: 50%;
-  width: 60%;
+  width: 40%;
   transform: translateX(-50%);
-  font-size: 2rem;
-}
+} */

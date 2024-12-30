@@ -22,3 +22,26 @@ body {
   line-height: 1.6;
   color: var(--text-color);
 }
+
+#categories {
+  list-style: none;
+  display: flex;
+  gap: 10px;
+  height: auto;
+  padding: 20px 0;
+  align-items: center;
+  justify-content: center;
+}
+
+#categories li a {
+  text-decoration: none;
+  border-radius: 20px;
+  padding: 10px;
+  color: white;
+  transition: color 300ms ease;
+  font-size: 1.2rem;
+}
+
+#categories li a:hover {
+  color: var(--link-color);
+}

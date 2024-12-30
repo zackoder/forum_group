@@ -16,7 +16,6 @@ type Error struct {
 
 func CreatePost(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		// http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		err := Error{Message: "Not Allowed", Code: http.StatusMethodNotAllowed}
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		json.NewEncoder(w).Encode(err)
@@ -24,7 +23,6 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	}
 	cookie, err := r.Cookie("token") // Name the Cookie
 	if err != nil {
-		// http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		err := Error{Message: "Unauthorized", Code: http.StatusUnauthorized}
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(err)
@@ -39,31 +37,16 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	title := r.FormValue("Title")
 	content := r.FormValue("Content")
 	categories := strings.Split(r.FormValue("options"), ",")
-	// for i := 0; i < len(categories); i++ {
-	// 	fmt.Printf(categories[i])
-	// }
-
 	var userId int
 
 	err = utils.DB.QueryRow("SELECT user_id FROM sessions WHERE token = ?", cookie.Value).Scan(&userId)
 	if err != nil {
 		err := Error{Message: "Error", Code: 500}
-		// http.Redirect(w, r, "/login", http.StatusSeeOther)
 		w.WriteHeader(500)
 		json.NewEncoder(w).Encode(err)
 		return
 	}
-	// parsedDate, err := time.Parse("2006-01-02 15:04:05", date)
-	// if err != nil {
-	// 	log.Fatal("Invalid date formate", err)
-	// }
-	// formattedDate := parsedDate.Format("2006-01-02 15:04:05")
-	// newCategories := []
-	// for _, cat := range categories{
-	// 	if cat != ""{
-	// 		return
-	// 	}
-	// }
+	
 	title = strings.TrimSpace(title)
 	content = strings.TrimSpace(content)
 	if title == "" || content == "" {
@@ -80,7 +63,6 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	last_post_id, err := result.LastInsertId()
-	fmt.Println(last_post_id)
 	if err != nil {
 		// http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		err := Error{Message: "Error", Code: http.StatusInternalServerError}
@@ -89,11 +71,9 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(err)
 		return
 	}
-	fmt.Println(categories)
 	for _, categ := range categories {
-		var category_id int
-		err := utils.DB.QueryRow("SELECT id FROM categories WHERE name = ?", categ).Scan(&category_id)
-		if err != nil {
+		category_id := TakeCategories(categ)
+		if category_id < 1 {
 			fmt.Println(err, categ)
 			err := Error{Message: "Bad Request", Code: http.StatusBadRequest}
 			w.WriteHeader(http.StatusBadRequest)
@@ -102,7 +82,6 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		}
 		_, err = utils.DB.Exec("INSERT INTO posts_categories(post_id, category_id) VALUES(?, ?)", last_post_id, category_id) // GetLast id in table posts
 		if err != nil {
-			// http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			err := Error{Message: "Bad Request", Code: http.StatusInternalServerError}
 			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode(err)
@@ -110,10 +89,10 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
 
-	// tmpl, err := template.ParseFiles("./templates/createpost.html")
-	// if err != nil {
-	// 	http.Error(w, "Error in the Parse File", http.StatusInternalServerError)
-	// }
-	// tmpl.Execute(w, nil)
+func TakeCategories(Category string) int {
+	category_id := -1
+	utils.DB.QueryRow("SELECT id FROM categories WHERE name = ?", Category).Scan(&category_id)
+	return category_id
 }
