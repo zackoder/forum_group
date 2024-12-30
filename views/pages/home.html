@@ -2,6 +2,10 @@
 <link rel="stylesheet" href="/static/styles/poststyle.css" />
 <link rel="stylesheet" href="/static/styles/home.css" />
 {{end}} {{define "title"}}Forum{{end}} {{define "content"}}
+
+<nav id="filter">
+  <ul id="categories"></ul>
+</nav>
 <div class="lay-out"></div>
 {{if .}}
 <button class="show-postForm"><img src="/static/images/add.png" /></button>

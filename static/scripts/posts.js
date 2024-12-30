@@ -424,17 +424,14 @@ if (form) {
 async function PostCategory() {
   let category = document.getElementById("category");
   try {
-    const res = await fetch("http://localhost:8001/api/category/list");
+    const res = await fetch("/api/category/list");
     const categories = document.querySelector("#categories");
     const data = await res.json();
     data.forEach((catg) => {
       let li = createEle("li");
       let a = createEle("a");
-      console.log(li);
-      console.log(a);
-      console.log(catg.Name);
 
-      a.href = `/categoreis/${catg.Id}`;
+      a.href = `/category/${catg.Name}`;
       a.innerText = catg.Name;
       category.innerHTML += `
       <label class="catLabel" for="${catg.Name}">

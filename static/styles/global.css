@@ -24,6 +24,11 @@ body {
 }
 
 #categories {
+  position: absolute;
+  top: 90px;
+  left: 50%;
+  width: 40%;
+  transform: translateX(-50%);
   list-style: none;
   display: flex;
   gap: 10px;
@@ -37,9 +42,10 @@ body {
   text-decoration: none;
   border-radius: 20px;
   padding: 10px;
-  color: white;
+  color: black;
   transition: color 300ms ease;
   font-size: 1.2rem;
+  font-family: Arial, sans-serif;
 }
 
 #categories li a:hover {

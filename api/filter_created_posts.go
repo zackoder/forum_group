@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"forum/utils"
@@ -43,14 +44,24 @@ func CreatedPosts(w http.ResponseWriter, r *http.Request) {
 	if utils.HandleError(utils.Error{Err: stmt_err, Code: http.StatusInternalServerError}, w) {
 		return
 	}
+	limit := r.URL.Query().Get("limit")
+	offset := r.URL.Query().Get("offset")
 
+	limitInt := 20
+	offsetInt := 0
+	if l, err := strconv.Atoi(limit); err == nil {
+		limitInt = l
+	}
+	if o, err := strconv.Atoi(offset); err == nil {
+		offsetInt = o
+	}
 	/* ---------------------------- Get Created Prosts ---------------------------- */
-	query = `SELECT p.id,p.title,p.content,p.categories,p.date,u.username FROM posts p JOIN users u ON (p.user_id = ? AND u.id = ?)`
+	query = `SELECT p.id,p.title,p.content,p.categories,p.date,u.username FROM posts p JOIN users u ON (p.user_id = ? AND u.id = ?) LIMIT ? OFFSET ?`
 	stmt, stmt_err = utils.DB.Prepare(query)
 	if utils.HandleError(utils.Error{Err: stmt_err, Code: http.StatusInternalServerError}, w) {
 		return
 	}
-	rows, rows_err := stmt.Query(user_id, user_id)
+	rows, rows_err := stmt.Query(user_id, user_id, limitInt, offsetInt)
 	if utils.HandleError(utils.Error{Err: rows_err, Code: http.StatusInternalServerError}, w) {
 		return
 	}
