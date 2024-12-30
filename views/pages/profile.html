@@ -2,7 +2,6 @@
 <link rel="stylesheet" href="/static/styles/poststyle.css" />
 <link rel="stylesheet" href="/static/styles/home.css" />
 {{end}} {{define "title"}}Forum{{end}} {{define "content"}}
-
 <nav id="filter">
   <ul id="categories">
     {{if .}}
@@ -35,6 +34,5 @@
 {{end}}
 <section id="posts-container"></section>
 {{end}} {{define "script"}}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-min.js"></script>
-<script type="module" src="/static/scripts/home.js"></script>
+<script type="module" src="/static/scripts/profile.js"></script>
 {{end}}

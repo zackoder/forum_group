@@ -1,17 +1,3 @@
-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
-  z-index: 3;
-  background-color: var(--secondary-color);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 20px;
-}
-
 .logo {
   font-size: 2rem;
   margin: 0;
@@ -39,7 +25,6 @@ header {
   font-size: 1.2rem;
   color: white;
   transition: color 200ms ease-in-out;
-
 }
 
 .navbar .navlinks:hover {
@@ -53,9 +38,10 @@ header {
 }
 
 .title {
+  width: 100%;
   align-self: self-start;
-  padding-left: 50px;
-  text-wrap: wrap;
+  padding-left: 5%;
+  word-wrap: break-word;
   font-size: 20px;
 }
 
@@ -99,7 +85,6 @@ header {
 }
 
 .poster {
-  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -113,22 +98,16 @@ header {
   border-radius: 50%;
 }
 
-.poster .usrname {
-  position: absolute;
-  top: 25%;
-  left: 8%;
-}
-
 .like-dislike-container {
   width: 100%;
   display: flex;
   justify-content: flex-start;
-  gap: 10px;
 }
 
 .like-btn,
-.dislike-btn {
-  display: flex;
+.dislike-btn,
+.like-btn-comment,
+.dislike-btn-comment {
   font-size: 18px;
   width: 35px;
   padding-top: 5px;
@@ -139,11 +118,13 @@ header {
   transition: background-color 200ms ease-in-out;
 }
 
-.like-btn:hover {
+.like-btn:hover,
+.like-btn-comment:hover {
   background-color: var(--like-hover);
 }
 
-.dislike-btn:hover {
+.dislike-btn:hover,
+.dislike-btn-comment:hover {
   background-color: var(--dislike-hover);
 }
 
@@ -168,26 +149,6 @@ header {
   position: relative;
   display: block;
 }
-
-/* .see_comments::before,
-.see_comments::after {
-  content: "";
-  display: block;
-  position: absolute;
-  top: 50%;
-  width: 300%;
-  height: 1px; 
-  background-color: #292929; 
-  transform: translateY(-50%);
-}
-
-.see_comments::before {
-  left: -310%;
-}
-
-.see_comments::after {
-  right: -310%;
-} */
 
 .comment_form {
   width: 90%;
@@ -227,7 +188,6 @@ header {
   background-color: transparent;
   width: 20px;
   height: 20px;
-  z-index: 2;
 }
 
 .postForm {
@@ -319,7 +279,6 @@ header {
   display: inline;
 }
 
-
 @media (max-width: 1024px) {
   .post-container {
     width: 80%;
@@ -360,7 +319,7 @@ header {
   }
 
   .greeting {
-    padding: 100px 10px;
+    padding-top: 150px;
     font-size: 1rem;
   }
 
@@ -373,13 +332,21 @@ header {
     font-size: 0.9rem;
   }
 
+  .likeNbr,
+  .dislikeNbr {
+    padding-top: 2.5%;
+    padding-left: 2px;
+    font-size: 0.8rem;
+    margin-right: 10px;
+  }
+
   .like-btn,
-  .dislike-btn {
+  .dislike-btn,
+  .like-btn-comment,
+  .dislike-btn-comment {
     font-size: 16px;
-    width: 50px;
   }
 }
-
 
 .commentHe {
   display: flex;
@@ -388,7 +355,6 @@ header {
 }
 
 .commentC {
-
   display: block;
   height: auto;
   margin: 2%;
@@ -401,7 +367,6 @@ header {
   height: auto;
 }
 
-
 .divcomments {
   display: none;
   border: 1px solid rgb(204, 204, 204);
@@ -411,5 +376,5 @@ header {
   border-radius: 5px;
   width: 100%;
   height: auto;
-  z-index: 0;
 }
+

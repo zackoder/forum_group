@@ -1,40 +1,49 @@
 header {
-    position: fixed;
-    box-shadow: 0 1px 5px 5px gray;
-    z-index: 3;
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    background-color: var(--secondary-color);
-  }
-  
-  .logo {
-    padding: 15px 0 0 25px;
-    font-size: 2rem;
-    margin-bottom: 20px;
-  }
-  
-  .logolink {
-    text-decoration: none;
-    color: var(--text-color);
-    transition: color 200ms ease;
-  }
-  
-  .logolink:hover {
-    color: var(--hover-color);
-  }
-  
-  .navbar {
-    list-style: none;
-    display: flex;
-    width: 200px;
-    align-items: center;
-    justify-content: space-around;
-  }
-  
-  .navbar .navlinks {
-    text-decoration: none;
-    font-size: 1.2rem;
-    color: white;
-  }
-  
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  box-shadow: var(--shadow);
+  z-index: 3;
+  background-color: var(--secondary-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+}
+
+.logo {
+  padding-left: 25px;
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.logolink {
+  text-decoration: none;
+  color: var(--text-color);
+  transition: color 200ms ease;
+}
+
+.logolink:hover {
+  color: var(--hover-color);
+}
+
+.navbar {
+  list-style: none;
+  display: flex;
+  width: 200px;
+  align-items: center;
+  justify-content: space-around;
+  font-weight: bold;
+}
+
+.navbar .navlinks {
+  text-decoration: none;
+  font-size: 1.2rem;
+  color: white;
+}
+
+#filter {
+  position: relative;
+  width: 100%;
+}

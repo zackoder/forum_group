@@ -10,6 +10,7 @@ import (
 )
 
 func PostReaction(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("HI")
 	var reactPost struct {
 		user_id int    // get from token
 		post_id int    // get from url
@@ -23,6 +24,7 @@ func PostReaction(w http.ResponseWriter, r *http.Request) {
 
 	/* ----------------------------------- handle action ----------------------------------- */
 	reactPost.action = r.FormValue("action")
+	fmt.Println(reactPost)
 	// fmt.Println(r.FormValue("action"))
 	/* ----------------------------------- Handle User Id ----------------------------------- */
 	token, token_err := r.Cookie("token")

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -28,6 +29,7 @@ func FilterByCategory(w http.ResponseWriter, r *http.Request) {
 	}
 	Category := r.PathValue("Category")
 	category_id := TakeCategories(Category)
+	fmt.Println(category_id)
 	if category_id < 1 {
 		json.NewEncoder(w).Encode(nil)
 		return
