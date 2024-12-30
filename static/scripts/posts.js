@@ -4,28 +4,44 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Event delegation for click events
   postsContainer.addEventListener("click", function (event) {
-    const postElement = event.target.closest(".post-container");
-    const commentEl = event.target.closest(".commentC");
-    if (commentEl) {
-      const commentId = commentEl.getAttribute("data-comment-id");
-      console.log(commentId);
-      if (event.target.classList.contains("like-btn-comment")) {
-        handleLike("comment", commentId, "like");
-        console.log(commentId);
-      } else if (event.target.classList.contains("dislike-btn-comment")) {
-        console.log(commentId);
-        handleLike("comment", commentId, "dislike");
-      }
-    }
-
-    const postId = postElement.getAttribute("data-post-id");
-
-    if (event.target.classList.contains("like-btn")) {
-      handleLike("posts", postId, "like");
-    } else if (event.target.classList.contains("dislike-btn")) {
-      handleLike("posts", postId, "dislike");
+    // Find the closest like/dislike container
+    const commentAction = event.target.closest(".like-dislike-container-comment");
+    if (!commentAction) return; // Exit if the click is outside any like/dislike container
+  
+    // Get the comment's unique ID
+    const commentId = commentAction.getAttribute("data-comment-id");
+    console.log(commentId);
+  
+    // Check if the click was on a like or dislike button
+    const likeButton = event.target.closest(".like-btn-comment");
+    console.log(likeButton,"likeButton");
+    const dislikeButton = event.target.closest(".dislike-btn-comment");
+    console.log(dislikeButton);
+  
+    if (likeButton!==null) {
+      console.log("Liked comment ID:", commentId);
+      handleLike("comment", commentId, "like");
+    } else if (dislikeButton!==null) {
+      console.log("Disliked comment ID:", commentId);
+      handleLike("comment", commentId, "dislike");
     }
   
+  
+  
+
+    const postElement = event.target.closest(".post-container");
+
+    const postId = postElement.getAttribute("data-post-id");
+// console.log(postId);
+    if (event.target.classList.contains("like-btn")) {
+      console.log(postId);
+      handleLike("posts", postId, "like");
+    } else if (event.target.classList.contains("dislike-btn")) {
+      console.log(postId)
+
+      handleLike("posts", postId, "dislike");
+    }
+
   });
 
   postsContainer.addEventListener("submit", function (event) {
@@ -69,7 +85,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function handleLike(path, id, like) {
-  console.log(like);
+  console.log(id, like);
 
   fetch(`/api/${path}/reaction/${id}`, {
     method: "POST",
@@ -149,7 +165,7 @@ async function loadMorePosts(name = "home") {
 
     if (!posts || posts.length === 0) return;
 
-    
+
     const postsContainer = document.getElementById("posts-container");
     posts.forEach((post) => {
 
@@ -214,7 +230,7 @@ async function loadMorePosts(name = "home") {
 
 
       const likeNbm = createEle("p");
-      likeNbm.innerText=post.Reactions.Likes
+      likeNbm.innerText = post.Reactions.Likes
 
 
       likebnt.appendChild(likeIcon);
@@ -229,7 +245,7 @@ async function loadMorePosts(name = "home") {
       dislikeIcone.src = "/static/images/dislike.png";
 
       const dislikeNbm = createEle("p");
-      dislikeNbm.innerText=post.Reactions.Dislikes
+      dislikeNbm.innerText = post.Reactions.Dislikes
 
       dislikebnt.appendChild(dislikeIcone);
       dislikebnt.appendChild(dislikeNbm);
@@ -477,7 +493,7 @@ async function GetComments(idPost, str) {
           console.log(data);
           const commentC = createEle("div");
           commentC.className = "commentC";
-          commentC.dataset.commentId = e.Id;
+        
 
           const commentHe = createEle("div");
           commentHe.className = "commentHe";
@@ -496,6 +512,7 @@ async function GetComments(idPost, str) {
 
           const like_dislike_container = createEle("div");
           like_dislike_container.className = "like-dislike-container-comment";
+          like_dislike_container.dataset.commentId = e.Id;
 
           /* creating of the like button */
           const likebnt = createEle("button");
