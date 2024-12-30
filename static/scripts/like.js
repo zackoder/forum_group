@@ -16,15 +16,15 @@ export function HandulLike(type, numlike, numdislike, path, id) {
   dislikespan.innerHTML = numdislike;
   likebtn.addEventListener("click", () => {
     if (likebtn.classList.length == 2) {
-      likebtn.classList.remove("like");
+      likebtn.classList.remove("liked");
       numlike--;
     } else {
       if (dislikebtn.classList.length == 2) {
-        dislikebtn.classList.remove("dislike");
+        dislikebtn.classList.remove("disliked");
         numdislike--;
       }
       numlike++;
-      likebtn.classList.add("like");
+      likebtn.classList.add("liked");
     }
     likespan.innerHTML = numlike;
     dislikespan.innerHTML = numdislike;
@@ -34,19 +34,23 @@ export function HandulLike(type, numlike, numdislike, path, id) {
         "Content-Type": "application/x-www-form-urlencoded",
       },
       body: `action=like`,
+    }).then(res=>{    
+      if (res.redirected){
+        window.location.href="login"
+      }
     });
   });
   dislikebtn.addEventListener("click", () => {
     if (dislikebtn.classList.length == 2) {
-      dislikebtn.classList.remove("dislike");
+      dislikebtn.classList.remove("disliked");
       numdislike--;
     } else {
       if (likebtn.classList.length == 2) {
-        likebtn.classList.remove("like");
+        likebtn.classList.remove("liked");
         numlike--;
       }
       numdislike++;
-      dislikebtn.classList.add("dislike");
+      dislikebtn.classList.add("disliked");
     }
     likespan.innerHTML = numlike;
     dislikespan.innerHTML = numdislike;
@@ -57,7 +61,9 @@ export function HandulLike(type, numlike, numdislike, path, id) {
       },
       body: `action=dislike`,
     }).then((res) => {
-      // console.log(res);
+      if (res.redirected) {
+        window.location.href = "login";
+      }
     });
   });
   return [likebtn, dislikebtn, likespan, dislikespan];
