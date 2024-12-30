@@ -12,14 +12,7 @@ import (
 )
 
 func NewComment(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("hi")
-	if r.Method != http.MethodPost {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		json.NewEncoder(w).Encode(map[string]string{
-			"message": http.StatusText(http.StatusMethodNotAllowed),
-		})
-		return
-	}
+	
 	var comment utils.Comment
 	/* ----------------------------- token validation ----------------------------- */
 	token, tokenErr := r.Cookie("token")

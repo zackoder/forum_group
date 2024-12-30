@@ -57,6 +57,7 @@ func FetchPosts(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 		post.Reactions = GetReaction(user_id, post.Id, "post_id")
+
 		posts = append(posts, post)
 	}
 	w.Header().Set("Content-Type", "application/json")
