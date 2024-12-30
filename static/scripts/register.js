@@ -55,13 +55,10 @@ async function validregister(e) {
   }
 
   if (password.value !== password_config.value) {
-    console.log(password.value);
-    console.log(password_config.value);
 
     document.getElementById("errorPassword_config").innerHTML = "machi kif kif";
     document.getElementById("errorPassword_config").style.color = "red";
     isValidpassword = false;
-    console.log("tttt");
   } else {
     document.getElementById("errorPassword_config").innerHTML = "";
     document.getElementById("errorPassword").innerHTML = "";
@@ -83,7 +80,6 @@ async function validregister(e) {
           password_config: password_config.value,
         }),
       });
-      console.log(response);
       
       if (response.ok) {
          window.location.href = "/";

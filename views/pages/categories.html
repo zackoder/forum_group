@@ -3,7 +3,11 @@
 <link rel="stylesheet" href="/static/styles/home.css" />
 {{end}} {{define "title"}}Forum{{end}} {{define "content"}}
 <nav id="filter">
-  <ul id="categories"></ul>
+  <ul id="categories">
+    {{if .}}
+    <li><a class="category" href="/liked-post">Liked posts</a></li>
+    {{end}}
+  </ul>
 </nav>
 <div class="lay-out"></div>
 {{if .}}

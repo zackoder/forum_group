@@ -58,7 +58,6 @@ func Home(w http.ResponseWriter, r *http.Request) {
 
 	pages := []string{
 		"views/pages/home.html",
-		"views/components/new_comment.html",
 	}
 	utils.ExecuteTemplate(w, pages, userName > 0)
 }
@@ -69,8 +68,7 @@ func LikedPostsPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	pages := []string{
-		"views/pages/home.html",
-		"views/components/new_comment.html",
+		"views/pages/likedPost.html",
 	}
 	utils.ExecuteTemplate(w, pages, nil)
 }

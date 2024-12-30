@@ -1,6 +1,5 @@
 import { addEventOnPosts, handleScroll } from "./posts.js";
-path = "/api/created/posts";
-console.log(path);
+let path = "/api/created/posts";
 
 addEventOnPosts(path);
 

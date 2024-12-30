@@ -9,12 +9,9 @@ export async function addEventOnPosts(path) {
       const commentEl = event.target.closest(".commentC");
       if (commentEl) {
         const commentId = commentEl.getAttribute("data-comment-id");
-        console.log(commentId);
         if (event.target.classList.contains("like-btn-comment")) {
           handleLike("comment", commentId, "like");
-          console.log(commentId);
         } else if (event.target.classList.contains("dislike-btn-comment")) {
-          console.log(commentId);
           handleLike("comment", commentId, "dislike");
         }
       }
@@ -33,9 +30,7 @@ export async function addEventOnPosts(path) {
       }
       if (event.target.classList.contains("like-btn-comment")) {
         handleLike("comment", commentId, "like");
-        console.log(commentId);
       } else if (event.target.classList.contains("dislike-btn-comment")) {
-        console.log(commentId);
         handleLike("comment", commentId, "dislike");
       }
     });
@@ -70,8 +65,6 @@ export async function addEventOnPosts(path) {
         event.target.disabled = true;
       }
       const divcomments = document.querySelector(".divcomments" + postId);
-      console.log(divcomments);
-
       if (CommentClass && postId) {
         GetComments(postId, divcomments);
       }
@@ -85,8 +78,6 @@ export async function addEventOnPosts(path) {
 }
 
 function handleLike(path, id, like) {
-  console.log(like);
-
   fetch(`/api/${path}/reaction/${id}`, {
     method: "POST",
     headers: {
@@ -95,15 +86,10 @@ function handleLike(path, id, like) {
     body: `action=${like}`,
   })
     .then((response) => {
-      console.log(response);
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (response.redirected) {
+        window.location.href = "/login";
       }
       return response.json();
-    })
-    .then((data) => {
-      console.log("Like/Dislike updated:", data);
     })
     .catch((error) => console.error("Error updating like/dislike:", error));
 }
@@ -123,7 +109,6 @@ function handleComment(postId, comment) {
       return response.json();
     })
     .then((data) => {
-      console.log(data);
       if (data.message != 200) {
         alert(" faild to add Comment");
       }
@@ -147,9 +132,9 @@ export async function loadMorePosts(path) {
 
   try {
     const response = await fetch(`${path}?offset=${offset}`);
-
     const posts = await response.json();
-
+    console.log(posts);
+    
     if (!posts || posts.length === 0) return;
     createPosts(posts);
 
@@ -205,7 +190,8 @@ function createPosts(posts) {
     categories_container.className = "categories";
 
     for (let cate of post.Categories) {
-      const span = createEle("span");
+      const span = createEle("a");
+      span.href = `/category/${cate}`;
       span.className = "category";
       span.innerText = cate;
       categories_container.appendChild(span);
@@ -248,9 +234,9 @@ function createPosts(posts) {
     // dislikebnt.appendChild(dislikeNbr);
 
     if (post.Reactions.Action === "like") {
-      likebnt.style.classList.add("liked");
+      likebnt.classList.add("liked");
     } else if (post.Reactions.Action === "dislike") {
-      dislikebnt.style.classList.add("disliked");
+      dislikebnt.classList.add("disliked");
     }
     /* appending like and dislike buttons to like container */
     like_dislike_container.append(likebnt, likeNbr, dislikebnt, dislikeNbr);
@@ -410,9 +396,6 @@ if (form) {
 
         if (res.ok) {
           window.location.href = res.url;
-        } else {
-          alert("Failed to submit post");
-          // console.log(res);
         }
       } catch (error) {
         alert("Error: " + error.message);
@@ -423,22 +406,28 @@ if (form) {
 
 async function PostCategory() {
   let category = document.getElementById("category");
+
   try {
     const res = await fetch("/api/category/list");
+
     const categories = document.querySelector("#categories");
     const data = await res.json();
+
     data.forEach((catg) => {
       let li = createEle("li");
       let a = createEle("a");
+      a.className = "category";
 
       a.href = `/category/${catg.Name}`;
       a.innerText = catg.Name;
-      category.innerHTML += `
-      <label class="catLabel" for="${catg.Name}">
-        <input type="checkbox" name="options" id="${catg.Name}" value="${catg.Name}" data-name="${catg.Name}"> <splan>${catg.Name}</span>
-      </label>
-
-      `;
+      if (category) {
+        category.innerHTML += `
+        <label class="catLabel" for="${catg.Name}">
+          <input type="checkbox" name="options" id="${catg.Name}" value="${catg.Name}" data-name="${catg.Name}"> <splan>${catg.Name}</span>
+        </label>
+  
+        `;
+      }
       li.append(a);
       categories.append(li);
     });
@@ -451,9 +440,7 @@ async function GetComments(idPost, str) {
   str.innerText = "";
   str.style.display = "block";
   try {
-    const response = await fetch(
-      `http://localhost:8001/api/${idPost}/comments`
-    );
+    const response = await fetch(`/api/${idPost}/comments`);
 
     if (response.ok) {
       const data = await response.json();

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 
+	"forum/api"
 	"forum/utils"
 )
 
@@ -46,7 +47,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(err)
 		return
 	}
-	
+
 	title = strings.TrimSpace(title)
 	content = strings.TrimSpace(content)
 	if title == "" || content == "" {
@@ -55,7 +56,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(err)
 		return
 	}
-	result, err := utils.DB.Exec("INSERT INTO posts(user_id, title, content, categories) VALUES(?, ?, ?, ?)", userId, title, strings.ReplaceAll(content, "\r\n", "<br>"), strings.Join(categories, ","))
+	result, err := utils.DB.Exec("INSERT INTO posts(user_id, title, content, categories) VALUES(?, ?, ?, ?)", userId, title, content, strings.Join(categories, ","))
 	if err != nil {
 		err := Error{Message: "can insert in base donne", Code: http.StatusUnauthorized}
 		w.WriteHeader(http.StatusUnauthorized)
@@ -72,7 +73,7 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	for _, categ := range categories {
-		category_id := TakeCategories(categ)
+		category_id := api.TakeCategories(categ)
 		if category_id < 1 {
 			fmt.Println(err, categ)
 			err := Error{Message: "Bad Request", Code: http.StatusBadRequest}
@@ -89,10 +90,4 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	http.Redirect(w, r, "/", http.StatusSeeOther)
-}
-
-func TakeCategories(Category string) int {
-	category_id := -1
-	utils.DB.QueryRow("SELECT id FROM categories WHERE name = ?", Category).Scan(&category_id)
-	return category_id
 }

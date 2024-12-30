@@ -38,7 +38,7 @@ body {
   justify-content: center;
 }
 
-#categories li a {
+.category {
   text-decoration: none;
   border-radius: 20px;
   padding: 10px;
@@ -48,6 +48,6 @@ body {
   font-family: Arial, sans-serif;
 }
 
-#categories li a:hover {
+.category:hover {
   color: var(--link-color);
 }

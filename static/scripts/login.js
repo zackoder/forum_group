@@ -40,7 +40,6 @@ async function validlogin(e) {
       console.log(
         JSON.stringify({ email: email.value, password: password.value })
       );
-      console.log(response);
       if (response.ok) {
         window.location.href = "/";
       } else {

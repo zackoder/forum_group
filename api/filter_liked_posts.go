@@ -88,6 +88,7 @@ func LikedPosts(w http.ResponseWriter, r *http.Request) {
 		post.Reactions = GetReaction(userid, post.Id, "post_id")
 		posts = append(posts, post)
 	}
+	fmt.Println(posts)
 	json.NewEncoder(w).Encode(posts)
 }
 

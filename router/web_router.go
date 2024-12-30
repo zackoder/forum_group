@@ -23,7 +23,7 @@ func WebRouter() *http.ServeMux {
 	webMux.HandleFunc("/logout", m.Authorization(auth.Logout))
 	webMux.HandleFunc("/liked-post", m.Authorization(controllers.LikedPostsPage))
 	webMux.HandleFunc("/profile", m.Authorization(controllers.CreatedPosts))
-	webMux.HandleFunc("/categories/{nameCategory}", (controllers.Categories))
+	webMux.HandleFunc("/category/{Category}", (controllers.Categories))
 
 	return webMux
 }

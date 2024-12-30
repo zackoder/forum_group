@@ -1,7 +1,7 @@
 async function PostCategory() {
     let category = document.getElementById("category")
     try {
-        const res = await fetch("http://localhost:8001/api/category/list")
+        const res = await fetch("/api/category/list")
         const data = await res.json()
         data.forEach(catg => {
             category.innerHTML += `
@@ -143,10 +143,6 @@ document.getElementById("postForm").addEventListener("submit", async function (e
             });
 
             if (res.ok) {
-                console.log(res);
-                
-                alert('Post successfully submitted');
-
                 setTimeout(function () {
                     window.location.href = res.url; 
                 }, 500);

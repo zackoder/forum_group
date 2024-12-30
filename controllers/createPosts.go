@@ -1,8 +1,10 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 
+	"forum/api"
 	"forum/utils"
 )
 
@@ -20,13 +22,14 @@ func Categories(w http.ResponseWriter, r *http.Request) {
 		utils.ErrorHandler(w, http.StatusMethodNotAllowed, http.StatusText(http.StatusMethodNotAllowed), "this Page doesn't support your Method", nil)
 		return
 	}
-	// categoriesName := r.PathValue("nameCategory")
-	// fmt.Println(categoriesName)
-	// category := TakeCategories(categoriesName)
-	// if category < 1 {
-	// 	utils.ErrorHandler(w, http.StatusNotFound, "Page not Found", "The page you are looking for is not available!", nil)
-	// 	return
-	// }
+	categoriesName := r.PathValue("Category")
+	fmt.Println(categoriesName)
+	category := api.TakeCategories(categoriesName)
+	fmt.Println(category)
+	if category < 1 {
+		utils.ErrorHandler(w, http.StatusNotFound, "Page not Found", "The page you are looking for is not available!", nil)
+		return
+	}
 	pages := []string{"views/pages/categories.html"}
 	utils.ExecuteTemplate(w, pages, nil)
 }
