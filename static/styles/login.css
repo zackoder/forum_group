@@ -53,12 +53,35 @@ form {
   cursor: pointer;
 }
 
+.logo {
+  font-size: 2rem;
+  margin: 0;
+  color: var(--text-color);
+}
+
 .logolink {
   text-decoration: none;
   color: var(--text-color);
-  transition: color 200ms ease;
+  transition: color 200ms ease-in-out;
 }
 
 .logolink:hover {
-  color: var(--hover-color);
+  color: var(--link-color);
+}
+
+.navbar {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+
+.navbar .navlinks {
+  text-decoration: none;
+  font-size: 1.2rem;
+  color: white;
+  transition: color 200ms ease-in-out;
+}
+
+.navbar .navlinks:hover {
+  color: var(--link-color);
 }

@@ -12,47 +12,6 @@ header {
   padding: 10px 20px;
 }
 
-.logo {
-  font-size: 2rem;
-  margin: 0;
-  color: var(--text-color);
-}
-
-.logolink:hover {
-  color: var(--link-hover);
-}
-
-/* .logo {
-  padding-left: 25px;
-  font-size: 2rem;
-  margin-bottom: 20px;
-} */
-
-/* .logolink {
-  text-decoration: none;
-  color: var(--text-color);
-  transition: color 200ms ease;
-}
-
-.logolink:hover {
-  color: var(--hover-color);
-} */
-
-.navbar {
-  list-style: none;
-  display: flex;
-  width: 200px;
-  align-items: center;
-  justify-content: space-around;
-  font-weight: bold;
-}
-
-.navbar .navlinks {
-  text-decoration: none;
-  font-size: 1.2rem;
-  color: white;
-}
-
 #filter {
   position: relative;
   width: 100%;
