@@ -14,8 +14,14 @@ func Comments(w http.ResponseWriter, r *http.Request) {
 	var comments []utils.CommentType
 	/* -------------------------- Check post_id -------------------------- */
 	post_id, err := strconv.Atoi(r.PathValue("PostId"))
-	if utils.HandleError(utils.Error{Err: err, Code: http.StatusNotFound}, w) {
+	if utils.HandleError(utils.Error{Err: err, Code: http.StatusNotFound}, w) || CheckPost(post_id) {
 		return
+	}
+
+	userId := 0
+	cookie, err := r.Cookie("token")
+	if err == nil {
+		userId = TakeuserId(cookie.Value)
 	}
 	/* -------------------------- Prepare query -------------------------- */
 	query := `SELECT id,user_id,comment,date FROM comments WHERE post_id = ?;`
@@ -35,11 +41,11 @@ func Comments(w http.ResponseWriter, r *http.Request) {
 		if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
 			return
 		}
-		comment.Username, err = GetUsername(user_id, w)
+		comment.Username, err = GetUsername(user_id)
 		if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
 			return
 		}
-		comment.Reactions = GetReaction(user_id, comment.Id, "comment_id")
+		comment.Reactions = GetReaction(userId, comment.Id, "comment_id")
 		comments = append(comments, comment)
 	}
 
@@ -48,7 +54,7 @@ func Comments(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(comments)
 }
 
-func GetUsername(id int, w http.ResponseWriter) (string, error) {
+func GetUsername(id int) (string, error) {
 	/* ----------------------------- this function get username ----------------------------- */
 	var username string
 	query := `SELECT (username) FROM users WHERE id= ?`
@@ -57,8 +63,5 @@ func GetUsername(id int, w http.ResponseWriter) (string, error) {
 		return "", err
 	}
 	err = stmt.QueryRow(id).Scan(&username)
-	if err != nil {
-		return "", err
-	}
-	return username, nil
+	return username, err
 }

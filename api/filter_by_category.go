@@ -1,10 +1,7 @@
 package api
 
 import (
-	"database/sql"
 	"encoding/json"
-	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -17,19 +14,11 @@ func FilterByCategory(w http.ResponseWriter, r *http.Request) {
 	var logged_user int
 	token, token_err := r.Cookie("token")
 	if token_err == nil {
-		query := `SELECT user_id FROM sessions WHERE token = ?;`
-		stmt, err := utils.DB.Prepare(query)
-		if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
-			return
-		}
-		err = stmt.QueryRow(token.Value).Scan(&logged_user)
-		if err != sql.ErrNoRows && utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
-			return
-		}
+		logged_user = TakeuserId(token.Value)
 	}
 	Category := r.PathValue("Category")
 	category_id := TakeCategories(Category)
-	fmt.Println(category_id)
+	// fmt.Println(category_id)
 	if category_id < 1 {
 		json.NewEncoder(w).Encode(nil)
 		return
@@ -48,7 +37,7 @@ func FilterByCategory(w http.ResponseWriter, r *http.Request) {
 		SELECT p.id,p.user_id,p.title,p.content,p.categories,p.date, u.username
 		FROM posts p JOIN posts_categories pc
 		ON p.id = pc.post_id AND pc.category_id = ? 
-		JOIN users u ON u.id = p.user_id LIMIT ? OFFSET ?;
+		JOIN users u ON u.id = p.user_id  ORDER BY p.id DESC LIMIT ? OFFSET ?;
 	`
 	stmt, stmt_err := utils.DB.Prepare(query)
 	if utils.HandleError(utils.Error{Err: stmt_err, Code: http.StatusInternalServerError}, w) {
@@ -72,12 +61,12 @@ func FilterByCategory(w http.ResponseWriter, r *http.Request) {
 	}
 
 	/* -------------------------- handle error no content -------------------------- */
-	if len(posts) == 0 {
-		err := errors.New("no posts")
-		if utils.HandleError(utils.Error{Err: err, Code: http.StatusNoContent}, w) {
-			return
-		}
-	}
+	// if len(posts) == 0 {
+	// 	err := errors.New("no posts")
+	// 	if utils.HandleError(utils.Error{Err: err, Code: http.StatusNoContent}, w) {
+	// 		return
+	// 	}
+	// }
 	/* -------------------------- Set result in json response -------------------------- */
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

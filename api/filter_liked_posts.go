@@ -19,28 +19,24 @@ func LikedPosts(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
-	limit := r.URL.Query().Get("limit")
+
 	offset := r.URL.Query().Get("offset")
 
 	limitInt := 20
 	offsetInt := 0
-	if l, err := strconv.Atoi(limit); err == nil {
-		limitInt = l
-	}
 	if o, err := strconv.Atoi(offset); err == nil {
 		offsetInt = o
 	}
 	cookie, err := r.Cookie("token")
 	if err != nil {
-		fmt.Println(err)
-		w.WriteHeader(http.StatusNonAuthoritativeInfo)
-		json.NewEncoder(w).Encode(map[string]string{"error": http.StatusText(http.StatusNonAuthoritativeInfo)})
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"error": http.StatusText(http.StatusUnauthorized)})
 		return
 	}
 	userid := TakeuserId(cookie.Value)
 	if userid < 1 {
-		w.WriteHeader(http.StatusNonAuthoritativeInfo)
-		json.NewEncoder(w).Encode(map[string]string{"error": http.StatusText(http.StatusNonAuthoritativeInfo)})
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"error": http.StatusText(http.StatusUnauthorized)})
 		return
 	}
 	query := `
@@ -69,7 +65,6 @@ func LikedPosts(w http.ResponseWriter, r *http.Request) {
 	`
 	rows, err := utils.DB.Query(query, userid, "like", limitInt, offsetInt)
 	if err != nil {
-		fmt.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]string{"error": http.StatusText(http.StatusInternalServerError)})
 		return
@@ -81,14 +76,12 @@ func LikedPosts(w http.ResponseWriter, r *http.Request) {
 		categories := ""
 
 		if err := rows.Scan(&post.UserName, &post.Id, &post.Title, &post.Content, &post.Date, &categories); err != nil {
-			fmt.Println(err)
 			continue
 		}
 		post.Categories = strings.Split(categories, ",")
 		post.Reactions = GetReaction(userid, post.Id, "post_id")
 		posts = append(posts, post)
 	}
-	fmt.Println(posts)
 	json.NewEncoder(w).Encode(posts)
 }
 
