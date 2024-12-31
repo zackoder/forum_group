@@ -100,29 +100,21 @@ func TakeuserId(secion string) int {
 	return id
 }
 
-func GetReaction(userID, id int, column string) utils.Reactions {
+func GetReaction(userid, id int, colom string) utils.Reactions {
 	reaction := utils.Reactions{}
-
-	// Query for likes and dislikes
-	countQuery := fmt.Sprintf(`
-		SELECT 
-			SUM(CASE WHEN type = 'like' THEN 1 ELSE 0 END) AS likes,
-			SUM(CASE WHEN type = 'dislike' THEN 1 ELSE 0 END) AS dislikes
-		FROM reactions
-		WHERE %s = ?`, column)
-
-	utils.DB.QueryRow(countQuery, id).Scan(&reaction.Likes, &reaction.Dislikes)
-
-	// If userID is not provided, skip querying for user action
-	if userID > 0 {
-		actionQuery := fmt.Sprintf(`
-			SELECT type 
-			FROM reactions 
-			WHERE %s = ? AND user_id = ?`, column)
-
-		utils.DB.QueryRow(actionQuery, id, userID).Scan(&reaction.Action)
-
+	query := `
+		SELECT count(*) FROM reactions WHERE %s = ? AND type = ?
+	`
+	query = fmt.Sprintf(query, colom)
+	utils.DB.QueryRow(query, id, "like").Scan(&reaction.Likes)
+	utils.DB.QueryRow(query, id, "dislike").Scan(&reaction.Dislikes)
+	if userid < 1 {
+		return reaction
 	}
-
+	query = `
+		SELECT type FROM reactions WHERE %s = ? AND user_id = ?
+	`
+	query = fmt.Sprintf(query, colom)
+	utils.DB.QueryRow(query, id, userid).Scan(&reaction.Action)
 	return reaction
 }
