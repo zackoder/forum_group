@@ -10,7 +10,6 @@ import (
 )
 
 func PostReaction(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("HI")
 	var reactPost struct {
 		user_id int    // get from token
 		post_id int    // get from url
@@ -25,7 +24,6 @@ func PostReaction(w http.ResponseWriter, r *http.Request) {
 	/* ----------------------------------- handle action ----------------------------------- */
 	reactPost.action = r.FormValue("action")
 	fmt.Println(reactPost)
-	// fmt.Println(r.FormValue("action"))
 	/* ----------------------------------- Handle User Id ----------------------------------- */
 	token, token_err := r.Cookie("token")
 	if utils.HandleError(utils.Error{Err: token_err, Code: http.StatusUnauthorized}, w) {
@@ -40,31 +38,19 @@ func PostReaction(w http.ResponseWriter, r *http.Request) {
 	if utils.HandleError(utils.Error{Err: stmt_err, Code: http.StatusInternalServerError}, w) {
 		return
 	}
-	like, err := CheckLIke(reactPost.post_id, reactPost.user_id, "like", "post_id")
-	if err != nil {
-
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]string{"error": "error in server"})
-		return
-	}
-	dilike, err := CheckLIke(reactPost.post_id, reactPost.user_id, "dislike", "post_id")
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]string{"error": "error in server"})
-		return
-	}
+	action := CheckLIke(reactPost.post_id, reactPost.user_id, "post_id")
 	if reactPost.action == "like" {
-		if dilike {
+		if action == "dislike" {
 			UpdateLike(reactPost.post_id, reactPost.user_id, "post_id", "like")
-		} else if like {
+		} else if action == "like" {
 			DeletLike(reactPost.post_id, reactPost.user_id, "post_id")
 		} else {
 			InsertLike(reactPost.post_id, reactPost.user_id, "post_id", "like")
 		}
 	} else if reactPost.action == "dislike" {
-		if like {
+		if action == "like" {
 			UpdateLike(reactPost.post_id, reactPost.user_id, "post_id", "dislike")
-		} else if dilike {
+		} else if action == "dislike" {
 			DeletLike(reactPost.post_id, reactPost.user_id, "post_id")
 		} else {
 			InsertLike(reactPost.post_id, reactPost.user_id, "post_id", "dislike")
@@ -83,8 +69,7 @@ func UpdateLike(id, userid int, which, typ string) {
 		WHERE %s = ?
 		AND user_id = ?
 	`, which)
-	_, err := utils.DB.Exec(query, typ, id, userid)
-	fmt.Println(err, "update")
+	utils.DB.Exec(query, typ, id, userid)
 }
 
 func InsertLike(id, userid int, which, typ string) {
@@ -92,32 +77,21 @@ func InsertLike(id, userid int, which, typ string) {
 		INSERT INTO reactions(%s ,user_id ,type)
 		VALUES( ? , ? , ? )
 	`, which)
-	_, err := utils.DB.Exec(query, id, userid, typ)
-	fmt.Println(err, "inser")
+	utils.DB.Exec(query, id, userid, typ)
 }
 
 func DeletLike(id, userid int, which string) {
 	query := fmt.Sprintf(`
 		DELETE FROM reactions WHERE %s = ? AND user_id = ?
 	`, which)
-	_, err := utils.DB.Exec(query, id, userid)
-	fmt.Println(err, "del")
+	utils.DB.Exec(query, id, userid)
 }
 
-func CheckLIke(id, userId int, typ, column string) (bool, error) {
-	var like bool
+func CheckLIke(id, userId int, column string) string {
+	var like string
 	query := fmt.Sprintf(`
-		SELECT EXISTS (
-			SELECT 1 
-			FROM reactions
-			WHERE %s = ? AND 
-			user_id = ? AND 
-			type = ?
-		)
+		SELECT type FROM reactions WHERE %s = ? AND user_id = ?
 	`, column)
-	err := utils.DB.QueryRow(query, id, userId, typ).Scan(&like)
-	if err != nil {
-		return false, fmt.Errorf("query execution error: %w", err)
-	}
-	return like, nil
+	utils.DB.QueryRow(query, id, userId).Scan(&like)
+	return like
 }

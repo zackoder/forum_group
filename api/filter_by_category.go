@@ -1,10 +1,8 @@
 package api
 
 import (
-	"database/sql"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -17,19 +15,11 @@ func FilterByCategory(w http.ResponseWriter, r *http.Request) {
 	var logged_user int
 	token, token_err := r.Cookie("token")
 	if token_err == nil {
-		query := `SELECT user_id FROM sessions WHERE token = ?;`
-		stmt, err := utils.DB.Prepare(query)
-		if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
-			return
-		}
-		err = stmt.QueryRow(token.Value).Scan(&logged_user)
-		if err != sql.ErrNoRows && utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
-			return
-		}
+		logged_user = TakeuserId(token.Value)
 	}
 	Category := r.PathValue("Category")
 	category_id := TakeCategories(Category)
-	fmt.Println(category_id)
+	// fmt.Println(category_id)
 	if category_id < 1 {
 		json.NewEncoder(w).Encode(nil)
 		return

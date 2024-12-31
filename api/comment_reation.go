@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -38,40 +37,28 @@ func CommentReaction(w http.ResponseWriter, r *http.Request) {
 	/* ------------------------------ handle comment_id ------------------------------ */
 	reactInfo.comment_id, err = strconv.Atoi(r.PathValue("CommentId"))
 	if utils.HandleError(utils.Error{Err: err, Code: http.StatusNotFound}, w) || CheckCommat(reactInfo.comment_id) != nil {
-		fmt.Println("commant id not valid")
 		return
 	}
-	// fmt.Println("ok")
-	like, err := CheckLIke(reactInfo.comment_id, reactInfo.user_id, "like", "comment_id")
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]string{"error": "error in server"})
-		return
-	}
-	dilike, err := CheckLIke(reactInfo.comment_id, reactInfo.user_id, "dislike", "comment_id")
-	if err != nil {
-		utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w)
-		return
-	}
+	action := CheckLIke(reactInfo.comment_id, reactInfo.user_id, "comment_id")
 	if reactInfo.action == "like" {
-		if dilike {
+		if action == "dislike" {
 			UpdateLike(reactInfo.comment_id, reactInfo.user_id, "comment_id", "like")
-		} else if like {
+		} else if action == "like" {
 			DeletLike(reactInfo.comment_id, reactInfo.user_id, "comment_id")
 		} else {
 			InsertLike(reactInfo.comment_id, reactInfo.user_id, "comment_id", "like")
 		}
 	} else if reactInfo.action == "dislike" {
-		if like {
+		if action == "like" {
 			UpdateLike(reactInfo.comment_id, reactInfo.user_id, "comment_id", "dislike")
-		} else if dilike {
+		} else if action == "dislike" {
 			DeletLike(reactInfo.comment_id, reactInfo.user_id, "comment_id")
 		} else {
 			InsertLike(reactInfo.comment_id, reactInfo.user_id, "comment_id", "dislike")
 		}
 	} else {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]string{"message": "invalid format"})
+		json.NewEncoder(w).Encode(map[string]string{"error": "invalid format"})
 		return
 	}
 }

@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -12,19 +11,12 @@ import (
 )
 
 func NewComment(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("hi")
-	if r.Method != http.MethodPost {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		json.NewEncoder(w).Encode(map[string]string{
-			"message": http.StatusText(http.StatusMethodNotAllowed),
-		})
-		return
-	}
+
 	var comment utils.Comment
 	/* ----------------------------- token validation ----------------------------- */
 	token, tokenErr := r.Cookie("token")
 	if tokenErr != nil {
-		fmt.Println(tokenErr.Error())
+		// fmt.Println(tokenErr.Error())
 		return
 	}
 
@@ -96,6 +88,5 @@ func CheckCommat(id int) error {
 	`
 	exist := false
 	err := utils.DB.QueryRow(query, id).Scan(&exist)
-	fmt.Println(err)
 	return err
 }

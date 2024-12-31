@@ -17,6 +17,11 @@ func Comments(w http.ResponseWriter, r *http.Request) {
 	if utils.HandleError(utils.Error{Err: err, Code: http.StatusNotFound}, w) {
 		return
 	}
+	userId := 0
+	cookie, err := r.Cookie("token")
+	if err == nil {
+		userId = TakeuserId(cookie.Value)
+	}
 	/* -------------------------- Prepare query -------------------------- */
 	query := `SELECT id,user_id,comment,date FROM comments WHERE post_id = ?;`
 	stmt, stmt_err := utils.DB.Prepare(query)
@@ -39,7 +44,7 @@ func Comments(w http.ResponseWriter, r *http.Request) {
 		if utils.HandleError(utils.Error{Err: err, Code: http.StatusInternalServerError}, w) {
 			return
 		}
-		comment.Reactions = GetReaction(user_id, comment.Id, "comment_id")
+		comment.Reactions = GetReaction(userId, comment.Id, "comment_id")
 		comments = append(comments, comment)
 	}
 

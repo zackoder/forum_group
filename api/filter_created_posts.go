@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -74,7 +73,6 @@ func CreatedPosts(w http.ResponseWriter, r *http.Request) {
 		}
 		p.Reactions = GetReaction(user_id, p.Id, "post_id")
 		p.Categories = strings.Split(categories, ",")
-		fmt.Println(p.Categories)
 		posts = append(posts, p)
 	}
 
