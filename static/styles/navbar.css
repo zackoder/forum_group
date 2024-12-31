@@ -13,12 +13,22 @@ header {
 }
 
 .logo {
+  font-size: 2rem;
+  margin: 0;
+  color: var(--text-color);
+}
+
+.logolink:hover {
+  color: var(--link-hover);
+}
+
+/* .logo {
   padding-left: 25px;
   font-size: 2rem;
   margin-bottom: 20px;
-}
+} */
 
-.logolink {
+/* .logolink {
   text-decoration: none;
   color: var(--text-color);
   transition: color 200ms ease;
@@ -26,7 +36,7 @@ header {
 
 .logolink:hover {
   color: var(--hover-color);
-}
+} */
 
 .navbar {
   list-style: none;

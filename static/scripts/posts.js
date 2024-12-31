@@ -5,64 +5,6 @@ export async function addEventOnPosts(path) {
     const postsContainer = document.getElementById("posts-container");
     PostCategory();
 
-    // Event delegation for click events
-    // postsContainer.addEventListener("click", function (event) {
-    //   // const postElement = event.target.closest(".post-container");
-    //   // const commentEl = event.target.closest(".commentC");
-    //   // if (commentEl) {
-    //   //   const commentId = commentEl.getAttribute("data-comment-id");
-    //   //   if (event.target.classList.contains("like-btn-comment")) {
-    //   //     const likebnt = event.target;
-    //   //     const likenbr = likebnt.closest.classList.contains("likeNbr");
-
-    //   //     console.log(likenbr);
-
-    //   //     handleLike("comment", commentId, "like");
-    //   //   } else if (event.target.classList.contains("dislike-btn-comment")) {
-    //   //     handleLike("comment", commentId, "dislike");
-    //   //   }
-    //   // }
-    //   // const postId = postElement.getAttribute("data-post-id");
-
-    //   // if (
-    //   //   event.target.classList.contains("like-btn") ||
-    //   //   event.target.classList.contains("likeIcon")
-    //   // ) {
-    //   //   function handleLike(path, id, like) {
-    //   //     fetch(`/api/${path}/reaction/${id}`, {
-    //   //       method: "POST",
-    //   //       headers: {
-    //   //         "Content-Type": "application/x-www-form-urlencoded",
-    //   //       },
-    //   //       body: `action=${like}`,
-    //   //     })
-    //   //       .then((response) => {
-    //   //         if (response.redirected) {
-    //   //           window.location.href = "/login";
-    //   //         }
-    //   //       })
-    //   //       .catch((error) =>
-    //   //         console.error("Error updating like/dislike:", error)
-    //   //       );
-    //   //   }
-    //   //   handleLike("posts", postId, "like");
-    //   //   const likebnt = event.target;
-    //   //   const likenbr = likebnt.parentElement.querySelector(".likeNbr");
-
-    //   //   console.log(likenbr);
-    //   // } else if (
-    //   //   event.target.classList.contains("dislike-btn") ||
-    //   //   event.target.classList.contains("dislikeIcon")
-    //   // ) {
-    //   //   handleLike("posts", postId, "dislike");
-    //   // }
-    //   // if (event.target.classList.contains("like-btn-comment")) {
-    //   //   handleLike("comment", commentId, "like");
-    //   // } else if (event.target.classList.contains("dislike-btn-comment")) {
-    //   //   handleLike("comment", commentId, "dislike");
-    //   // }
-    // });
-
     postsContainer.addEventListener("submit", function (event) {
       const postElement = event.target.closest(".post-container");
       if (event.target.classList.contains("comment_form")) {
@@ -104,7 +46,6 @@ export async function addEventOnPosts(path) {
     });
   });
 }
-
 
 function handleComment(postId, comment) {
   fetch(`/api/${postId}/comment/new`, {
@@ -159,57 +100,45 @@ export async function loadMorePosts(path) {
 function createPosts(posts) {
   const postsContainer = document.getElementById("posts-container");
   posts.forEach((post) => {
-    const postElement = document.createElement("div");
-    postElement.className = "post-container";
+    const postElement = createEle("div", "post-container");
     postElement.dataset.postId = post.Id;
 
     /* h2 will contain the image and name of the persen who posted */
-    const posterName = createEle("h2");
-    posterName.className = "poster";
+    const posterName = createEle("h2", "poster");
     const posterImg = createEle("img");
     posterImg.src =
       "/static/images/466006304_871124095226532_8631138819273739648_n.jpg";
-    const nameContainer = createEle("span");
-    nameContainer.className = "usrname";
+    const nameContainer = createEle("span", "usrname");
     nameContainer.innerText = post.UserName;
-    const createdat = createEle("span");
+    const createdat = createEle("span", "creationdate");
 
     createdat.innerText = formDate(post.Date);
-    createdat.className = "creationdate";
     posterName.appendChild(posterImg);
     posterName.appendChild(nameContainer);
     postElement.appendChild(posterName);
     postElement.appendChild(createdat);
 
     /* creating a div that will contain all the elements bellow */
-    const pc = createEle("div");
-    pc.className = "pc";
+    const pc = createEle("div", "pc");
 
     /* creating an h3 element to contain the post title */
-    const title = createEle("h3");
-    title.className = "title";
+    const title = createEle("h3", "title");
     title.innerText = post.Title;
 
     /* creating a p element that will contain the content of the post */
-    const content = createEle("p");
-    content.className = "content";
+    const content = createEle("p", "content");
     content.innerText = post.Content;
-    pc.append(title, content);
 
-    const categories_container = createEle("div");
-    categories_container.className = "categories";
+    const categories_container = createEle("div", "categories");
 
     for (let cate of post.Categories) {
-      const span = createEle("a");
+      const span = createEle("a", "category");
       span.href = `/category/${cate}`;
-      span.className = "category";
       span.innerText = cate;
       categories_container.appendChild(span);
     }
-    pc.appendChild(categories_container);
     /* creating like and dislike button */
-    const like_dislike_container = createEle("div");
-    like_dislike_container.className = "like-dislike-container";
+    const like_dislike_container = createEle("div", "like-dislike-container");
     //
 
     const [likebnt, dislikebnt, likeNbr, dislikeNbr] = HandulLike(
@@ -220,20 +149,16 @@ function createPosts(posts) {
       post.Id
     );
 
-    ///
-    /* creating of the like button */
-    // const likebnt = createEle("button");
     likebnt.classList.add("like-btn");
 
     /* create an img element to contain like icon */
-    const likeIcon = createEle("img");
+    const likeIcon = createEle("img", "likeNbr");
     likeIcon.className = "likeIcon";
     likeIcon.src = "/static/images/like.png";
 
     // const likeNbr = createEle("span");
-    likeNbr.className = "likeNbr";
     // likeNbr.innerText = post.Reactions.Likes;
-
+    likeNbr.className = "likeNbr";
     likebnt.appendChild(likeIcon);
     // likebnt.appendChild(likeNbm);
 
@@ -242,8 +167,7 @@ function createPosts(posts) {
 
     dislikebnt.classList.add("dislike-btn");
     /* creating an img tag to containg dislike icon */
-    const dislikeIcon = createEle("img");
-    dislikeIcon.className = "dislikeIcon";
+    const dislikeIcon = createEle("img", "dislikeIcon");
     dislikeIcon.src = "/static/images/dislike.png";
 
     // const dislikeNbr = createEle("span");
@@ -257,43 +181,41 @@ function createPosts(posts) {
     like_dislike_container.append(likebnt, likeNbr, dislikebnt, dislikeNbr);
 
     /* appending like container to the post contaner */
-    pc.appendChild(like_dislike_container);
 
     ////add div comments
-    const divcomments = createEle("div");
-    divcomments.className = `divcomments${post.Id} divcomments`;
-
-    pc.appendChild(divcomments);
+    const divcomments = createEle("div", `divcomments${post.Id} divcomments`);
 
     /* adding a button to see comments */
-    const seecomments = createEle("button");
-    seecomments.className = "see_comments";
+    const seecomments = createEle("button", "see_comments");
     seecomments.innerText = "see comments";
-    pc.appendChild(seecomments);
-    /* creating the form that sends comments */
-    const comment_form = createEle("form");
-    comment_form.method = "POST";
-    comment_form.className = "comment_form";
 
-    const title_impt = createEle("input");
-    title_impt.className = "comment";
+    /* creating the form that sends comments */
+    const comment_form = createEle("form", "comment_form");
+    comment_form.method = "POST";
+
+    const title_impt = createEle("input", "comment");
     title_impt.name = "comment";
     title_impt.type = "text";
     title_impt.placeholder = "Add your comment";
     title_impt.required = true;
 
-    const submit_comment = createEle("button");
-    submit_comment.className = "send_comment";
+    const submit_comment = createEle("button", "send_comment");
     submit_comment.type = "submit";
 
-    const send_icon = createEle("img");
-    send_icon.className = "sendimg";
+    const send_icon = createEle("img", "sendimg");
     send_icon.src = "/static/images/send-message.png";
     submit_comment.appendChild(send_icon);
-    comment_form.appendChild(title_impt);
-    comment_form.appendChild(submit_comment);
+    comment_form.append(title_impt, submit_comment);
 
-    pc.appendChild(comment_form);
+    pc.append(
+      title,
+      content,
+      categories_container,
+      like_dislike_container,
+      divcomments,
+      seecomments,
+      comment_form
+    );
     postElement.appendChild(pc);
 
     postsContainer.appendChild(postElement);
@@ -323,8 +245,10 @@ function formDate(date) {
   return timeText;
 }
 
-function createEle(elename) {
-  return document.createElement(elename);
+function createEle(elename, className) {
+  const ele = document.createElement(elename);
+  ele.className = className;
+  return ele;
 }
 
 const showPostFormButton = document.querySelector(".show-postForm");
@@ -505,8 +429,7 @@ async function GetComments(idPost, str) {
           likebnt.classList.add("like-btn-comment");
 
           /* create an img element to contain like icon */
-          const likeIcon = createEle("img");
-          likeIcon.className = "likeicon-comment";
+          const likeIcon = createEle("img", "likeicon-comment");
           likeIcon.src = "/static/images/like.png";
 
           likebnt.appendChild(likeIcon);

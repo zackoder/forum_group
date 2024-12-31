@@ -1,8 +1,8 @@
-// import { addEventOnPosts, handleScroll } from "./posts.js";
-// let path = "/api/liked/posts";
+import { addEventOnPosts, handleScroll } from "./posts.js";
+let path = "/api/liked/posts";
 
-// addEventOnPosts(path);
+addEventOnPosts(path);
 
-// window.addEventListener("scrollend", () => {
-//   setInterval(handleScroll(path));
-// });
+window.addEventListener("scrollend", () => {
+  setInterval(handleScroll(path));
+});

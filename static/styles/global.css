@@ -27,7 +27,8 @@ body {
   position: absolute;
   top: 90px;
   left: 50%;
-  width: 40%;
+  max-width: 500px;
+  width: 90%;
   transform: translateX(-50%);
   list-style: none;
   display: flex;
@@ -36,6 +37,7 @@ body {
   padding: 20px 0;
   align-items: center;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
 .category {

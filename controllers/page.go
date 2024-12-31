@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"forum/api"
+	"forum/controllers/auth"
 	"forum/utils"
 )
 
@@ -50,16 +51,11 @@ func Home(w http.ResponseWriter, r *http.Request) {
 		utils.ErrorHandler(w, http.StatusMethodNotAllowed, http.StatusText(http.StatusMethodNotAllowed), "this Page doesn't support your Method", nil)
 		return
 	}
-	userName := 0
-	cookie, err := r.Cookie("token")
-	if err == nil {
-		userName = api.TakeuserId(cookie.Value)
-	}
 
 	pages := []string{
 		"views/pages/home.html",
 	}
-	utils.ExecuteTemplate(w, pages, userName > 0)
+	utils.ExecuteTemplate(w, pages, auth.Islogin(r))
 }
 
 func LikedPostsPage(w http.ResponseWriter, r *http.Request) {
@@ -70,5 +66,5 @@ func LikedPostsPage(w http.ResponseWriter, r *http.Request) {
 	pages := []string{
 		"views/pages/likedPost.html",
 	}
-	utils.ExecuteTemplate(w, pages, nil)
+	utils.ExecuteTemplate(w, pages, true)
 }

@@ -1,7 +1,6 @@
 package api
 
 import (
-	"database/sql"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -43,20 +42,11 @@ func FetchPosts(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var post utils.PostsResult
 		var user_id int
-		var date sql.NullString
 		var categories string
-
-		if err := rows.Scan(&post.Id, &user_id, &post.Title, &post.Content, &categories, &date); err != nil {
+		if err := rows.Scan(&post.Id, &user_id, &post.Title, &post.Content, &categories, &post.Date); err != nil {
 			continue
 		}
-
 		post.Categories = strings.Split(categories, ",")
-
-		if date.Valid {
-			post.Date = date.String
-		} else {
-			post.Date = ""
-		}
 
 		if err := utils.DB.QueryRow("SELECT username FROM users WHERE id = ?", user_id).Scan(&post.UserName); err != nil {
 			continue
