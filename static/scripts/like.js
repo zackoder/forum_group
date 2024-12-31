@@ -1,10 +1,6 @@
 export function HandulLike(type, numlike, numdislike, path, id) {
-  console.log(type);
   const likebtn = document.createElement("button");
   const dislikebtn = document.createElement("button");
-  likebtn.className = "like";
-  dislikebtn.className = "dislike";
-
   if (type === "like") {
     likebtn.classList.add("liked");
   } else if (type === "dislike") {

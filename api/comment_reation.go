@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -38,10 +37,8 @@ func CommentReaction(w http.ResponseWriter, r *http.Request) {
 	/* ------------------------------ handle comment_id ------------------------------ */
 	reactInfo.comment_id, err = strconv.Atoi(r.PathValue("CommentId"))
 	if utils.HandleError(utils.Error{Err: err, Code: http.StatusNotFound}, w) || CheckCommat(reactInfo.comment_id) != nil {
-		fmt.Println("commant id not valid")
 		return
 	}
-	// fmt.Println("ok")
 	like, err := CheckLIke(reactInfo.comment_id, reactInfo.user_id, "like", "comment_id")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

@@ -32,7 +32,6 @@ func LikedPosts(w http.ResponseWriter, r *http.Request) {
 	}
 	cookie, err := r.Cookie("token")
 	if err != nil {
-		fmt.Println(err)
 		w.WriteHeader(http.StatusNonAuthoritativeInfo)
 		json.NewEncoder(w).Encode(map[string]string{"error": http.StatusText(http.StatusNonAuthoritativeInfo)})
 		return
@@ -69,7 +68,6 @@ func LikedPosts(w http.ResponseWriter, r *http.Request) {
 	`
 	rows, err := utils.DB.Query(query, userid, "like", limitInt, offsetInt)
 	if err != nil {
-		fmt.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]string{"error": http.StatusText(http.StatusInternalServerError)})
 		return
@@ -81,14 +79,12 @@ func LikedPosts(w http.ResponseWriter, r *http.Request) {
 		categories := ""
 
 		if err := rows.Scan(&post.UserName, &post.Id, &post.Title, &post.Content, &post.Date, &categories); err != nil {
-			fmt.Println(err)
 			continue
 		}
 		post.Categories = strings.Split(categories, ",")
 		post.Reactions = GetReaction(userid, post.Id, "post_id")
 		posts = append(posts, post)
 	}
-	fmt.Println(posts)
 	json.NewEncoder(w).Encode(posts)
 }
 

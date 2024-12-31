@@ -6,62 +6,62 @@ export async function addEventOnPosts(path) {
     PostCategory();
 
     // Event delegation for click events
-    postsContainer.addEventListener("click", function (event) {
-      const postElement = event.target.closest(".post-container");
-      const commentEl = event.target.closest(".commentC");
-      if (commentEl) {
-        const commentId = commentEl.getAttribute("data-comment-id");
-        if (event.target.classList.contains("like-btn-comment")) {
-          const likebnt = event.target;
-          const likenbr = likebnt.closest.classList.contains("likeNbr");
+    // postsContainer.addEventListener("click", function (event) {
+    //   // const postElement = event.target.closest(".post-container");
+    //   // const commentEl = event.target.closest(".commentC");
+    //   // if (commentEl) {
+    //   //   const commentId = commentEl.getAttribute("data-comment-id");
+    //   //   if (event.target.classList.contains("like-btn-comment")) {
+    //   //     const likebnt = event.target;
+    //   //     const likenbr = likebnt.closest.classList.contains("likeNbr");
 
-          console.log(likenbr);
+    //   //     console.log(likenbr);
 
-          handleLike("comment", commentId, "like");
-        } else if (event.target.classList.contains("dislike-btn-comment")) {
-          handleLike("comment", commentId, "dislike");
-        }
-      }
-      const postId = postElement.getAttribute("data-post-id");
+    //   //     handleLike("comment", commentId, "like");
+    //   //   } else if (event.target.classList.contains("dislike-btn-comment")) {
+    //   //     handleLike("comment", commentId, "dislike");
+    //   //   }
+    //   // }
+    //   // const postId = postElement.getAttribute("data-post-id");
 
-      // if (
-      //   event.target.classList.contains("like-btn") ||
-      //   event.target.classList.contains("likeIcon")
-      // ) {
-      //   function handleLike(path, id, like) {
-      //     fetch(`/api/${path}/reaction/${id}`, {
-      //       method: "POST",
-      //       headers: {
-      //         "Content-Type": "application/x-www-form-urlencoded",
-      //       },
-      //       body: `action=${like}`,
-      //     })
-      //       .then((response) => {
-      //         if (response.redirected) {
-      //           window.location.href = "/login";
-      //         }
-      //       })
-      //       .catch((error) =>
-      //         console.error("Error updating like/dislike:", error)
-      //       );
-      //   }
-      //   handleLike("posts", postId, "like");
-      //   const likebnt = event.target;
-      //   const likenbr = likebnt.parentElement.querySelector(".likeNbr");
+    //   // if (
+    //   //   event.target.classList.contains("like-btn") ||
+    //   //   event.target.classList.contains("likeIcon")
+    //   // ) {
+    //   //   function handleLike(path, id, like) {
+    //   //     fetch(`/api/${path}/reaction/${id}`, {
+    //   //       method: "POST",
+    //   //       headers: {
+    //   //         "Content-Type": "application/x-www-form-urlencoded",
+    //   //       },
+    //   //       body: `action=${like}`,
+    //   //     })
+    //   //       .then((response) => {
+    //   //         if (response.redirected) {
+    //   //           window.location.href = "/login";
+    //   //         }
+    //   //       })
+    //   //       .catch((error) =>
+    //   //         console.error("Error updating like/dislike:", error)
+    //   //       );
+    //   //   }
+    //   //   handleLike("posts", postId, "like");
+    //   //   const likebnt = event.target;
+    //   //   const likenbr = likebnt.parentElement.querySelector(".likeNbr");
 
-      //   console.log(likenbr);
-      // } else if (
-      //   event.target.classList.contains("dislike-btn") ||
-      //   event.target.classList.contains("dislikeIcon")
-      // ) {
-      //   handleLike("posts", postId, "dislike");
-      // }
-      // if (event.target.classList.contains("like-btn-comment")) {
-      //   handleLike("comment", commentId, "like");
-      // } else if (event.target.classList.contains("dislike-btn-comment")) {
-      //   handleLike("comment", commentId, "dislike");
-      // }
-    });
+    //   //   console.log(likenbr);
+    //   // } else if (
+    //   //   event.target.classList.contains("dislike-btn") ||
+    //   //   event.target.classList.contains("dislikeIcon")
+    //   // ) {
+    //   //   handleLike("posts", postId, "dislike");
+    //   // }
+    //   // if (event.target.classList.contains("like-btn-comment")) {
+    //   //   handleLike("comment", commentId, "like");
+    //   // } else if (event.target.classList.contains("dislike-btn-comment")) {
+    //   //   handleLike("comment", commentId, "dislike");
+    //   // }
+    // });
 
     postsContainer.addEventListener("submit", function (event) {
       const postElement = event.target.closest(".post-container");
@@ -100,26 +100,11 @@ export async function addEventOnPosts(path) {
 
     loadMorePosts(path);
     window.addEventListener("scrollend", () => {
-      setInterval(handleScroll, 5000);
+      handleScroll(path);
     });
   });
 }
 
-function handleLike(path, id, like) {
-  fetch(`/api/${path}/reaction/${id}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: `action=${like}`,
-  })
-    .then((response) => {
-      if (response.redirected) {
-        window.location.href = "/login";
-      }
-    })
-    .catch((error) => console.error("Error updating like/dislike:", error));
-}
 
 function handleComment(postId, comment) {
   fetch(`/api/${postId}/comment/new`, {
@@ -131,14 +116,12 @@ function handleComment(postId, comment) {
   })
     .then((response) => {
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        alert("faild to add Comment");
+        return;
       }
       return response.json();
     })
     .then((data) => {
-      if (data.message != 200) {
-        alert(" faild to add Comment");
-      }
       let comment_form = ".divcomments" + postId;
       let commentElement = document.querySelector(comment_form);
       GetComments(postId, commentElement);
@@ -228,7 +211,6 @@ function createPosts(posts) {
     const like_dislike_container = createEle("div");
     like_dislike_container.className = "like-dislike-container";
     //
-    console.log(post.Reactions.Action);
 
     const [likebnt, dislikebnt, likeNbr, dislikeNbr] = HandulLike(
       post.Reactions.Action,
@@ -241,7 +223,7 @@ function createPosts(posts) {
     ///
     /* creating of the like button */
     // const likebnt = createEle("button");
-    likebnt.className = "like-btn";
+    likebnt.classList.add("like-btn");
 
     /* create an img element to contain like icon */
     const likeIcon = createEle("img");
@@ -257,8 +239,8 @@ function createPosts(posts) {
 
     /* creationg of the dislike button */
     // const dislikebnt = createEle("button");
-    dislikebnt.className = "dislike-btn";
 
+    dislikebnt.classList.add("dislike-btn");
     /* creating an img tag to containg dislike icon */
     const dislikeIcon = createEle("img");
     dislikeIcon.className = "dislikeIcon";
@@ -271,11 +253,6 @@ function createPosts(posts) {
     dislikebnt.appendChild(dislikeIcon);
     // dislikebnt.appendChild(dislikeNbr);
 
-    // if (post.Reactions.Action === "like") {
-    //   likebnt.classList.add("liked");
-    // } else if (post.Reactions.Action === "dislike") {
-    //   dislikebnt.classList.add("disliked");
-    // }
     /* appending like and dislike buttons to like container */
     like_dislike_container.append(likebnt, likeNbr, dislikebnt, dislikeNbr);
 
@@ -513,8 +490,19 @@ async function GetComments(idPost, str) {
           like_dislike_container.className = "like-dislike-container-comment";
 
           /* creating of the like button */
-          const likebnt = createEle("button");
-          likebnt.className = "like-btn-comment";
+          //
+          const [likebnt, dislikebnt, likeNmb, dislikeNmb] = HandulLike(
+            e.Reactions.Action,
+            e.Reactions.Likes,
+            e.Reactions.Dislikes,
+            "comment",
+            e.Id
+          );
+
+          //
+          // const likebnt = createEle("button");
+          // likebnt.className = "like-btn-comment";
+          likebnt.classList.add("like-btn-comment");
 
           /* create an img element to contain like icon */
           const likeIcon = createEle("img");
@@ -523,15 +511,15 @@ async function GetComments(idPost, str) {
 
           likebnt.appendChild(likeIcon);
 
-          const likeNmb = createEle("span");
+          // const likeNmb = createEle("span");
           likeNmb.className = "likeNbr";
           likeNmb.innerText = e.Reactions.Likes;
           // likebnt.appendChild(likeNmb);
 
           /* creationg of the dislike button */
-          const dislikebnt = createEle("button");
-          dislikebnt.className = "dislike-btn-comment";
-
+          // const dislikebnt = createEle("button");
+          // dislikebnt.className = ;
+          dislikebnt.classList.add("dislike-btn-comment");
           /* creating an img tag to containg dislike icon */
           const dislikeIcon = createEle("img");
           dislikeIcon.className = "dislikeicon-comment";
@@ -539,7 +527,7 @@ async function GetComments(idPost, str) {
 
           dislikebnt.appendChild(dislikeIcon);
 
-          const dislikeNmb = createEle("span");
+          // const dislikeNmb = createEle("span");
           dislikeNmb.className = "dislikeNbr";
           dislikeNmb.innerText = e.Reactions.Dislikes;
           // dislikebnt.appendChild(dislikeNmb);

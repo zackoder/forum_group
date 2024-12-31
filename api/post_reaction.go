@@ -10,7 +10,6 @@ import (
 )
 
 func PostReaction(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("HI")
 	var reactPost struct {
 		user_id int    // get from token
 		post_id int    // get from url
@@ -25,7 +24,6 @@ func PostReaction(w http.ResponseWriter, r *http.Request) {
 	/* ----------------------------------- handle action ----------------------------------- */
 	reactPost.action = r.FormValue("action")
 	fmt.Println(reactPost)
-	// fmt.Println(r.FormValue("action"))
 	/* ----------------------------------- Handle User Id ----------------------------------- */
 	token, token_err := r.Cookie("token")
 	if utils.HandleError(utils.Error{Err: token_err, Code: http.StatusUnauthorized}, w) {
@@ -83,8 +81,7 @@ func UpdateLike(id, userid int, which, typ string) {
 		WHERE %s = ?
 		AND user_id = ?
 	`, which)
-	_, err := utils.DB.Exec(query, typ, id, userid)
-	fmt.Println(err, "update")
+	utils.DB.Exec(query, typ, id, userid)
 }
 
 func InsertLike(id, userid int, which, typ string) {
@@ -92,16 +89,16 @@ func InsertLike(id, userid int, which, typ string) {
 		INSERT INTO reactions(%s ,user_id ,type)
 		VALUES( ? , ? , ? )
 	`, which)
-	_, err := utils.DB.Exec(query, id, userid, typ)
-	fmt.Println(err, "inser")
+	utils.DB.Exec(query, id, userid, typ)
+
 }
 
 func DeletLike(id, userid int, which string) {
 	query := fmt.Sprintf(`
 		DELETE FROM reactions WHERE %s = ? AND user_id = ?
 	`, which)
-	_, err := utils.DB.Exec(query, id, userid)
-	fmt.Println(err, "del")
+	utils.DB.Exec(query, id, userid)
+
 }
 
 func CheckLIke(id, userId int, typ, column string) (bool, error) {

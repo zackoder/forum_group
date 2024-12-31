@@ -26,6 +26,11 @@ func FetchPosts(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(nil)
 		return
 	}
+	userid := 0
+	cookie, err := r.Cookie("token")
+	if err == nil {
+		userid = TakeuserId(cookie.Value)
+	}
 	query := "SELECT id, user_id, title, content, categories, date FROM posts ORDER BY id DESC LIMIT ? OFFSET ?"
 	rows, err := utils.DB.Query(query, 20, nbr_offset)
 	if err != nil {
@@ -56,7 +61,7 @@ func FetchPosts(w http.ResponseWriter, r *http.Request) {
 		if err := utils.DB.QueryRow("SELECT username FROM users WHERE id = ?", user_id).Scan(&post.UserName); err != nil {
 			continue
 		}
-		post.Reactions = GetReaction(user_id, post.Id, "post_id")
+		post.Reactions = GetReaction(userid, post.Id, "post_id")
 
 		posts = append(posts, post)
 	}
