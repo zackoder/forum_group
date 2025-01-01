@@ -58,6 +58,12 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(err)
 		return
 	}
+	if len(post.Title) > 100 || len(post.Content) > 1000 {
+		err := Error{Message: "Title or Content is more than expact", Code: http.StatusBadRequest}
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err)
+		return
+	}
 	result, err := utils.DB.Exec("INSERT INTO posts(user_id, title, content, categories) VALUES(?, ?, ?, ?)", userId, post.Title, post.Content, strings.Join(post.Categories, ","))
 	if err != nil {
 		err := Error{Message: "can insert in base donne", Code: http.StatusUnauthorized}
@@ -93,6 +99,4 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	json.NewEncoder(w).Encode(post)
-	// fmt.Println(post)
-	// http.Redirect(w, r, "/", http.StatusSeeOther)
 }

@@ -224,7 +224,6 @@ if (form) {
   form.addEventListener("submit", async function (event) {
     event.preventDefault();
     // Declare validation flags
-    console.log("ok");
     const postsContainer = document.getElementById("posts-container");
     let isValidTitle = false;
     let isValidContent = false;
@@ -237,7 +236,7 @@ if (form) {
 
     // Get selected checkboxes
     let checkboxes = document.querySelectorAll('input[name="options"]:checked');
-    console.log(checkboxes);
+
 
     checkboxes.forEach((checkbox) => {
       categoryName.push(checkbox.getAttribute("data-name"));
@@ -247,6 +246,10 @@ if (form) {
       document.getElementById("errorTitle").innerHTML = "Title is required";
       document.getElementById("errorTitle").style.color = "red";
       isValidTitle = false;
+    } else if (Title.length > 100) {
+      document.getElementById("errorTitle").innerHTML = "max title is 100";
+      document.getElementById("errorTitle").style.color = "red";
+      isValidTitle = false;
     } else {
       document.getElementById("errorTitle").innerHTML = "";
       isValidTitle = true;
@@ -254,6 +257,10 @@ if (form) {
 
     if (Content === "") {
       document.getElementById("errorContent").innerHTML = "Content is required";
+      document.getElementById("errorContent").style.color = "red";
+      isValidContent = false;
+    } else if (Content.length > 1000) {
+      document.getElementById("errorContent").innerHTML = "max Content 1000";
       document.getElementById("errorContent").style.color = "red";
       isValidContent = false;
     } else {
