@@ -1,4 +1,4 @@
-import { HandulLike } from "./like.js";
+import { CreatPost, HandulLike } from "./like.js";
 
 export async function addEventOnPosts(path) {
   document.addEventListener("DOMContentLoaded", function () {
@@ -155,150 +155,15 @@ export async function loadMorePosts(path) {
   }
 }
 
-function createPosts(posts) {
+export function createPosts(posts) {
   const postsContainer = document.getElementById("posts-container");
   posts.forEach((post) => {
-    const postElement = document.createElement("div");
-    postElement.className = "post-container";
-    postElement.dataset.postId = post.Id;
-
-    /* h2 will contain the image and name of the persen who posted */
-    const posterName = createEle("h2");
-    posterName.className = "poster";
-    const posterImg = createEle("img");
-    posterImg.src =
-      "/static/images/466006304_871124095226532_8631138819273739648_n.jpg";
-    const nameContainer = createEle("span");
-    nameContainer.className = "usrname";
-    nameContainer.innerText = post.UserName;
-    const createdat = createEle("span");
-
-    createdat.innerText = formDate(post.Date);
-    createdat.className = "creationdate";
-    posterName.appendChild(posterImg);
-    posterName.appendChild(nameContainer);
-    postElement.appendChild(posterName);
-    postElement.appendChild(createdat);
-
-    /* creating a div that will contain all the elements bellow */
-    const pc = createEle("div");
-    pc.className = "pc";
-
-    /* creating an h3 element to contain the post title */
-    const title = createEle("h3");
-    title.className = "title";
-    title.innerText = post.Title;
-
-    /* creating a p element that will contain the content of the post */
-    const content = createEle("p");
-    content.className = "content";
-    content.innerText = post.Content;
-    pc.append(title, content);
-
-    const categories_container = createEle("div");
-    categories_container.className = "categories";
-
-    for (let cate of post.Categories) {
-      const span = createEle("a");
-      span.href = `/category/${cate}`;
-      span.className = "category";
-      span.innerText = cate;
-      categories_container.appendChild(span);
-    }
-    pc.appendChild(categories_container);
-    /* creating like and dislike button */
-    const like_dislike_container = createEle("div");
-    like_dislike_container.className = "like-dislike-container";
-    //
-
-    const [likebnt, dislikebnt, likeNbr, dislikeNbr] = HandulLike(
-      post.Reactions.Action,
-      post.Reactions.Likes,
-      post.Reactions.Dislikes,
-      "posts",
-      post.Id
-    );
-    ///
-    /* creating of the like button */
-    // const likebnt = createEle("button");
-    likebnt.classList.add("like-btn");
-
-    /* create an img element to contain like icon */
-    const likeIcon = createEle("img");
-    likeIcon.className = "likeIcon";
-    likeIcon.src = "/static/images/like.png";
-
-    // const likeNbr = createEle("span");
-    likeNbr.className = "likeNbr";
-    // likeNbr.innerText = post.Reactions.Likes;
-
-    likebnt.appendChild(likeIcon);
-    // likebnt.appendChild(likeNbm);
-
-    /* creationg of the dislike button */
-    // const dislikebnt = createEle("button");
-
-    dislikebnt.classList.add("dislike-btn");
-    /* creating an img tag to containg dislike icon */
-    const dislikeIcon = createEle("img");
-    dislikeIcon.className = "dislikeIcon";
-    dislikeIcon.src = "/static/images/dislike.png";
-
-    // const dislikeNbr = createEle("span");
-    dislikeNbr.className = "dislikeNbr";
-    // dislikeNbr.innerText = post.Reactions.Dislikes;
-
-    dislikebnt.appendChild(dislikeIcon);
-    // dislikebnt.appendChild(dislikeNbr);
-
-    /* appending like and dislike buttons to like container */
-    like_dislike_container.append(likebnt, likeNbr, dislikebnt, dislikeNbr);
-
-    /* appending like container to the post contaner */
-    pc.appendChild(like_dislike_container);
-
-    ////add div comments
-    const divcomments = createEle("div");
-    divcomments.className = `divcomments${post.Id} divcomments`;
-
-    pc.appendChild(divcomments);
-
-    /* adding a button to see comments */
-    const seecomments = createEle("button");
-    seecomments.className = "see_comments";
-    seecomments.innerText = "see comments";
-    pc.appendChild(seecomments);
-    /* creating the form that sends comments */
-    const comment_form = createEle("form");
-    comment_form.method = "POST";
-    comment_form.className = "comment_form";
-
-    const title_impt = createEle("input");
-    title_impt.className = "comment";
-    title_impt.name = "comment";
-    title_impt.type = "text";
-    title_impt.placeholder = "Add your comment";
-    title_impt.required = true;
-
-    const submit_comment = createEle("button");
-    submit_comment.className = "send_comment";
-    submit_comment.type = "submit";
-
-    const send_icon = createEle("img");
-    send_icon.className = "sendimg";
-    send_icon.src = "/static/images/send-message.png";
-    submit_comment.appendChild(send_icon);
-    comment_form.appendChild(title_impt);
-    comment_form.appendChild(submit_comment);
-
-    pc.appendChild(comment_form);
-    postElement.appendChild(pc);
-
+    const postElement = CreatPost(post);
     postsContainer.appendChild(postElement);
   });
 }
 
-function formDate(date) {
+export function formDate(date) {
   let CreattionDate = new Date(date).getTime();
   const currentTime = Date.now();
   const elapsed = currentTime - CreattionDate;
@@ -321,7 +186,7 @@ function formDate(date) {
   return timeText;
 }
 
-function createEle(elename) {
+export function createEle(elename) {
   return document.createElement(elename);
 }
 
@@ -359,7 +224,9 @@ if (form) {
   form.addEventListener("submit", async function (event) {
     event.preventDefault();
     // Declare validation flags
-    let isValidTitle = true;
+    console.log("ok");
+    const postsContainer = document.getElementById("posts-container");
+    let isValidTitle = false;
     let isValidContent = false;
     let isValidCheckboxes = false;
 
@@ -370,9 +237,20 @@ if (form) {
 
     // Get selected checkboxes
     let checkboxes = document.querySelectorAll('input[name="options"]:checked');
+    console.log(checkboxes);
+
     checkboxes.forEach((checkbox) => {
       categoryName.push(checkbox.getAttribute("data-name"));
     });
+
+    if (Title === "") {
+      document.getElementById("errorTitle").innerHTML = "Title is required";
+      document.getElementById("errorTitle").style.color = "red";
+      isValidTitle = false;
+    } else {
+      document.getElementById("errorTitle").innerHTML = "";
+      isValidTitle = true;
+    }
 
     if (Content === "") {
       document.getElementById("errorContent").innerHTML = "Content is required";
@@ -408,7 +286,11 @@ if (form) {
         });
 
         if (res.ok) {
-          window.location.href = res.url;
+          const post = await res.json();
+          const div = CreatPost(post);
+          postsContainer.prepend(div);
+          form.style.display = "none";
+          layout.style.display = "none";
         }
       } catch (error) {
         alert("Error: " + error.message);
