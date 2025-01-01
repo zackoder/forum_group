@@ -11,7 +11,6 @@ import (
 )
 
 func NewComment(w http.ResponseWriter, r *http.Request) {
-
 	var comment utils.Comment
 	/* ----------------------------- token validation ----------------------------- */
 	token, tokenErr := r.Cookie("token")

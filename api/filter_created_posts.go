@@ -18,13 +18,6 @@ import (
 
 func CreatedPosts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	if r.Method != http.MethodGet {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		json.NewEncoder(w).Encode(map[string]string{
-			"message": http.StatusText(http.StatusMethodNotAllowed),
-		})
-		return
-	}
 	var posts []utils.PostsResult
 	/* ---------------------------- Handle token ---------------------------- */
 	token, token_err := r.Cookie("token")

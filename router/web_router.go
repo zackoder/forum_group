@@ -13,17 +13,17 @@ func WebRouter() *http.ServeMux {
 
 	webMux.HandleFunc("/static/", controllers.Server)
 	/* --------------------------- pages handlers --------------------------- */
-	webMux.HandleFunc("/", controllers.Home)
-	webMux.HandleFunc("/add-post", m.Authorization(controllers.CreatePost))
+	webMux.HandleFunc("/", m.CheckMethod(controllers.Home,"GET"))
+	webMux.HandleFunc("/add-post", m.CheckMethod(m.Authorization(controllers.CreatePost),"POST"))
 	/* --------------------------- login and register handlers --------------------------- */
-	webMux.HandleFunc("/user/register", auth.SingUp)
-	webMux.HandleFunc("/user/login", auth.SingIn)
-	webMux.HandleFunc("/register", controllers.Register)
-	webMux.HandleFunc("/login", controllers.Login)
+	webMux.HandleFunc("/user/register", m.CheckMethod(auth.SingUp,"POST"))
+	webMux.HandleFunc("/user/login", m.CheckMethod(auth.SingIn,"POST"))
+	webMux.HandleFunc("/register", m.CheckMethod(controllers.Register,"GET"))
+	webMux.HandleFunc("/login", m.CheckMethod(controllers.Login,"GET"))
 	webMux.HandleFunc("/logout", m.Authorization(auth.Logout))
 	webMux.HandleFunc("/liked-post", m.Authorization(controllers.LikedPostsPage))
 	webMux.HandleFunc("/profile", m.Authorization(controllers.CreatedPosts))
-	webMux.HandleFunc("/category/{Category}", (controllers.Categories))
+	webMux.HandleFunc("/category/{nameCategory}", (controllers.Categories))
 
 	return webMux
 }

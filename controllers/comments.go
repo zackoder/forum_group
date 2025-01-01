@@ -10,3 +10,4 @@ func CheckPost(postId int) bool {
 	err := utils.DB.QueryRow(query, postId).Scan(&id)
 	return err != nil
 }
+

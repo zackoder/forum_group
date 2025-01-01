@@ -288,6 +288,9 @@
 }
 
 @media (max-width: 768px) {
+  #posts-container {
+    padding-top: 200px;
+  }
   header {
     flex-direction: column;
     padding: 10px;

@@ -17,11 +17,6 @@ import (
 
 func SingIn(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
-	if r.Method != http.MethodPost {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		json.NewEncoder(w).Encode(map[string]string{"error": http.StatusText(http.StatusMethodNotAllowed)})
-		return
-	}
 	user := utils.User{}
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if !IsValidEmail(user.Email) || user.Password == "" || err != nil {
@@ -125,11 +120,6 @@ func Insert(user utils.User) (int, int, error) {
 
 func SingUp(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	if r.Method != http.MethodPost {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		json.NewEncoder(w).Encode(map[string]string{"error": http.StatusText(http.StatusMethodNotAllowed)})
-		return
-	}
 	user := utils.User{}
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if !IsValidUsername(user.Username) || !IsValidEmail(user.Email) || user.Password != user.ConfPass || err != nil {

@@ -12,13 +12,7 @@ import (
 
 func LikedPosts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	if r.Method != http.MethodGet {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		json.NewEncoder(w).Encode(map[string]string{
-			"message": http.StatusText(http.StatusMethodNotAllowed),
-		})
-		return
-	}
+
 	limit := r.URL.Query().Get("limit")
 	offset := r.URL.Query().Get("offset")
 
