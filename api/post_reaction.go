@@ -23,21 +23,12 @@ func PostReaction(w http.ResponseWriter, r *http.Request) {
 
 	/* ----------------------------------- handle action ----------------------------------- */
 	reactPost.action = r.FormValue("action")
-	fmt.Println(reactPost)
 	/* ----------------------------------- Handle User Id ----------------------------------- */
 	token, token_err := r.Cookie("token")
 	if utils.HandleError(utils.Error{Err: token_err, Code: http.StatusUnauthorized}, w) {
 		return
 	}
-	get_user := `SELECT user_id FROM sessions WHERE token= ? LIMIT 1`
-	stmt, stmt_err := utils.DB.Prepare(get_user)
-	if utils.HandleError(utils.Error{Err: stmt_err, Code: http.StatusInternalServerError}, w) {
-		return
-	}
-	stmt_err = stmt.QueryRow(token.Value).Scan(&reactPost.user_id)
-	if utils.HandleError(utils.Error{Err: stmt_err, Code: http.StatusInternalServerError}, w) {
-		return
-	}
+	reactPost.user_id = TakeuserId(token.Value)
 	action := CheckLIke(reactPost.post_id, reactPost.user_id, "post_id")
 	if reactPost.action == "like" {
 		if action == "dislike" {

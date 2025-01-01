@@ -15,7 +15,8 @@ func NewComment(w http.ResponseWriter, r *http.Request) {
 	/* ----------------------------- token validation ----------------------------- */
 	token, tokenErr := r.Cookie("token")
 	if tokenErr != nil {
-		// fmt.Println(tokenErr.Error())
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"error": http.StatusText(http.StatusUnauthorized)})
 		return
 	}
 
@@ -30,18 +31,18 @@ func NewComment(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	/* ----------------------------- Prepare query for get user_id ----------------------------- */
-	getUserIdQuery := `SELECT user_id FROM sessions WHERE token=?;`
-	stmt, stmt_err := utils.DB.Prepare(getUserIdQuery)
-	if utils.HandleError(utils.Error{Err: stmt_err, Code: http.StatusInternalServerError}, w) {
-		return
-	}
+	// getUserIdQuery := `SELECT user_id FROM sessions WHERE token=?;`
+	// stmt, stmt_err := utils.DB.Prepare(getUserIdQuery)
+	// if utils.HandleError(utils.Error{Err: stmt_err, Code: http.StatusInternalServerError}, w) {
+	// 	return
+	// }
 
-	/* ----------------------------- Get user_id from DB ----------------------------- */
-	queryErr := stmt.QueryRow(token.Value).Scan(&comment.UserId)
-	if utils.HandleError(utils.Error{Err: queryErr, Code: http.StatusInternalServerError}, w) {
-		return
-	}
-
+	// /* ----------------------------- Get user_id from DB ----------------------------- */
+	// queryErr := stmt.QueryRow(token.Value).Scan(&comment.UserId)
+	// if utils.HandleError(utils.Error{Err: queryErr, Code: http.StatusInternalServerError}, w) {
+	// 	return
+	// }
+	comment.UserId = TakeuserId(token.Value)
 	/* ----------------------------- Handle comment data ----------------------------- */
 	comment.Comment = strings.TrimSpace(r.FormValue("comment"))
 	if len(comment.Comment) < 1 || len(comment.Comment) > 500 {
@@ -53,7 +54,7 @@ func NewComment(w http.ResponseWriter, r *http.Request) {
 
 	/* ----------------------------- Prepare create comment query ----------------------------- */
 	query := `INSERT INTO comments(user_id,post_id,comment) VALUES (?,?,?);`
-	stmt, stmt_err = utils.DB.Prepare(query)
+	stmt, stmt_err := utils.DB.Prepare(query)
 	if utils.HandleError(utils.Error{Err: stmt_err, Code: http.StatusInternalServerError}, w) {
 		return
 	}

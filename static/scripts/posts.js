@@ -1,4 +1,4 @@
-import { HandulLike } from "./like.js";
+import { CreatPost, HandulLike } from "./like.js";
 
 export async function addEventOnPosts(path) {
   document.addEventListener("DOMContentLoaded", function () {
@@ -67,7 +67,7 @@ function handleComment(postId, comment) {
       let commentElement = document.querySelector(comment_form);
       GetComments(postId, commentElement);
     })
-    .catch((error) => alert("Error submitting comment:", error));
+    .catch((error) => window.location.href = "/login");
 }
 
 let offset = 0;
@@ -97,7 +97,7 @@ export async function loadMorePosts(path) {
   }
 }
 
-function createPosts(posts) {
+export function createPosts(posts) {
   const postsContainer = document.getElementById("posts-container");
   posts.forEach((post) => {
     const postElement = createEle("div", "post-container");
@@ -222,7 +222,7 @@ function createPosts(posts) {
   });
 }
 
-function formDate(date) {
+export function formDate(date) {
   let CreattionDate = new Date(date).getTime();
   const currentTime = Date.now();
   const elapsed = currentTime - CreattionDate;
@@ -245,7 +245,7 @@ function formDate(date) {
   return timeText;
 }
 
-function createEle(elename, className) {
+export function createEle(elename, className) {
   const ele = document.createElement(elename);
   ele.className = className;
   return ele;
@@ -285,7 +285,8 @@ if (form) {
   form.addEventListener("submit", async function (event) {
     event.preventDefault();
     // Declare validation flags
-    let isValidTitle = true;
+    const postsContainer = document.getElementById("posts-container");
+    let isValidTitle = false;
     let isValidContent = false;
     let isValidCheckboxes = false;
 
@@ -296,12 +297,31 @@ if (form) {
 
     // Get selected checkboxes
     let checkboxes = document.querySelectorAll('input[name="options"]:checked');
+
+
     checkboxes.forEach((checkbox) => {
       categoryName.push(checkbox.getAttribute("data-name"));
     });
 
+    if (Title === "") {
+      document.getElementById("errorTitle").innerHTML = "Title is required";
+      document.getElementById("errorTitle").style.color = "red";
+      isValidTitle = false;
+    } else if (Title.length > 100) {
+      document.getElementById("errorTitle").innerHTML = "max title is 100";
+      document.getElementById("errorTitle").style.color = "red";
+      isValidTitle = false;
+    } else {
+      document.getElementById("errorTitle").innerHTML = "";
+      isValidTitle = true;
+    }
+
     if (Content === "") {
       document.getElementById("errorContent").innerHTML = "Content is required";
+      document.getElementById("errorContent").style.color = "red";
+      isValidContent = false;
+    } else if (Content.length > 1000) {
+      document.getElementById("errorContent").innerHTML = "max Content 1000";
       document.getElementById("errorContent").style.color = "red";
       isValidContent = false;
     } else {
@@ -334,7 +354,11 @@ if (form) {
         });
 
         if (res.ok) {
-          window.location.href = res.url;
+          const post = await res.json();
+          const div = CreatPost(post);
+          postsContainer.prepend(div);
+          form.style.display = "none";
+          layout.style.display = "none";
         }
       } catch (error) {
         alert("Error: " + error.message);

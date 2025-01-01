@@ -13,27 +13,23 @@ import (
 func LikedPosts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	limit := r.URL.Query().Get("limit")
 	offset := r.URL.Query().Get("offset")
 
 	limitInt := 20
 	offsetInt := 0
-	if l, err := strconv.Atoi(limit); err == nil {
-		limitInt = l
-	}
 	if o, err := strconv.Atoi(offset); err == nil {
 		offsetInt = o
 	}
 	cookie, err := r.Cookie("token")
 	if err != nil {
-		w.WriteHeader(http.StatusNonAuthoritativeInfo)
-		json.NewEncoder(w).Encode(map[string]string{"error": http.StatusText(http.StatusNonAuthoritativeInfo)})
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"error": http.StatusText(http.StatusUnauthorized)})
 		return
 	}
 	userid := TakeuserId(cookie.Value)
 	if userid < 1 {
-		w.WriteHeader(http.StatusNonAuthoritativeInfo)
-		json.NewEncoder(w).Encode(map[string]string{"error": http.StatusText(http.StatusNonAuthoritativeInfo)})
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{"error": http.StatusText(http.StatusUnauthorized)})
 		return
 	}
 	query := `

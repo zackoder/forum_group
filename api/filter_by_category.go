@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 	"strconv"
 	"strings"
@@ -38,7 +37,7 @@ func FilterByCategory(w http.ResponseWriter, r *http.Request) {
 		SELECT p.id,p.user_id,p.title,p.content,p.categories,p.date, u.username
 		FROM posts p JOIN posts_categories pc
 		ON p.id = pc.post_id AND pc.category_id = ? 
-		JOIN users u ON u.id = p.user_id LIMIT ? OFFSET ?;
+		JOIN users u ON u.id = p.user_id  ORDER BY p.id DESC LIMIT ? OFFSET ?;
 	`
 	stmt, stmt_err := utils.DB.Prepare(query)
 	if utils.HandleError(utils.Error{Err: stmt_err, Code: http.StatusInternalServerError}, w) {
@@ -61,14 +60,7 @@ func FilterByCategory(w http.ResponseWriter, r *http.Request) {
 		posts = append(posts, p)
 	}
 
-	/* -------------------------- handle error no content -------------------------- */
-	if len(posts) == 0 {
-		err := errors.New("no posts")
-		if utils.HandleError(utils.Error{Err: err, Code: http.StatusNoContent}, w) {
-			return
-		}
-	}
-	/* -------------------------- Set result in json response -------------------------- */
+	/* -------------------- Set result in json response -------------------------- */
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(posts)

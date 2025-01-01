@@ -47,12 +47,8 @@ func FetchPosts(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 		post.Categories = strings.Split(categories, ",")
-
-		if err := utils.DB.QueryRow("SELECT username FROM users WHERE id = ?", user_id).Scan(&post.UserName); err != nil {
-			continue
-		}
+		post.UserName, _ = GetUsername(user_id)
 		post.Reactions = GetReaction(userid, post.Id, "post_id")
-
 		posts = append(posts, post)
 	}
 	w.Header().Set("Content-Type", "application/json")

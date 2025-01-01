@@ -24,7 +24,7 @@ func CommentReaction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	/* select user_id from database */
-	get_user := `SELECT user_id FROM sessions WHERE token= ? LIMIT 1`
+	get_user := `SELECT user_id FROM sessions WHERE token= ?`
 	stm, stm_err := utils.DB.Prepare(get_user)
 	if utils.HandleError(utils.Error{Err: stm_err, Code: http.StatusInternalServerError}, w) {
 		return

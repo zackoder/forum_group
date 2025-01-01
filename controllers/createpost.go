@@ -16,6 +16,13 @@ type Error struct {
 }
 
 func CreatePost(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		err := Error{Message: "Not Allowed", Code: http.StatusMethodNotAllowed}
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		json.NewEncoder(w).Encode(err)
+		return
+	}
+	post := utils.PostsResult{}
 	cookie, err := r.Cookie("token") // Name the Cookie
 	if err != nil {
 		err := Error{Message: "Unauthorized", Code: http.StatusUnauthorized}
@@ -28,10 +35,21 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println(err)
 	}
+	Categoriesid := []int{}
+	post.Categories = strings.Split(r.FormValue("options"), ",")
+	post.Content = r.FormValue("Content")
+	post.Title = r.FormValue("Title")
+	for _, categ := range post.Categories {
+		categid := api.TakeCategories(categ)
+		if categid < 1 {
+			err := Error{Message: "Title or Content is more than expact", Code: http.StatusBadRequest}
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(err)
+			return
+		}
+		Categoriesid = append(Categoriesid, categid)
+	}
 
-	title := r.FormValue("Title")
-	content := r.FormValue("Content")
-	categories := strings.Split(r.FormValue("options"), ",")
 	var userId int
 
 	err = utils.DB.QueryRow("SELECT user_id FROM sessions WHERE token = ?", cookie.Value).Scan(&userId)
@@ -42,15 +60,21 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	title = strings.TrimSpace(title)
-	content = strings.TrimSpace(content)
-	if title == "" || content == "" {
+	post.Title = strings.TrimSpace(post.Title)
+	post.Content = strings.TrimSpace(post.Content)
+	if post.Title == "" || post.Content == "" {
 		err := Error{Message: "Title or Content is empty", Code: http.StatusBadRequest}
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(err)
 		return
 	}
-	result, err := utils.DB.Exec("INSERT INTO posts(user_id, title, content, categories) VALUES(?, ?, ?, ?)", userId, title, content, strings.Join(categories, ","))
+	if len(post.Title) > 100 || len(post.Content) > 1000 {
+		err := Error{Message: "Title or Content is more than expact", Code: http.StatusBadRequest}
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(err)
+		return
+	}
+	result, err := utils.DB.Exec("INSERT INTO posts(user_id, title, content, categories) VALUES(?, ?, ?, ?)", userId, post.Title, post.Content, strings.Join(post.Categories, ","))
 	if err != nil {
 		err := Error{Message: "can insert in base donne", Code: http.StatusUnauthorized}
 		w.WriteHeader(http.StatusUnauthorized)
@@ -66,16 +90,9 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(err)
 		return
 	}
-	for _, categ := range categories {
-		category_id := api.TakeCategories(categ)
-		if category_id < 1 {
-			fmt.Println(err, categ)
-			err := Error{Message: "Bad Request", Code: http.StatusBadRequest}
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(err)
-			return
-		}
-		_, err = utils.DB.Exec("INSERT INTO posts_categories(post_id, category_id) VALUES(?, ?)", last_post_id, category_id) // GetLast id in table posts
+	post.Id = int(last_post_id)
+	for _, categ := range Categoriesid {
+		_, err = utils.DB.Exec("INSERT INTO posts_categories(post_id, category_id) VALUES(?, ?)", post.Id, categ) // GetLast id in table posts
 		if err != nil {
 			err := Error{Message: "Bad Request", Code: http.StatusInternalServerError}
 			w.WriteHeader(http.StatusBadRequest)
@@ -83,5 +100,5 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	json.NewEncoder(w).Encode(post)
 }

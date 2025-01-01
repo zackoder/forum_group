@@ -27,7 +27,6 @@ body {
   position: absolute;
   top: 90px;
   left: 50%;
-  max-width: 500px;
   width: 90%;
   transform: translateX(-50%);
   list-style: none;

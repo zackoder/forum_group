@@ -11,3 +11,4 @@ func CheckPost(postId int) bool {
 	return err != nil
 }
 
+
