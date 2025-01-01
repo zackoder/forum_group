@@ -9,11 +9,16 @@ export async function addEventOnPosts(path) {
 
     postsContainer.addEventListener("submit", function (event) {
       const postElement = event.target.closest(".post-container");
+      const CommentClass = document.querySelector(".see_comments");
+      CommentClass.disabled = true;
+      console.log(CommentClass);
       if (event.target.classList.contains("comment_form")) {
         event.preventDefault();
         const form = event.target;
 
         const postId = postElement.getAttribute("data-post-id");
+       
+
         const commentText = form.querySelector(".comment").value.trim();
 
         if (commentText === "") {
@@ -21,9 +26,12 @@ export async function addEventOnPosts(path) {
           return;
         }
 
+
+
         handleComment(postId, commentText);
         form.reset();
       }
+
     });
 
     postsContainer.addEventListener("click", function (event) {
