@@ -77,7 +77,7 @@ func InitTables(db *sql.DB) {
 			FOREIGN KEY (category_id) REFERENCES categories(id)
 		);
 
-		INSERT INTO categories(name) VALUES ("developpment"),("technology"),("news") ON CONFLICT (name) DO NOTHING;
+		INSERT INTO categories(name) VALUES ("Dev"),("Tech"),("News"), ("Gaming"), ("Music") ON CONFLICT (name) DO NOTHING;
 	`
 	_, err := db.Exec(query)
 	if err != nil {
