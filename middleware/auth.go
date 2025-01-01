@@ -8,6 +8,12 @@ import (
 
 func Authorization(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		defer func() {
+			if err := recover(); err != nil {
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+				// Optionally log the error for debugging purposes
+			}
+		}()
 		token, err := r.Cookie("token")
 		if err != nil {
 			http.Redirect(w, r, "/login", http.StatusSeeOther)

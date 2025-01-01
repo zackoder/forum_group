@@ -16,7 +16,6 @@ type Error struct {
 }
 
 func CreatePost(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(r.Method)
 	if r.Method != http.MethodPost {
 		err := Error{Message: "Not Allowed", Code: http.StatusMethodNotAllowed}
 		w.WriteHeader(http.StatusMethodNotAllowed)
@@ -36,10 +35,21 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println(err)
 	}
-
-	post.Title = r.FormValue("Title")
-	post.Content = r.FormValue("Content")
+	Categoriesid := []int{}
 	post.Categories = strings.Split(r.FormValue("options"), ",")
+	post.Content = r.FormValue("Content")
+	post.Title = r.FormValue("Title")
+	for _, categ := range post.Categories {
+		categid := api.TakeCategories(categ)
+		if categid < 1 {
+			err := Error{Message: "Title or Content is more than expact", Code: http.StatusBadRequest}
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(err)
+			return
+		}
+		Categoriesid = append(Categoriesid, categid)
+	}
+
 	var userId int
 
 	err = utils.DB.QueryRow("SELECT user_id FROM sessions WHERE token = ?", cookie.Value).Scan(&userId)
@@ -81,16 +91,8 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	post.Id = int(last_post_id)
-	for _, categ := range post.Categories {
-		category_id := api.TakeCategories(categ)
-		if category_id < 1 {
-			fmt.Println(err, categ)
-			err := Error{Message: "Bad Request", Code: http.StatusBadRequest}
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(err)
-			return
-		}
-		_, err = utils.DB.Exec("INSERT INTO posts_categories(post_id, category_id) VALUES(?, ?)", post.Id, category_id) // GetLast id in table posts
+	for _, categ := range Categoriesid {
+		_, err = utils.DB.Exec("INSERT INTO posts_categories(post_id, category_id) VALUES(?, ?)", post.Id, categ) // GetLast id in table posts
 		if err != nil {
 			err := Error{Message: "Bad Request", Code: http.StatusInternalServerError}
 			w.WriteHeader(http.StatusBadRequest)

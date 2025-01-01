@@ -5,63 +5,7 @@ export async function addEventOnPosts(path) {
     const postsContainer = document.getElementById("posts-container");
     PostCategory();
 
-    // Event delegation for click events
-    // postsContainer.addEventListener("click", function (event) {
-    //   // const postElement = event.target.closest(".post-container");
-    //   // const commentEl = event.target.closest(".commentC");
-    //   // if (commentEl) {
-    //   //   const commentId = commentEl.getAttribute("data-comment-id");
-    //   //   if (event.target.classList.contains("like-btn-comment")) {
-    //   //     const likebnt = event.target;
-    //   //     const likenbr = likebnt.closest.classList.contains("likeNbr");
 
-    //   //     console.log(likenbr);
-
-    //   //     handleLike("comment", commentId, "like");
-    //   //   } else if (event.target.classList.contains("dislike-btn-comment")) {
-    //   //     handleLike("comment", commentId, "dislike");
-    //   //   }
-    //   // }
-    //   // const postId = postElement.getAttribute("data-post-id");
-
-    //   // if (
-    //   //   event.target.classList.contains("like-btn") ||
-    //   //   event.target.classList.contains("likeIcon")
-    //   // ) {
-    //   //   function handleLike(path, id, like) {
-    //   //     fetch(`/api/${path}/reaction/${id}`, {
-    //   //       method: "POST",
-    //   //       headers: {
-    //   //         "Content-Type": "application/x-www-form-urlencoded",
-    //   //       },
-    //   //       body: `action=${like}`,
-    //   //     })
-    //   //       .then((response) => {
-    //   //         if (response.redirected) {
-    //   //           window.location.href = "/login";
-    //   //         }
-    //   //       })
-    //   //       .catch((error) =>
-    //   //         console.error("Error updating like/dislike:", error)
-    //   //       );
-    //   //   }
-    //   //   handleLike("posts", postId, "like");
-    //   //   const likebnt = event.target;
-    //   //   const likenbr = likebnt.parentElement.querySelector(".likeNbr");
-
-    //   //   console.log(likenbr);
-    //   // } else if (
-    //   //   event.target.classList.contains("dislike-btn") ||
-    //   //   event.target.classList.contains("dislikeIcon")
-    //   // ) {
-    //   //   handleLike("posts", postId, "dislike");
-    //   // }
-    //   // if (event.target.classList.contains("like-btn-comment")) {
-    //   //   handleLike("comment", commentId, "like");
-    //   // } else if (event.target.classList.contains("dislike-btn-comment")) {
-    //   //   handleLike("comment", commentId, "dislike");
-    //   // }
-    // });
 
     postsContainer.addEventListener("submit", function (event) {
       const postElement = event.target.closest(".post-container");
