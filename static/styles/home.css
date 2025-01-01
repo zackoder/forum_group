@@ -40,7 +40,6 @@
 .title {
   width: 100%;
   align-self: self-start;
-  padding-left: 5%;
   word-wrap: break-word;
   font-size: 20px;
 }
@@ -59,11 +58,13 @@
 .post-container .pc {
   position: relative;
   border-radius: 8px;
-  padding: 3% 20px;
+  padding: 3% 0;
   margin-bottom: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 90%;
+  margin-inline: auto;
 }
 
 .post-container .pc::before,
@@ -72,8 +73,8 @@
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  width: 90%;
-  border-top: 1px solid black;
+  width: 100%;
+  border-top: 1px solid rgb(92, 92, 92);
 }
 
 .post-container .pc::before {
@@ -268,12 +269,9 @@
   margin-bottom: 5px;
   display: flex;
   flex-wrap: wrap;
+  gap: 10px;
 }
 
-.category {
-  padding: 10px;
-  /* display: inline; */
-}
 
 @media (max-width: 1024px) {
   .post-container {

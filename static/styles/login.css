@@ -18,7 +18,12 @@
 }
 
 form {
-  width: 90%;
+  padding: 0 20px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
 }
 
 .minititle {
@@ -26,18 +31,19 @@ form {
 }
 
 .lbl {
+  align-self: flex-start;
   font-size: 25px;
   color: #2867c5;
   display: block;
 }
 
 .impt {
-  height: 35px;
-  width: 90%;
+  height: 40px;
+  width: 100%;
   border: #2867c5 solid 1px;
   border-radius: 25px;
-  margin: 3% 0;
-  padding-left: 4%;
+  padding: 10px 4%;
+  font-size: 1.2rem;
 }
 
 .submit {

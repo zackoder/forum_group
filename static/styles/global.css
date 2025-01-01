@@ -41,13 +41,15 @@ body {
 }
 
 .category {
+  font-weight: 600;
   text-decoration: none;
   border-radius: 20px;
-  padding: 10px;
+  padding: 5px 10px;
   color: black;
   transition: color 300ms ease;
   font-size: 1.2rem;
   font-family: Arial, sans-serif;
+  border: 1px solid black ;
 }
 
 .category:hover {
