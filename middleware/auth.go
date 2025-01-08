@@ -12,7 +12,7 @@ var (
 	rateLimitData = make(map[string]*RateLimitInfo)
 	mu            sync.Mutex
 	rateLimit     = 10
-	rateInterval  = time.Second
+	rateInterval  = time.Second * 2
 )
 
 type RateLimitInfo struct {
